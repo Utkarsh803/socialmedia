@@ -1,0 +1,35 @@
+.PostTools {
+    position:inherit;
+    background-color: black;
+    display: flex;
+    flex-direction: row;
+    width: 97%;
+    height:fit-content;
+    margin-top: -1%;
+    padding-left: 3%;
+    
+}
+
+
+.PostTools .icons{
+    position: relative;
+    background-color: black;
+    height: 100%;
+    width:5%;
+    margin-right:5%;
+    
+}
+
+.PostTools .save{
+    position: relative;
+    background-color: black;
+    height: 100%;
+    width:5%;
+   width: 5%;
+   margin-top: 3%;
+}
+
+.PostTools .space{
+    background-color: black;
+    width: 62%;
+}

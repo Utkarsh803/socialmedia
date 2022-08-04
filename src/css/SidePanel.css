@@ -1,0 +1,19 @@
+.SidePanel{
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    width: 30%;
+    height: 40vh;
+    border-radius: 6%;
+    margin-left: 63%;
+    margin-top: 2%;
+    padding: 2%;
+}
+
+.SidePanel .trend{
+    position: relative;
+    background-color: black;
+    text-align: center;
+    font-size: larger;
+}
