@@ -7,7 +7,7 @@ import {auth} from './firebase-config';
 import {db} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc} from 'firebase/firestore';
 import { BrowserRouter as Router, Switch, 
-    Route,Outlet, Link ,Redirect,} from "react-router-dom";
+    Route,Outlet, Link ,Redirect, useNavigate} from "react-router-dom";
 
 function Login() {
 
@@ -17,28 +17,9 @@ function Login() {
     const [loginPassword, setLoginPassword]=useState("");
     const [userId, setUserId]=useState("");
     const [name, setUserName]=useState("");
-    const [loaded, setLoaded]=useState(true);
-    const [loggedIn, setLoggedIn]=useState(true);
-    
-
     const [user, setUser] = useState({});
 
-    useEffect(() => {
-    onAuthStateChanged(auth, (currentUser)=>{
-            if(currentUser)
-            {
-                setUser(currentUser);
-                setLoaded(true);
-                setLoggedIn(true);
-            }
-            else
-            {
-                setUser("");
-                setLoggedIn(false);
-                setLoaded(true);
-            }
-         //   window.location='App.js';
-    });},[]);
+
 
     const register = async () =>
     {
@@ -79,6 +60,7 @@ function Login() {
         {
             const user = await signInWithEmailAndPassword(auth, loginEmail, loginPassword );
             setUserId(auth.currentUser.uid);
+        
             console.log(user);
         } 
         catch(error)
@@ -92,17 +74,10 @@ function Login() {
             await signOut(auth);
 
     }
-    if(!loaded){
-        return(
-            <div >
-                <h1>Loading</h1>
-            </div>
-        )
-    }
+
 
     return (<div className="Login">
-    {user ? (<Home></Home>):
-    ( 
+    
     <div>    
     <div className='divider'>
     <div className="half">
@@ -125,7 +100,7 @@ function Login() {
     </div>
     </div>
     </div>
-    )}
+    
 
     </div>);
 }

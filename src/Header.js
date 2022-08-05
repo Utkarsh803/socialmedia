@@ -7,6 +7,8 @@ import logo from'./mslogo.jpg';
 import {useState, useEffect} from "react";
 import {db} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc} from 'firebase/firestore';
+import { useNavigate } from "react-router-dom";
+import Settings from './Settings';
 
 function Header({handleLogout, name}) {
 
@@ -16,6 +18,21 @@ function Header({handleLogout, name}) {
   const[image, SetImage]=useState();
   const[next, SetNext]=useState(false);
   const[caption, SetCaption]=useState(null);
+
+  let navigate = useNavigate(); 
+
+  function goToMyProfile() {
+    navigate("/myprofile");
+  }
+
+  function goToSettings() {
+    navigate("/settings");
+  }
+
+  function goToHome() {
+    navigate("/");
+  }
+
 
 
   function handleButtonProfileMenu() {
@@ -64,7 +81,7 @@ function Header({handleLogout, name}) {
     <img src={logo} className="logo" />
     <input placeholder='search...'></input>
     
-    <AiOutlineHome className='icons'/>
+    <AiOutlineHome className='icons' onClick={goToHome}/>
     
     <BiImageAdd className='icons'  onClick={handleButtonAddPost}/>
     {addPost && (
@@ -106,8 +123,8 @@ function Header({handleLogout, name}) {
     {profileMenu && (
     <div class="dropdown">
       <ul>
-        <button className='selection'> <CgProfile className='selectionIcon'/>  My Profile</button>
-        <button className='selection'><AiFillSetting className='selectionIcon' />  Settings</button>
+        <button className='selection'  onClick={goToMyProfile}> <CgProfile className='selectionIcon'/>  My Profile</button>
+        <button className='selection' onClick={goToSettings}><AiFillSetting className='selectionIcon' />  Settings</button>
         <button className='selection'><FaRegBookmark className='selectionIcon' /> Saved</button>
         <button className='selection'><BiHelpCircle className='selectionIcon'/>  Help Center</button>
         <button className='selection' onClick={handleLogout}>Logout</button>

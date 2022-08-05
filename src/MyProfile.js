@@ -10,7 +10,7 @@ import {signOut, onAuthStateChanged} from "firebase/auth";
 
 
 
-function Home() {
+function MyProfile() {
 
   const [userId, setUserId]=useState("");
     const [name, setUserName]=useState("");
@@ -33,13 +33,9 @@ function Home() {
     <nav>
     <div className='divider'>
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
-    <div className='pagehaedspace'>
-    <Post handleLogout={logout} name={auth.currentUser.email} ></Post>
-    </div>
-    <SidePanel/>
     </div>
     </nav>
   </div>);
 }
 
-export default Home;
+export default  MyProfile;
