@@ -9,6 +9,13 @@ import {signOut, onAuthStateChanged} from "firebase/auth";
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import {FaUserAltSlash, FaBellSlash} from 'react-icons/fa';
+import {MdOutlineBlock} from 'react-icons/md';
 
 import { alpha, styled } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
@@ -16,6 +23,7 @@ import InputLabel from '@mui/material/InputLabel';
 import { TextFieldProps } from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import { OutlinedInputProps } from '@mui/material/OutlinedInput';
+import { SmoothCorners } from 'react-smooth-corners'
 
 
 
@@ -25,7 +33,7 @@ import { OutlinedInputProps } from '@mui/material/OutlinedInput';
 function Settings() {
 
   const [userId, setUserId]=useState("");
-    const [name, setUserName]=useState("");
+    const [name, setName]=useState("");
     const [loaded, setLoaded]=useState(true);
     const [loggedIn, setLoggedIn]=useState(true);
     const [editProfile, SetEditProfile]=useState(true);
@@ -34,6 +42,15 @@ function Settings() {
     const [privacy, SetPrivacy]=useState(false);
     const [security, SetSecurity]=useState(false);
     const [loginActivity, SetLoginActivity]=useState(false);
+    
+    const [username, SetUserName]=useState("");
+    const [website, SetWebsite]=useState("");
+    const [bio, SetBio]=useState("");
+    const [phone, SetPhone]=useState("");
+    const [email, SetEmail]=useState("");
+    const [gender, SetGender]=useState("");
+
+
     
 
     const [user, setUser] = useState({});
@@ -47,6 +64,8 @@ function Settings() {
         
 
   }
+
+  const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
   const handleButtonEditProfile = () =>
   {
@@ -74,8 +93,8 @@ function Settings() {
   const handleButtonEmailAndSms = () =>
   {
           SetEditProfile(false);
+          SetPasswordReset(false);
           SetEmailAndSms(true);
-          SetEmailAndSms(false);
           SetPrivacy(false);
           SetSecurity(false);
           SetLoginActivity(false);
@@ -87,7 +106,7 @@ function Settings() {
     SetEditProfile(false);
           SetPrivacy(true);
           SetEmailAndSms(false);
-          SetPrivacy(false);
+          SetPasswordReset(false);
           SetSecurity(false);
           SetLoginActivity(false);
         
@@ -99,7 +118,7 @@ function Settings() {
           SetSecurity(true);
           SetEmailAndSms(false);
           SetPrivacy(false);
-          SetSecurity(false);
+          SetPasswordReset(false);
           SetLoginActivity(false);
         
 
@@ -111,9 +130,13 @@ function Settings() {
           SetEmailAndSms(false);
           SetPrivacy(false);
           SetSecurity(false);
-          SetLoginActivity(false);
+          SetPasswordReset(false);
         
 
+  }
+  const handleInputName=(e)=>{
+    setName(e);
+    console.log(name);
   }
 
   const RedditTextField = styled((props) => (
@@ -122,6 +145,7 @@ function Settings() {
     '& .MuiFilledInput-root': {
       border: '1px solid #e2e2e1',
       borderColor: theme.palette.primary.main,
+      width:220,
       overflow: 'hidden',
       borderRadius: 4,
       backgroundColor: 'white',
@@ -130,12 +154,17 @@ function Settings() {
         'border-color',
         'background-color',
         'box-shadow',
-      ])},
+      ])}
   }));
   
   
 
- 
+  const buttons = [
+    <Button key="one">One</Button>,
+    <Button key="two">Two</Button>,
+    <Button key="three">Three</Button>,
+  ];
+
   return (<div className="Settings">
     <nav>
     <div className='divider'>
@@ -154,6 +183,7 @@ function Settings() {
     <div className="formContainer">
         <div className='username'>{auth.currentUser.email}</div>
         <button className='changePicButton'>Change Profile Photo</button>
+        
     <Box
       component="form"
       sx={{
@@ -166,34 +196,37 @@ function Settings() {
         <div className='formInputs'>
 
         <RedditTextField
-        label="Name"
-        defaultValue="Utkarsh"
+        label="Name *"
+        defaultValue=""
         id="reddit-input"
         variant="filled"
-        style={{ marginTop: 11 }}
+        style={{ marginTop: 0 }}
         InputLabelProps={{
             style: { color: 'black' ,backgroundColor: 'white'},
           }}
         size="small"
+        onChange={(event)=>handleInputName(event.target.value)}
+
       />
 
 <RedditTextField
-        label="Userame"
+        label="Userame *"
         defaultValue="Utkarsh"
         id="reddit-input"
         variant="filled"
-        style={{ marginTop: 11 }}
+        style={{ marginTop: 0 }}
         InputLabelProps={{
             style: { color: 'black' ,backgroundColor: 'white'},
           }}
         size="small"
+
       />
         <RedditTextField
         label="Website"
         defaultValue=""
         id="reddit-input"
         variant="filled"
-        style={{ marginTop: 11 }}
+        style={{ marginTop: 0 }}
         InputLabelProps={{
             style: { color: 'black' ,backgroundColor: 'white'},
           }}
@@ -204,7 +237,7 @@ function Settings() {
         defaultValue="YOLO"
         id="reddit-input"
         variant="filled"
-        style={{ marginTop: 11 }}
+        style={{ marginTop: 0 }}
         InputLabelProps={{
             style: { color: 'black' ,backgroundColor: 'white'},
           }}
@@ -215,22 +248,22 @@ function Settings() {
         
       />
                 <RedditTextField
-        label="Number"
+        label="Number *"
         defaultValue=""
         id="reddit-input"
         variant="filled"
-        style={{ marginTop: 11 }}
+        style={{ marginTop: 0}}
         InputLabelProps={{
             style: { color: 'black' ,backgroundColor: 'white'},
           }}
         size="small"
       />
                 <RedditTextField
-        label="Email"
+        label="Email *"
         defaultValue=""
         id="reddit-input"
         variant="filled"
-        style={{ marginTop: 11 }}
+        style={{ marginTop: 0 }}
         InputLabelProps={{
             style: { color: 'black' ,backgroundColor: 'white'},
           }}
@@ -241,7 +274,7 @@ function Settings() {
         defaultValue=""
         id="reddit-input"
         variant="filled"
-        style={{ marginTop: 11 }}
+        style={{ marginTop: 0 }}
         InputLabelProps={{
             style: { color: 'black' ,backgroundColor: 'white'},
           }}
@@ -270,7 +303,6 @@ function Settings() {
         id="reddit-input"
         variant="filled"
         style={{ marginTop: 11 }}
-        
         InputLabelProps={{
             style: { color: 'black' ,backgroundColor: 'white'},
           }}
@@ -300,10 +332,89 @@ function Settings() {
           }}
         size="small"
       />
-        <button className='submit'>Submit</button>
+        <button className='submitResetPassword'>Submit</button>
       </div>
     </Box>
     </div>)}
+    {emailAndSms && (
+    <div className="formContainerEmailandSms">
+    <Box
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1, width: '25ch' },
+         
+      }}
+      noValidate
+      autoComplete="off"
+    >
+        <div className='formInputsColumnEmailAndSms'>
+        <div className='row'>
+        <input type='checkbox' className="shiftup"></input>
+        <div className='column'>
+        <div className='bgblackbig'>Email</div>
+        <div className='bgblacksmall'> Receive important emails from our app</div>
+        </div>
+        </div>
+        <div className='row'>
+        <input type='checkbox' className="shiftup"></input>
+        <div className='column'>
+        <div className='bgblackbig'>SMS</div>
+        <div className='bgblacksmall'> Receive important SMS from our app. </div>
+        </div>
+        </div>
+      </div>
+    </Box>
+    </div>)}
+    {privacy && (
+    <div className="formContainerEmailandSms">
+    <Box
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1, width: '25ch' },
+         
+      }}
+      noValidate
+      autoComplete="off"
+    >
+        <div className='formInputsColumnEmailAndSms'>
+        <div className='row'>
+        <input type='checkbox' className="shiftup"></input>
+        <div className='column'>
+        <div className='bgblackbig'>Private Account</div>
+        <div className='bgblacksmall'> Only share posts with people who follow you.</div>
+        </div>
+        </div>
+        <div className='margin-top'>
+        <button className='full-wide-netral' ><FaUserAltSlash className='buttonIcon'></FaUserAltSlash>Restricted Accounts</button>
+        <button className='full-wide-netral'><MdOutlineBlock className='buttonIcon'></MdOutlineBlock>Blocked Accounts</button>
+        <button className='full-wide-netral'>< FaBellSlash className='buttonIcon'></FaBellSlash>Muted Accounts</button>
+        </div>
+      </div>
+    </Box>
+    </div>)}
+    {security && (
+    <div className="formContainerEmailandSms">
+    <Box
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1, width: '25ch' },
+         
+      }}
+      noValidate
+      autoComplete="off"
+    >
+        <div className='formInputsColumnEmailAndSms'>
+        <div className='row'>
+        <input type='checkbox' className="shiftup"></input>
+        <div className='column'>
+        <div className='bgblackbig'>Two Factor Authentication</div>
+        <div className='bgblacksmall'>Receive OTP whenever you sign in.</div>
+        </div>
+        </div>
+      </div>
+    </Box>
+    </div>)}
+
     </div>
     </nav>
   </div>);

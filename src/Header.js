@@ -2,7 +2,7 @@ import './css/Header.css';
 import {CgProfile} from 'react-icons/cg';
 import { AiOutlineHeart,AiOutlineHome, AiFillSetting, AiOutlineVideoCameraAdd,AiOutlineCloseCircle} from 'react-icons/ai';
 import {BiImageAdd, BiMessageRounded, BiHelpCircle} from 'react-icons/bi';
-import {FaRegBookmark }from 'react-icons/fa';
+import {FaRegBookmark , FaUserAltSlash}from 'react-icons/fa';
 import logo from'./mslogo.jpg';
 import {useState, useEffect} from "react";
 import {db} from './firebase-config';
