@@ -4,7 +4,7 @@ import Post from'./Post.js';
 import SidePanel from './SidePanel';
 import {useState, useEffect } from "react";
 import {db, auth} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc} from 'firebase/firestore';
 import {signOut, onAuthStateChanged} from "firebase/auth";
 import * as React from 'react';
 import Box from '@mui/material/Box';
@@ -16,6 +16,7 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import {FaUserAltSlash, FaBellSlash} from 'react-icons/fa';
 import {MdOutlineBlock} from 'react-icons/md';
+import Spinner from './Spinner';
 
 import { alpha, styled } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
@@ -34,7 +35,7 @@ function Settings() {
 
   const [userId, setUserId]=useState("");
     const [name, setName]=useState("");
-    const [loaded, setLoaded]=useState(true);
+    
     const [loggedIn, setLoggedIn]=useState(true);
     const [editProfile, SetEditProfile]=useState(true);
     const [passwordReset, SetPasswordReset]=useState(false);
@@ -49,13 +50,34 @@ function Settings() {
     const [phone, SetPhone]=useState("");
     const [email, SetEmail]=useState("");
     const [gender, SetGender]=useState("");
+    const [user, setUser] = useState('');
+  const [value, setValue] = React.useState('Controlled');
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const docRef = doc(db, "users", auth.currentUser.uid);
 
 
-    
+  useEffect(()=>{
+    const getUsersData = async () => {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setName(docSnap.data().name);
+        SetUserName(docSnap.data().username);
+        SetBio(docSnap.data().bio);
+        SetPhone(docSnap.data().phone);
+        SetEmail(docSnap.data().email);
+        SetGender(docSnap.data().gender);
+        SetWebsite(docSnap.data().website);
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+  };
 
-    const [user, setUser] = useState({});
+  getUsersData();
+  }, [] );
 
-    const [value, setValue] = React.useState('Controlled');
 
 
   const logout = async () =>
@@ -112,6 +134,7 @@ function Settings() {
         
 
   }
+
   const handleButtonSecurity = () =>
   {
     SetEditProfile(false);
@@ -120,8 +143,6 @@ function Settings() {
           SetPrivacy(false);
           SetPasswordReset(false);
           SetLoginActivity(false);
-        
-
   }
   const handleButtonLoginActivity = () =>
   {
@@ -134,29 +155,36 @@ function Settings() {
         
 
   }
+
   const handleInputName=(e)=>{
     setName(e);
     console.log(name);
   }
-
-  const RedditTextField = styled((props) => (
-    <TextField InputProps={{ disableUnderline: true }} {...props} />
-  ))(({ theme }) => ({
-    '& .MuiFilledInput-root': {
-      border: '1px solid #e2e2e1',
-      borderColor: theme.palette.primary.main,
-      width:220,
-      overflow: 'hidden',
-      borderRadius: 4,
-      backgroundColor: 'white',
-      boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 2px`,
-      transition: theme.transitions.create([
-        'border-color',
-        'background-color',
-        'box-shadow',
-      ])}
-  }));
   
+  const handleInputUsername=(e)=>{
+    SetUserName(e);
+    console.log(username);
+  }
+  const handleInputBio=(e)=>{
+    SetBio(e);
+    console.log(bio);
+  }
+  const handleInputPhone=(e)=>{
+    SetPhone(e);
+    console.log(phone);
+  }
+  const handleInputEmail=(e)=>{
+    SetEmail(e);
+    console.log(email);
+  }
+  const handleInputGender=(e)=>{
+    SetGender(e);
+    console.log(gender);
+  }
+  const handleInputWebsite=(e)=>{
+    SetWebsite(e);
+    console.log(gender);
+  }
   
 
   const buttons = [
@@ -164,6 +192,38 @@ function Settings() {
     <Button key="two">Two</Button>,
     <Button key="three">Three</Button>,
   ];
+
+
+
+  const addProfileInfo = async () =>
+  {
+    setIsLoading(true);  
+      try
+       {  
+          await setDoc(doc(db, "users", auth.currentUser.uid), {
+              name: name,
+              username:username,
+              email: email,
+              phone:phone,
+              bio:bio,
+              gender:gender,
+              website:website,
+              });
+              setIsLoading(false);
+              showAlert();
+            } 
+      catch(error)
+      {
+          console.log(error.message);
+          setIsLoading(false);
+      }
+  }
+
+    const showAlert = () =>{
+      window.alert("Profile successfully updated!")
+    }
+
+
 
   return (<div className="Settings">
     <nav>
@@ -181,172 +241,39 @@ function Settings() {
     </div>
     {editProfile && (
     <div className="formContainer">
+        {isLoading && <Spinner/>}
         <div className='username'>{auth.currentUser.email}</div>
         <button className='changePicButton'>Change Profile Photo</button>
         
-    <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-         
-      }}
-      noValidate
-      autoComplete="off"
-    >
-        <div className='formInputs'>
-
-        <RedditTextField
-        label="Name *"
-        defaultValue=""
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 0 }}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-        onChange={(event)=>handleInputName(event.target.value)}
-
-      />
-
-<RedditTextField
-        label="Userame *"
-        defaultValue="Utkarsh"
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 0 }}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-
-      />
-        <RedditTextField
-        label="Website"
-        defaultValue=""
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 0 }}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-      />
-    <RedditTextField
-        label="Bio"
-        defaultValue="YOLO"
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 0 }}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-        multiline
-        maxRows={2}
+        <div className='formInputsColumn'>
+        <div className='bgblack'>Name :<input placeholder={name} className='formInput'></input></div>
         
-        
-      />
-                <RedditTextField
-        label="Number *"
-        defaultValue=""
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 0}}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-      />
-                <RedditTextField
-        label="Email *"
-        defaultValue=""
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 0 }}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-      />
-                <RedditTextField
-        label="Gender"
-        defaultValue=""
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 0 }}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-      />
-        <button className='submit'>Submit</button>
+        <div className='bgblack'>Username :<input placeholder={username} className='formInput' onChange={(event)=>{handleInputName(event.target.value)}}></input></div>
+        <div className='bgblack'>Website :<input placeholder={website} className='formInput' onChange={(event)=>{handleInputWebsite(event.target.value)}}></input></div>
+        <div className='bgblack'> Bio :<input placeholder={bio} className='formInputBio' onChange={(event)=>{handleInputBio(event.target.value)}}></input></div>
+        <div className='bgblack'>Number :<input placeholder={phone} className='formInput' onChange={(event)=>{handleInputPhone(event.target.value)}}></input></div>
+        <div className='bgblack'>Email :<input placeholder={email} className='formInput' onChange={(event)=>{handleInputEmail(event.target.value)}}></input></div>
+        <div className='bgblack'>Gender :<input placeholder={gender} className='formInput' onChange={(event)=>{handleInputGender(event.target.value)}}></input></div>
+        <button className='submit' onClick={addProfileInfo} disabled={isLoading}>Submit </button>
       </div>
-    </Box>
     </div>)}
     {passwordReset && (
     <div className="formContainer">
-    <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-         
-      }}
-      noValidate
-      autoComplete="off"
-    >
-        <div className='formInputsColumn'>
+  
+        <div className='formInputsColumnPasswordReset'>
     
-        <RedditTextField
-        label="Enter Old Password *"
-        defaultValue=""
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 11 }}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-      />
-                <RedditTextField
+        <input placeholder='Enter Old Password*' className='formInput'></input>
                 
-        label="Enter New Password *"
-        defaultValue=""
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 11 }}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-      />
-                <RedditTextField
                 
-        label="Confirm New Password *"
-        defaultValue=""
-        id="reddit-input"
-        variant="filled"
-        style={{ marginTop: 11 }}
-        InputLabelProps={{
-            style: { color: 'black' ,backgroundColor: 'white'},
-          }}
-        size="small"
-      />
-        <button className='submitResetPassword'>Submit</button>
+        <input placeholder='Enter New Password *'  className='formInput'></input>
+        <input placeholder='Confirm New Password *' className='formInput'></input>
+        <button className='submitResetPassword' disabled={isLoading}>Submit</button>
       </div>
-    </Box>
+
     </div>)}
     {emailAndSms && (
     <div className="formContainerEmailandSms">
-    <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-         
-      }}
-      noValidate
-      autoComplete="off"
-    >
+    
         <div className='formInputsColumnEmailAndSms'>
         <div className='row'>
         <input type='checkbox' className="shiftup"></input>
@@ -363,19 +290,11 @@ function Settings() {
         </div>
         </div>
       </div>
-    </Box>
+
     </div>)}
     {privacy && (
     <div className="formContainerEmailandSms">
-    <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-         
-      }}
-      noValidate
-      autoComplete="off"
-    >
+
         <div className='formInputsColumnEmailAndSms'>
         <div className='row'>
         <input type='checkbox' className="shiftup"></input>
@@ -390,19 +309,11 @@ function Settings() {
         <button className='full-wide-netral'>< FaBellSlash className='buttonIcon'></FaBellSlash>Muted Accounts</button>
         </div>
       </div>
-    </Box>
+    
     </div>)}
     {security && (
     <div className="formContainerEmailandSms">
-    <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-         
-      }}
-      noValidate
-      autoComplete="off"
-    >
+
         <div className='formInputsColumnEmailAndSms'>
         <div className='row'>
         <input type='checkbox' className="shiftup"></input>
@@ -412,7 +323,7 @@ function Settings() {
         </div>
         </div>
       </div>
-    </Box>
+    
     </div>)}
 
     </div>
