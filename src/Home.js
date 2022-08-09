@@ -28,13 +28,14 @@ function Home() {
 
   }
 
+
  
   return (<div className="Home">
     <nav>
     <div className='divider'>
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
     <div className='pagehaedspace'>
-    <Post handleLogout={logout} name={auth.currentUser.email} ></Post>
+    <Post name={auth.currentUser.email} ></Post>
     </div>
     <SidePanel/>
     </div>

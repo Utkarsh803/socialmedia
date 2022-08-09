@@ -6,11 +6,11 @@ import {db} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc} from 'firebase/firestore';
 import PostTools from './PostTools';
 
-function Post({handleLogout, name}) {
+function Post({postid, name, authorId, captions, comments, likes, timestamp, url}) {
   const caption = "Hello this is my first post.";
   return (<div className="Post">
     <nav>
-    <PostHeader handleLogout= {handleLogout} name = {name} ></PostHeader>
+    <PostHeader name = {name} ></PostHeader>
     <img src={logo} className="media" />
     <PostTools></PostTools>
     <div className='caption'>

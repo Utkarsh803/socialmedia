@@ -5,7 +5,7 @@ import SidePanel from './SidePanel';
 import {useState, useEffect } from "react";
 import {db, auth} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc} from 'firebase/firestore';
-import {signOut, onAuthStateChanged} from "firebase/auth";
+import {signOut, onAuthStateChanged, reauthenticateWithCredential,updatePassword, EmailAuthCredential , AuthCredential, EmailAuthProvider} from "firebase/auth";
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -17,6 +17,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import {FaUserAltSlash, FaBellSlash} from 'react-icons/fa';
 import {MdOutlineBlock} from 'react-icons/md';
 import Spinner from './Spinner';
+import { useNavigate } from "react-router-dom";
 
 import { alpha, styled } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
@@ -55,8 +56,18 @@ function Settings() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const docRef = doc(db, "users", auth.currentUser.uid);
+  const[twoFactor, SetTwoFactor]= useState(false);
+  const[privateAccount, SetPrivateAccount]= useState(false);
+  const[getEmail, SetGetEmail]= useState(false);
+  const[getSms, SetGetSms]= useState(false);
 
+  const [credential, SetCredential]=useState("");
+  const [newPass, SetnewPass]=useState("");
+  const [newPassConfirm, SetNewPassConfirm]=useState("");
+
+
+  const docRef = doc(db, "users", auth.currentUser.uid);
+  let navigate = useNavigate(); 
 
   useEffect(()=>{
     const getUsersData = async () => {
@@ -69,12 +80,15 @@ function Settings() {
         SetEmail(docSnap.data().email);
         SetGender(docSnap.data().gender);
         SetWebsite(docSnap.data().website);
+        SetGetEmail(docSnap.data().getEmail);
+        SetGetSms(docSnap.data().getSms);
+        SetPrivateAccount(docSnap.data().private);
+        SetTwoFactor(docSnap.data().twoFactor);
       } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");
       }
   };
-
   getUsersData();
   }, [] );
 
@@ -83,6 +97,7 @@ function Settings() {
   const logout = async () =>
   {
           await signOut(auth);
+          navigate("/");
         
 
   }
@@ -185,7 +200,8 @@ function Settings() {
     SetWebsite(e);
     console.log(gender);
   }
-  
+
+
 
   const buttons = [
     <Button key="one">One</Button>,
@@ -208,6 +224,10 @@ function Settings() {
               bio:bio,
               gender:gender,
               website:website,
+              getEmail:getEmail,
+              getSms:getSms,
+              private: privateAccount,
+              twoFactor: twoFactor,
               });
               setIsLoading(false);
               showAlert();
@@ -219,11 +239,128 @@ function Settings() {
       }
   }
 
+  const handleInputGetEmail= async()=>{
+    SetGetEmail(!getEmail);
+  }
+  const handleInputTwoFactor= async()=>{
+    SetTwoFactor(!twoFactor);
+  }
+  const handleInputPrivate= async()=>{
+    SetPrivateAccount(!privateAccount);
+  }
+  const handleInputGetSms= async()=>{
+    SetGetSms(!getSms);
+  }
+  
+
+  const submitGetEmail = async () =>
+  { 
+    handleInputGetEmail();
+    console.log("Email is " + getEmail);
+      try
+       {  
+        const newFields = {getEmail: getEmail};
+        await updateDoc(docRef, newFields);
+              if(getEmail===true){
+                window.alert("You have successfully signed up to receive emails");
+              }
+              else{
+                window.alert("You have opted out of receiving emails");
+              }
+            } 
+      catch(error)
+      {
+        window.alert("We had some error");
+      }
+  }
+
+  const submitGetSms = async () =>
+  { 
+    handleInputGetSms();
+      try
+       { 
+        const newFields = {getSms: getSms}; 
+        await updateDoc(docRef, newFields);
+              if(getSms){
+                window.alert("You have successfully signed up to receive Sms");
+              }
+              else{
+                window.alert("You have opted out of receiving Sms");
+              }
+            } 
+      catch(error)
+      {
+        window.alert("We had some error");
+      }
+  }
+
+  const submitPrivateAccount = async () =>
+  { 
+    handleInputPrivate();
+      try
+       {  
+        const newFields = {private: privateAccount};
+        await updateDoc(docRef, newFields);
+              if(privateAccount){
+                window.alert("You have set account to private.");
+              }
+              else{
+                window.alert("You have set account to public.");
+              }
+            } 
+      catch(error)
+      {
+        window.alert("We had some error");
+      }
+  }
+
+  const submitTwoFactor = async () =>
+  { 
+    handleInputTwoFactor();
+      try
+       {  
+        const newFields = {twoFactor: twoFactor};
+            await updateDoc(docRef, newFields);
+              if(twoFactor){
+                window.alert("You have successfully signed up for two factor authentication.");
+              }
+              else{
+                window.alert("You have opted out of two factor authentication");
+              }
+            } 
+      catch(error)
+      {
+        window.alert("We had some error");
+      }
+  }
+
     const showAlert = () =>{
       window.alert("Profile successfully updated!")
     }
 
 
+
+
+
+    const reAuth = async() =>{
+      const cred = EmailAuthProvider.credential(auth.currentUser.email, credential); 
+      reauthenticateWithCredential(auth.currentUser,cred).then(() => {
+      if(newPass==newPassConfirm){
+        updatePassword(auth.currentUser, newPassConfirm).then(() => {
+          window.alert("New password set successfully.")
+        }).catch((error) => {
+          window.alert("Could not set password.Please try again")
+          console.log(error);
+        });
+      }
+      else{
+        window.alert("New Passwords do not match.")
+      }
+    }).catch((error) => {
+      window.alert("Password Incorrect");
+      console.log(error);
+    });
+  }
 
   return (<div className="Settings">
     <nav>
@@ -237,7 +374,7 @@ function Settings() {
             <button className='sideButtons' onClick={handleButtonEmailAndSms}>Email and SMS</button>
             <button className='sideButtons' onClick={handleButtonPrivacy}>Privacy</button>
             <button className='sideButtons' onClick={handleButtonSecurity}>Security</button>
-            <button className='sideButtons' onClick={handleButtonLoginActivity}>Login Activity</button>
+            <button disabled className='sideButtons' onClick={handleButtonLoginActivity}>Login Activity {'('}Coming Soon!{')'}</button>
     </div>
     {editProfile && (
     <div className="formContainer">
@@ -262,12 +399,12 @@ function Settings() {
   
         <div className='formInputsColumnPasswordReset'>
     
-        <input placeholder='Enter Old Password*' className='formInput'></input>
+        <input placeholder='Enter Old Password*' className='formInput' onChange={(event=>{SetCredential(event.target.value)})}></input>
                 
                 
-        <input placeholder='Enter New Password *'  className='formInput'></input>
-        <input placeholder='Confirm New Password *' className='formInput'></input>
-        <button className='submitResetPassword' disabled={isLoading}>Submit</button>
+        <input placeholder='Enter New Password *'  className='formInput' onChange={(event=>{SetnewPass(event.target.value)})}></input>
+        <input placeholder='Confirm New Password *' className='formInput'  onChange={(event=>{SetNewPassConfirm(event.target.value)})}></input>
+        <button className='submitResetPassword'   onClick={reAuth}>Submit</button>
       </div>
 
     </div>)}
@@ -276,14 +413,14 @@ function Settings() {
     
         <div className='formInputsColumnEmailAndSms'>
         <div className='row'>
-        <input type='checkbox' className="shiftup"></input>
+        <input type='checkbox' checked={getEmail} className="shiftup" onChange={submitGetEmail}></input>
         <div className='column'>
-        <div className='bgblackbig'>Email</div>
+        <div className='bgblackbig' >Email</div>
         <div className='bgblacksmall'> Receive important emails from our app</div>
         </div>
         </div>
         <div className='row'>
-        <input type='checkbox' className="shiftup"></input>
+        <input type='checkbox' checked={getSms} className="shiftup" onChange={submitGetSms}></input>
         <div className='column'>
         <div className='bgblackbig'>SMS</div>
         <div className='bgblacksmall'> Receive important SMS from our app. </div>
@@ -297,7 +434,7 @@ function Settings() {
 
         <div className='formInputsColumnEmailAndSms'>
         <div className='row'>
-        <input type='checkbox' className="shiftup"></input>
+        <input type='checkbox' checked={privateAccount} className="shiftup" onChange={submitPrivateAccount}></input>
         <div className='column'>
         <div className='bgblackbig'>Private Account</div>
         <div className='bgblacksmall'> Only share posts with people who follow you.</div>
@@ -316,7 +453,7 @@ function Settings() {
 
         <div className='formInputsColumnEmailAndSms'>
         <div className='row'>
-        <input type='checkbox' className="shiftup"></input>
+        <input type='checkbox' className="shiftup" checked={twoFactor} onChange={submitTwoFactor}></input>
         <div className='column'>
         <div className='bgblackbig'>Two Factor Authentication</div>
         <div className='bgblacksmall'>Receive OTP whenever you sign in.</div>

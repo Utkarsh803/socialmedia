@@ -169,12 +169,17 @@
               .Settings .submitResetPassword{
                 position: relative;
                 width: 40%;
-                margin-top: 3%;
-                margin-left: 12%;
+                margin-top: 6%;
+                margin-left: 11.5%;
                 height: fit-content;
                 
                
                   }
+
+                  .Settings .submitResetPassword:active {
+                    vertical-align: top;
+                    padding: 8px 13px 6px;
+                }
 
           .Settings .changePicButton{
             position: relative;

@@ -7,7 +7,7 @@ import {useState, useEffect } from "react";
 import {db, auth} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc} from 'firebase/firestore';
 
-function PostHeader({handleLogout, name}) {
+function PostHeader({name}) {
 
     const[option, SetOption]=useState(false);
 
