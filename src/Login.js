@@ -44,15 +44,123 @@ function Login() {
         try
         {
             await setDoc(doc(db, "users", auth.currentUser.uid), {
+                bio:"",
+                created:0,
+                followers:0,
+                following:0,
+                gender:"",
+                getEmail:true,
+                getSms:true,
                 name: name,
+                phone:0,
+                posts:0,
+                private:false,
+                twoFactor:false,
+                username:name,
+                website:"",
                 email: registerEmail,
+                profilePic:"",
                 });
+
         } 
         catch(error)
         {
             console.log(error.message);
         }
     }
+
+    
+    const addToFollowerList = async(uid) =>{
+    try
+    {  
+      await setDoc(doc(db,  `/users/${auth.currentUser.uid}/followers`, `${uid}`), {
+        totalFollowers:0,
+       });         
+        console.log("A Follower list was created for the post: ");   
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Follower list could not be created. Try Again :("); 
+   }
+   }
+
+   
+   const addToFollowingList = async(uid) =>{
+    try
+    {  
+        await setDoc(doc(db,  `/users/${auth.currentUser.uid}/following`, `${uid}`), {
+            totalFollowing:0,
+           });        
+        console.log("A Following list was created for the post: ");   
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Following list could not be created. Try Again :("); 
+   }
+   }
+
+   
+   const addToSavedList = async(uid) =>{
+    try
+    {  
+        await setDoc(doc(db,  `/users/${auth.currentUser.uid}/saved`, `${uid}`), {
+            totalSaves:0,
+           });        
+        console.log("A Savedlist was created for the post: ");   
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Saved list could not be created. Try Again :("); 
+   }
+   }
+   const addToBlockedList = async(uid) =>{
+    try
+    {  
+      await setDoc(doc(db,  `/users/${auth.currentUser.uid}/blocked`, `${uid}`), {
+        totalBlocked:0,
+       });         
+        console.log("A Blocked list was created for the post: ");   
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Blocked list could not be created. Try Again :("); 
+   }
+   }
+
+   const addToRestricetedList = async(uid) =>{
+    try
+    {  
+      await setDoc(doc(db,  `/users/${auth.currentUser.uid}/restricted`, `${uid}`), {
+        totalRestricted:0,
+       });         
+        console.log("A Restricted list was created for the post: ");   
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Restricted list could not be created. Try Again :("); 
+   }
+   }
+
+   
+   const addToMutedList = async(uid) =>{
+    try
+    {  
+      await setDoc(doc(db,  `/users/${auth.currentUser.uid}/muted`, `${uid}`), {
+        totalMuted:0,
+       });         
+        console.log("A Muted list was created for the post: ");   
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Muted list could not be created. Try Again :("); 
+   }
+   }
 
     const login = async () =>
     {

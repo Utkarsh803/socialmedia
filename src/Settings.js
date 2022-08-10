@@ -3,29 +3,21 @@ import Header from'./Header.js';
 import Post from'./Post.js';
 import SidePanel from './SidePanel';
 import {useState, useEffect } from "react";
-import {db, auth} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc} from 'firebase/firestore';
+import {db, auth, storage} from './firebase-config';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc, serverTimestamp} from 'firebase/firestore';
 import {signOut, onAuthStateChanged, reauthenticateWithCredential,updatePassword, EmailAuthCredential , AuthCredential, EmailAuthProvider} from "firebase/auth";
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import {FaUserAltSlash, FaBellSlash} from 'react-icons/fa';
+import {AiOutlineCloseCircle} from 'react-icons/ai';
 import {MdOutlineBlock} from 'react-icons/md';
 import Spinner from './Spinner';
 import { useNavigate } from "react-router-dom";
+import Avatar from '@mui/material/Avatar';
+import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 
-import { alpha, styled } from '@mui/material/styles';
-import InputBase from '@mui/material/InputBase';
-import InputLabel from '@mui/material/InputLabel';
-import { TextFieldProps } from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
-import { OutlinedInputProps } from '@mui/material/OutlinedInput';
-import { SmoothCorners } from 'react-smooth-corners'
+import {v4} from 'uuid'
+
 
 
 
@@ -52,6 +44,11 @@ function Settings() {
     const [email, SetEmail]=useState("");
     const [gender, SetGender]=useState("");
     const [user, setUser] = useState('');
+    const [profilePic, SetProfilePic]=useState(null);
+    const [uploadProfilePic, SetUploadProfilePic]=useState(false);
+    const [profilePicFile, SetProfilePicFile]=useState(false);
+    const [preview, SetPreview]=useState(false);
+
   const [value, setValue] = React.useState('Controlled');
 
   const [isLoading, setIsLoading] = useState(false);
@@ -64,10 +61,47 @@ function Settings() {
   const [credential, SetCredential]=useState("");
   const [newPass, SetnewPass]=useState("");
   const [newPassConfirm, SetNewPassConfirm]=useState("");
+  const [percent, SetPercent]=useState(0);
+  const [url, SetUrl]=useState(null);
+  const [currentPic, SetCurrentPic]=useState(null);
+  const [currentPicUrl, SetCurrentPicUrl]=useState(null);
+
+
 
 
   const docRef = doc(db, "users", auth.currentUser.uid);
   let navigate = useNavigate(); 
+
+  const getProfilePic= async()=>{
+
+    const docRef = doc(db, "users", auth.currentUser.uid);
+    const docSnap = await getDoc(docRef);
+    
+  getDownloadURL(ref(storage, `${auth.currentUser.uid}/${docSnap.data().profilePic}`))
+  .then((url) => {
+    SetCurrentPicUrl(url);
+    console.log("Profile Pic Downloaded");
+  })
+  .catch((error) => {
+    // A full list of error codes is available at
+    // https://firebase.google.com/docs/storage/web/handle-errors
+    switch (error.code) {
+      case 'storage/object-not-found':
+        console.log("File doesn't exist");
+        break;
+      case 'storage/unauthorized':
+        console.log("User doesn't have permission to access the object");
+        break;
+      case 'storage/canceled':
+        console.log("User canceled the upload");
+        break;
+      case 'storage/unknown':
+        console.log("Unknown error occurred, inspect the server response");
+        break;
+    }
+  });
+
+  }
 
   useEffect(()=>{
     const getUsersData = async () => {
@@ -84,11 +118,18 @@ function Settings() {
         SetGetSms(docSnap.data().getSms);
         SetPrivateAccount(docSnap.data().private);
         SetTwoFactor(docSnap.data().twoFactor);
+        SetCurrentPic(docSnap.data().profilePic);
       } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");
       }
   };
+ try{
+  getProfilePic();
+ }
+ catch(error){
+  console.log(error);
+ }
   getUsersData();
   }, [] );
 
@@ -216,7 +257,7 @@ function Settings() {
     setIsLoading(true);  
       try
        {  
-          await setDoc(doc(db, "users", auth.currentUser.uid), {
+          await updateDoc(doc(db, "users", auth.currentUser.uid), {
               name: name,
               username:username,
               email: email,
@@ -224,13 +265,10 @@ function Settings() {
               bio:bio,
               gender:gender,
               website:website,
-              getEmail:getEmail,
-              getSms:getSms,
-              private: privateAccount,
-              twoFactor: twoFactor,
               });
               setIsLoading(false);
               showAlert();
+              console.log("Profile updated!");
             } 
       catch(error)
       {
@@ -362,11 +400,161 @@ function Settings() {
     });
   }
 
+  const onImageChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      SetProfilePic(URL.createObjectURL(event.target.files[0]));
+      SetProfilePicFile(event.target.files[0]);
+    }
+   }
+  
+   function handleButtonUploadImage() {
+    SetProfilePic(null);
+    SetProfilePicFile(null);
+    SetUploadProfilePic(false);
+    SetPreview(false);
+  }
+
+  function handleButtonPreview() {
+    SetUploadProfilePic(!uploadProfilePic);
+    SetPreview(!preview);
+    
+  }
+
+  function handleButtonBack() {
+    SetUploadProfilePic(!uploadProfilePic);
+    SetPreview(!preview);
+  }
+
+  function handleButtonChangePic() {
+    SetUploadProfilePic(!uploadProfilePic);
+  }
+
+  const addToStorage = async(imgName) =>{
+
+    if (profilePicFile == null) {
+        window.alert("Please choose a file first!");
+        return;
+    }
+  
+    try{
+    const storageRef = ref(storage, `/${auth.currentUser.uid}/${imgName}`);
+    SetUrl(imgName);
+    const uploadTask = uploadBytesResumable(storageRef, profilePicFile);
+  
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+          const percent = Math.round(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+  
+          // update progress
+          SetPercent(percent);
+      },
+      (err) => console.log(err),
+      () => {
+          // download url
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+            console.log(url);
+            console.log(imgName);
+          });
+      }
+  ); 
+  console.log('image upload successful!');
+  }
+  
+  catch(error){
+    console.log(error);
+  }
+  }
+
+  const  addProfilePicToAlbum = async(url) =>{
+    try
+    {  
+       const usersCollectionRef = collection(db,  `/users/${auth.currentUser.uid}/album`);
+       const addedDoc = await addDoc (usersCollectionRef, {
+        url: url,
+        created:serverTimestamp(),
+        });      
+        console.log("Image added to album with url : "+ url +"and id: "+addedDoc.id);   
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Image could not be added to album. Try Again :("); 
+   }
+   }
+
+  const addProfilePic = async() =>{
+    try
+    {  
+       const imageName = profilePicFile.name + v4();
+       await addToStorage(imageName);
+
+       const userDoc = doc(db, "users", auth.currentUser.uid);
+       const newFields = {profilePic: imageName};
+       await updateDoc(userDoc, newFields);     
+       
+       addProfilePicToAlbum( imageName);
+        console.log("Profile Pic uploaded ");   
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("ProfilePic was not changes.Try again :("); 
+   }
+   }
+
+
+  const handleButtonUploadProfilePic = async()=>{
+      await addProfilePic();
+      SetUploadProfilePic(false);
+      SetPreview(false);
+      SetProfilePic(null);
+      SetProfilePicFile(null);
+      SetPercent(0);
+      SetUrl(null);
+  }
+
+
+
   return (<div className="Settings">
     <nav>
     <div className='divider'>
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
     </div>
+    {uploadProfilePic && (   
+ <div class="uploadtray">
+  <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton"></AiOutlineCloseCircle>
+<div className='chooseAndDisplay'>
+  <input type="file" className='chooseImage' onChange={onImageChange} ></input>
+</div>
+{profilePic &&(<img src={profilePic} alt="preview image" className='preview' />)}
+  <button className="uploadImage" onClick={handleButtonPreview}>Preview</button>
+</div>)}
+
+{preview && (   
+  <div class="uploadtray">
+   <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton"></AiOutlineCloseCircle>
+   <button className="back" onClick={handleButtonBack}>Back</button>
+    
+   {profilePic &&(
+  <div className='profilePic'>
+   <Avatar
+  alt="preview image"
+  src={profilePic}
+  sx={{ width: 306, height: 306 }}/>
+  </div>
+  
+  )}
+
+   <button className="uploadImage" onClick={handleButtonUploadProfilePic}>Change</button><p>{percent}% done</p>
+ </div>
+
+
+
+
+  )}
     <div className='pageDivide'>
     <div className='options'>
             <button className='sideButtons'  onClick={handleButtonEditProfile}>Edit Profile</button>
@@ -379,9 +567,16 @@ function Settings() {
     {editProfile && (
     <div className="formContainer">
         {isLoading && <Spinner/>}
-        <div className='username'>{auth.currentUser.email}</div>
-        <button className='changePicButton'>Change Profile Photo</button>
-        
+        <div className='editProfileRow'>
+        <Avatar
+        alt="preview image"
+        src={currentPicUrl}
+        sx={{ width: 76, height: 76 }}/>
+        <div className='editProfileColumn'>
+        <div className='username'>{username}</div>
+        <button className='changePicButton' onClick={handleButtonChangePic}>Change Profile Photo</button>
+        </div>
+        </div>
         <div className='formInputsColumn'>
         <div className='bgblack'>Name :<input placeholder={name} className='formInput'></input></div>
         

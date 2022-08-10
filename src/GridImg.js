@@ -1,4 +1,4 @@
-import './css/Post.css';
+
 import logo from './mslogo.jpg';
 import PostHeader from './PostHeader';
 import {useState, useEffect } from "react";
@@ -7,7 +7,7 @@ import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc} from 'firebase/f
 import PostTools from './PostTools';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 
-function Post({postid, name, authorId, captions, comments, likes, timestamp, url}) {
+function GridImg({postid, name, authorId, captions, comments, likes, timestamp, url}) {
 
   const[postUrl, SetPostUrl]=useState(null);
   
@@ -48,17 +48,9 @@ function Post({postid, name, authorId, captions, comments, likes, timestamp, url
   }, [] );
 
 
-  return (<div className="Post">
-    <nav>
-    <PostHeader name = {name} ></PostHeader>
-    <img src={postUrl} className="media" />
-    <PostTools></PostTools>
-    <div className='caption'>
-      <div className='nametag'>{name}{' '}{captions}</div>
-    </div>
-    <div className='footer'></div>
-    </nav>
+  return (<div >
+    <img src={postUrl} style={{width:'100%', backgroundColor:'black', marginBottom:"-1.7%"}}/>
   </div>);
 }
 
-export default Post;
+export default GridImg;
