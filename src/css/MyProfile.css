@@ -85,6 +85,15 @@
 
 .MyProfile .indPost{ 
     position: relative;
+    width: 85%;
+    padding-left: 7.5%;
+    background-color:black;
+    margin-bottom: 0.5%;
+    border: 1px solid black;
+}
+
+.MyProfile .indGrid{ 
+    position: relative;
     width: 32.5%;
     background-color:black;
     margin-right: 0.5%;

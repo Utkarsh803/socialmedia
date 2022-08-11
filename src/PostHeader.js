@@ -2,15 +2,15 @@ import './css/PostHeader.css';
 import {CgProfile} from 'react-icons/cg';
 import { AiOutlineHeart, AiOutlineNotification } from 'react-icons/ai';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
-import logo from'./mslogo.jpg';
 import {useState, useEffect } from "react";
 import {db, auth} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc} from 'firebase/firestore';
+import Avatar from '@mui/material/Avatar';
 
-function PostHeader({name}) {
+function PostHeader({name, url}) {
 
     const[option, SetOption]=useState(false);
-
+    
     function handleButtonOptiont() {
         SetOption(!option);
       }
@@ -18,7 +18,11 @@ function PostHeader({name}) {
 
   return (<div className="PostHeader">
 
-    <img src={logo} className="logo" />
+    <Avatar
+    alt="preview image"
+    src={url}
+    sx={{ width: 60, height: 60}}
+    />
     <h4 className='welcome'>{name}</h4>
     <BiDotsVerticalRounded className='icons'  onClick={handleButtonOptiont}/>
     {option && (

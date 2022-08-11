@@ -15,7 +15,6 @@ function GridImg({postid, name, authorId, captions, comments, likes, timestamp, 
   getDownloadURL(ref(storage, `${auth.currentUser.uid}/${url}`))
   .then((url) => {
     SetPostUrl(url);
-    console.log("Post image Downloaded");
   })
   .catch((error) => {
     // A full list of error codes is available at

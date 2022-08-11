@@ -2,7 +2,7 @@ import './css/MyProfile.css';
 import Header from'./Header.js';
 import Post from'./Post.js';
 import SidePanel from './SidePanel';
-import {useState, useEffect } from "react";
+import {useState, useEffect , useRef} from "react";
 import {db, auth, storage} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
 import {signOut, onAuthStateChanged} from "firebase/auth";
@@ -35,13 +35,15 @@ function MyProfile() {
     const [numberOFollowers, SetNumberOfFollowers]=useState(null);
     const [numberOFollowing,SetNumberOfFollowing]=useState(null);
     const [numberOfPosts, SetNumberOfPosts]=useState(null);
-
+    const [time, setTime] = useState(Date. now()); 
     const [focusImages, SetFocusImages]=useState(true);
     const [focusVideos, SetFocusVideos]=useState(false);
     const [focusTags, SetFocusTags]=useState(false);
+    const [grid, SetGrid]=useState(true);
 
     const docRef = doc(db, "users", auth.currentUser.uid);
     let navigate = useNavigate(); 
+    const myRef = useRef(null)
 
     const handleButtonFocusImages=()=>{
       SetFocusImages(true);
@@ -59,79 +61,63 @@ function MyProfile() {
       SetFocusVideos(false);
       SetFocusImages(false);
     }
-  
-    const getProfilePic= async()=>{
-  
-      const docRef = doc(db, "users", auth.currentUser.uid);
-      const docSnap = await getDoc(docRef);
-      
-    getDownloadURL(ref(storage, `${auth.currentUser.uid}/${docSnap.data().profilePic}`))
-    .then((url) => {
-      SetCurrentPicUrl(url);
-      console.log("Profile Pic Downloaded");
-    })
-    .catch((error) => {
-      // A full list of error codes is available at
-      // https://firebase.google.com/docs/storage/web/handle-errors
-      switch (error.code) {
-        case 'storage/object-not-found':
-          console.log("File doesn't exist");
-          break;
-        case 'storage/unauthorized':
-          console.log("User doesn't have permission to access the object");
-          break;
-        case 'storage/canceled':
-          console.log("User canceled the upload");
-          break;
-        case 'storage/unknown':
-          console.log("Unknown error occurred, inspect the server response");
-          break;
-      }
-    });}
-
 
     const postsCollectionRef = collection(db, `users/${auth.currentUser.uid}/posts`);
 
 
     useEffect(()=>{
-      const getUsersData = async () => {
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setName(docSnap.data().name);
-          SetUserName(docSnap.data().username);
-          SetBio(docSnap.data().bio);
-          SetPhone(docSnap.data().phone);
-          SetEmail(docSnap.data().email);
-          SetGender(docSnap.data().gender);
-          SetWebsite(docSnap.data().website);
-          SetGetEmail(docSnap.data().getEmail);
-          SetGetSms(docSnap.data().getSms);
-          SetPrivateAccount(docSnap.data().private);
-          SetTwoFactor(docSnap.data().twoFactor);
-          SetCurrentPic(docSnap.data().profilePic);
-          SetNumberOfFollowers(docSnap.data().followers);
-          SetNumberOfFollowing(docSnap.data().following);
-          SetNumberOfPosts(docSnap.data().posts);
-          
-        } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
-    };
 
-    const getUserPost =async()=>{
-      const data = await getDocs(postsCollectionRef);
-      SetPosts(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
-    }
+        const getUsersData = async () => {
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
 
-   try{
-    getProfilePic();
-   }
-   catch(error){
-    console.log(error);
-   }
-    getUsersData();
-    getUserPost();
+            setName(docSnap.data().name);
+            SetUserName(docSnap.data().username);
+            SetBio(docSnap.data().bio);
+            SetWebsite(docSnap.data().website);           
+            SetNumberOfFollowers(docSnap.data().followers);
+            SetNumberOfFollowing(docSnap.data().following);
+            SetNumberOfPosts(docSnap.data().posts);
+
+            getDownloadURL(ref(storage, `${auth.currentUser.uid}/${docSnap.data().profilePic}`))
+        .then((url) => {
+          SetCurrentPicUrl(url);
+        })
+        .catch((error) => {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          switch (error.code) {
+            case 'storage/object-not-found':
+              console.log("File doesn't exist");
+              break;
+            case 'storage/unauthorized':
+              console.log("User doesn't have permission to access the object");
+              break;
+            case 'storage/canceled':
+              console.log("User canceled the upload");
+              break;
+            case 'storage/unknown':
+              console.log("Unknown error occurred, inspect the server response");
+              break;
+          }
+        });
+            
+          } else {
+            // doc.data() will be undefined in this case
+            console.log("No such document!");
+          }
+      };
+  
+      const getUserPost =async()=>{
+        const data = await getDocs(postsCollectionRef);
+        SetPosts(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      }
+      
+      const interval = setInterval(()=>{
+      getUsersData();
+      getUserPost();
+      }, 1000);
+      return ()=>clearInterval(interval);
     }, [] );
 
   const logout = async () =>
@@ -166,6 +152,11 @@ function MyProfile() {
     }
   });
 
+  }
+
+
+  const handleButtonSetGrid=()=>{
+    SetGrid(!grid);
   }
 
   const handleButtonEditProfile=()=>{
@@ -225,18 +216,25 @@ function MyProfile() {
       :(<AiFillTag className='catIcon' onClick={handleButtonFocusTags}></AiFillTag>)}
       
     
-    
-    
       </div>
-      <div className='posts'>
-      
-      {posts && focusImages &&
+      <div className='posts'>  
+      {posts && focusImages && grid &&
       (posts.map((post)=>
-    {return <div className="indPost">
-      <GridImg name={name} captions={post.caption} url={post.url} ></GridImg>
+    {return <div id={post.url} className="indGrid" onClick={handleButtonSetGrid}>
+      <GridImg name={name} captions={post.caption} url={post.url}></GridImg>
       </div>
     })
   )}  
+
+{posts && focusImages && !grid &&
+      (posts.map((post)=>
+    {return <div className="indPost">
+      <Post name={name} captions={post.caption} url={post.url} profilePic={currentPicUrl} likes={post.likes} comments={post.comments} timeStamp={post.timeStamp}></Post>
+      </div>
+    })
+  )} 
+
+
  
   </div>
     </div>

@@ -2,9 +2,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    margin-top: 2%;
-    margin-left: 3%;
-    width:60%;
+    background-color: black;
+    width:100%;
 }
 
 .Post .media{
