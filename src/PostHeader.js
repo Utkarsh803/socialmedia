@@ -21,7 +21,7 @@ function PostHeader({name, url}) {
     <Avatar
     alt="preview image"
     src={url}
-    sx={{ width: 60, height: 60}}
+    sx={{ width: 40, height: 40, marginTop:'2%'}}
     />
     <h4 className='welcome'>{name}</h4>
     <BiDotsVerticalRounded className='icons'  onClick={handleButtonOptiont}/>

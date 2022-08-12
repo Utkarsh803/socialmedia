@@ -4,6 +4,7 @@
     flex-direction: column;
     background-color: black;
     width:100%;
+    margin-top: 1%;
 }
 
 .Post .media{
@@ -14,12 +15,16 @@
 
 .Post .caption{
     position:relative;
-    background-color: black;
     display: flex;
     flex-direction: row;
+    background-color: black;
     color: aliceblue;
-    width: 100%;
-    height:fit-content;
+    max-width: 100%;
+    height:auto;
+    margin-top: 0%;
+    padding-top: 2%;
+    margin-bottom: 0%;
+    padding-left: 2%;
 }
 
 .Post .nametag{

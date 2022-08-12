@@ -112,12 +112,8 @@ function MyProfile() {
         const data = await getDocs(postsCollectionRef);
         SetPosts(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
       }
-      
-      const interval = setInterval(()=>{
       getUsersData();
       getUserPost();
-      }, 1000);
-      return ()=>clearInterval(interval);
     }, [] );
 
   const logout = async () =>
@@ -221,7 +217,7 @@ function MyProfile() {
       {posts && focusImages && grid &&
       (posts.map((post)=>
     {return <div id={post.url} className="indGrid" onClick={handleButtonSetGrid}>
-      <GridImg name={name} captions={post.caption} url={post.url}></GridImg>
+      <GridImg name={name} captions={post.caption} url={post.url} ></GridImg>
       </div>
     })
   )}  
@@ -229,7 +225,7 @@ function MyProfile() {
 {posts && focusImages && !grid &&
       (posts.map((post)=>
     {return <div className="indPost">
-      <Post name={name} captions={post.caption} url={post.url} profilePic={currentPicUrl} likes={post.likes} comments={post.comments} timeStamp={post.timeStamp}></Post>
+      <Post postid={posts.id} name={name} authorId={post.authorId} captions={post.caption} url={post.url} profilePic={currentPicUrl} likes={post.likes} comments={post.comments} timeStamp={post.timeStamp}></Post>
       </div>
     })
   )} 

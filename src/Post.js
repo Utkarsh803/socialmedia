@@ -6,11 +6,13 @@ import {db, auth, storage} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc} from 'firebase/firestore';
 import PostTools from './PostTools';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
-
+import moment from 'react-moment'
+import {BiDotsVerticalRounded } from 'react-icons/bi';
+import Avatar from '@mui/material/Avatar';
 
 function Post({postid, name, authorId, captions, comments, likes, timeStamp, url, profilePic}) {
 
-  const[postUrl, SetPostUrl]=useState(null);
+  const[postUrl, SetPostUrl]=useState(null);;
 
     const getPostPic= async()=>{
     getDownloadURL(ref(storage, `${auth.currentUser.uid}/${url}`))
@@ -38,9 +40,11 @@ function Post({postid, name, authorId, captions, comments, likes, timeStamp, url
   
     }
 
+
   useEffect(()=>{
     try{
       getPostPic();
+
     }
     catch(error){
       console.log(error);
@@ -52,13 +56,34 @@ function Post({postid, name, authorId, captions, comments, likes, timeStamp, url
     <nav>
     <PostHeader name = {name} url={profilePic}></PostHeader>
     <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />
-    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'3%', textAlign:'left', fontStyle:'normal'}}>{likes} likes</div>
-    <PostTools></PostTools>
+    <PostTools postid={postid} authorId={authorId} likes={likes}></PostTools>
+    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
     <div className='caption'>
-      <div className='nametag'>{name}{' '}{captions}</div>
+    <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'1%', marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'1%', width:'90%'}}>
+{captions}
+    </span>
     </div>
-    <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%'}}>View {comments} comments</div>
-    <div>{timeStamp}</div>
+
+    {(comments > 2 && comments > 0) &&
+    <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>View {comments} comments</div>}
+    
+    {(comments < 2 ) && (
+     <div>
+     <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>{comments} comments</div>    </div>
+    )
+    }
+
+<div style={{display:'flex', flexDirection:'row', backgroundColor:'black', height:'9vh'}}>
+<Avatar
+    alt="preview image"
+    src={profilePic}
+    sx={{ width: 25, height: 25, marginTop:'1%', marginLeft:'3%'}}
+    />
+    <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'80%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }}>
+    </input>
+    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', borderBottom:'1px solid white', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}}>Post</button>
+    </div>
+    <div style={{color:'grey',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}> {new Date(timeStamp).toDateString()}</div>
     <div className='footer'></div>
     </nav>
   </div>);
