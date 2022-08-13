@@ -10,7 +10,7 @@ import moment from 'react-moment'
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import Avatar from '@mui/material/Avatar';
 
-function Post({postid, name, authorId, captions, comments, likes, timeStamp, url, profilePic}) {
+function Post({postid, name, authorId, captions, comments, likes, saves, timeStamp, url, profilePic}) {
 
   const[postUrl, SetPostUrl]=useState(null);;
 
@@ -56,7 +56,7 @@ function Post({postid, name, authorId, captions, comments, likes, timeStamp, url
     <nav>
     <PostHeader name = {name} url={profilePic}></PostHeader>
     <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />
-    <PostTools postid={postid} authorId={authorId} likes={likes}></PostTools>
+    <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves}></PostTools>
     <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
     <div className='caption'>
     <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'1%', marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'1%', width:'90%'}}>
@@ -81,9 +81,9 @@ function Post({postid, name, authorId, captions, comments, likes, timeStamp, url
     />
     <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'80%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }}>
     </input>
-    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', borderBottom:'1px solid white', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}}>Post</button>
+    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}}>Post</button>
     </div>
-    <div style={{color:'grey',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}> {new Date(timeStamp).toDateString()}</div>
+    <div style={{color:'grey',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}>{timeStamp.toDate().toLocaleDateString('en-IN')}</div>
     <div className='footer'></div>
     </nav>
   </div>);

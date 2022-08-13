@@ -225,7 +225,7 @@ function MyProfile() {
 {posts && focusImages && !grid &&
       (posts.map((post)=>
     {return <div className="indPost">
-      <Post postid={posts.id} name={name} authorId={post.authorId} captions={post.caption} url={post.url} profilePic={currentPicUrl} likes={post.likes} comments={post.comments} timeStamp={post.timeStamp}></Post>
+      <Post postid={post.id} name={name} authorId={post.authorID} captions={post.caption} url={post.url} profilePic={currentPicUrl} likes={post.likes} saves={post.saved} comments={post.comments} timeStamp={post.timeStamp}></Post>
       </div>
     })
   )} 

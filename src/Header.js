@@ -11,6 +11,9 @@ import { useNavigate } from "react-router-dom";
 import Settings from './Settings';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import {v4} from 'uuid'
+import { query, where, orderBy, limit } from "firebase/firestore";  
+import SearchResult from './SearchResult';
+
 
 
 function Header({handleLogout, name}) {
@@ -25,9 +28,25 @@ function Header({handleLogout, name}) {
   const[percent, SetPercent]=useState(0);
   const[postID, SetPostID]=useState(null);
   const[url, SetUrl]=useState(null);
+  const[searchRes, SetSearchRes]=useState(null);
+  const[searchInput, SetSearchInput]=useState(null);
 
   let navigate = useNavigate(); 
   
+  
+  const search = async(name) =>{
+    SetSearchInput(name);
+    console.log(name);
+    if(name != ''){
+    const citiesRef = collection(db, "users");
+    const q = query(citiesRef, where("username", ">=", `${name}`), where("username", "<=", `${name + "~"}`), limit(3));
+    const querySnapshot = await getDocs(q);
+      SetSearchRes(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+    }
+    else{
+      SetSearchRes(null);
+    }
+  }
   
   
   const addToStorage = async(imgName) =>{
@@ -305,8 +324,19 @@ catch(error){
   return (<div className="Header">
 
     <img src={logo} className="logo" />
-    <input placeholder='search...'></input>
-    
+
+
+   <div style={{ display:'flex', flexDirection:'column', width:'57%', backgroundColor:'black', color:'white'}}>
+    <input style={{width:'60%', marginTop:'5%'}} placeholder='search...' onChange={(event)=>search(event.target.value)}></input>
+    {searchRes && 
+    (
+    searchRes.map((res)=>
+    {return <div  style={{width:'60%', marginLeft:'4%'}}>
+     <SearchResult name={res.username} authorId={res.id} url={res.profilePic}></SearchResult>
+      </div>;
+    })
+    )}
+    </div>
     <AiOutlineHome className='icons' onClick={goToHome}/>
     
     <BiImageAdd className='icons'  onClick={handleButtonAddPost}/>
