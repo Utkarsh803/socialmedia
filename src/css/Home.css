@@ -40,3 +40,42 @@
   .Home .pagehaedspace{
     margin-top: 0%;
   }
+
+  .Home .secondTray{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    width:60%;
+    height:fit-content;
+    margin-Top: 2%;
+    margin-left: 1.5%;
+    border-radius: 2%;
+    border-top-left-radius: 2%;
+    border-bottom-left-radius: 2%;
+}
+
+.Home .posts{
+  position: relative;
+  display: flex;
+  flex: 1;
+  background-color: black;
+  flex-wrap: wrap;
+  flex-direction: 'row';
+  width: 90%;
+  height: fit-content;
+  margin-left: 5%;
+  padding-top: 2%;
+  border-radius: 2%;
+  margin-bottom: 2%;
+  
+}
+
+.Home .indPost{ 
+  position: relative;
+  width: 85%;
+  padding-left: 7.5%;
+  background-color:black;
+  margin-bottom: 0.5%;
+  border: 1px solid black;
+}

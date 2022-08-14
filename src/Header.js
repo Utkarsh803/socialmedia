@@ -30,11 +30,11 @@ function Header({handleLogout, name}) {
   const[url, SetUrl]=useState(null);
   const[searchRes, SetSearchRes]=useState(null);
   const[searchInput, SetSearchInput]=useState(null);
-
+  const[followersList, SetFollowersList]=useState(null);
   let navigate = useNavigate(); 
-  
-  
-  const search = async(name) =>{
+ 
+
+   const search = async(name) =>{
     SetSearchInput(name);
     console.log(name);
     if(name != ''){
@@ -154,6 +154,33 @@ catch(error){
     }
    }
 
+  const addToFeed=async(postid)=>{
+    try {
+    const followerRef = collection(db, `users/${auth.currentUser.uid}/followerList`);
+    const data = await getDocs(followerRef);
+    
+    data.forEach((docc) => {
+
+      console.log(docc.id, " => ", docc.data());
+      const feedRef = doc(db, `feed/${docc.id}/posts`, `${postid}`);
+
+      setDoc(feedRef, {
+        added:serverTimestamp(),
+        author:auth.currentUser.uid,
+        postID:postid,
+      });
+
+     // SetFollowersList(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
+     console.log("Added doc to"+ docc.id +"'s feed.");  
+    });
+  
+  }
+  catch(error){
+    console.log(error);
+  }
+  }
+
+
    const createPost = async() =>{
     try
     {  
@@ -174,6 +201,7 @@ catch(error){
         addToAlbum(addedDoc.id, imageName);
         createLikeList(addedDoc.id);
         createCommentList(addedDoc.id);
+        addToFeed(addedDoc.id);
         console.log("Post ID : "+ addedDoc.id);   
          } 
    catch(error)
