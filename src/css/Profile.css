@@ -1,0 +1,268 @@
+.Profile{
+    color: aliceblue;
+    background-color: aliceblue;
+  }
+
+
+  .Profile .divider{
+    position: relative;
+    display: flex;
+    background-color: rgb(26, 3, 71);
+    flex-direction: column;
+    margin-top: 9%;    
+  }
+
+  .Profile button{
+    position: relative;
+    display: block;
+    width:10%;
+    min-height: 35px;
+      appearance: button;
+      backface-visibility: hidden;
+      background-color: #405cf5;
+      border-width: 0;
+      box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
+      box-sizing: border-box;
+      color: #fff;
+      cursor: pointer;
+      font-family: -apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif;
+      margin-top:3%;
+      margin-bottom:9%;
+      outline: none;
+      overflow: hidden;
+      padding: 0 25px;
+      text-transform: none;
+      transform: translateZ(0);
+      transition: all .2s,box-shadow .08s ease-in;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+  }
+
+
+.Profile .firstTray{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    width:70%;
+    height:fit-content;
+    margin-left: 15%;
+    border-radius: 2%;
+    border-top-left-radius: 2%;
+    border-bottom-left-radius: 2%;
+}
+
+.Profile .secondTray{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    width:70%;
+    height:fit-content;
+    margin-left: 15%;
+    
+    border-radius: 2%;
+    border-top-left-radius: 2%;
+    border-bottom-left-radius: 2%;
+}
+
+.Profile .posts{
+    position: relative;
+    display: flex;
+    flex: 1;
+    background-color: black;
+    flex-wrap: wrap;
+    flex-direction: 'row';
+    width: 71%;
+    height: fit-content;
+    margin-left: 15%;
+    padding-top: 1%;
+    border-radius: 2%;
+    margin-bottom: 2%;
+    
+}
+
+.Profile .indPost{ 
+    position: relative;
+    width: 85%;
+    padding-left: 7.5%;
+    background-color:black;
+    margin-bottom: 0.5%;
+    border: 1px solid black;
+}
+
+.Profile .indGrid{ 
+    position: relative;
+    width: 32.5%;
+    background-color:black;
+    margin-right: 0.5%;
+    margin-bottom: 0.5%;
+    border: 1px solid black;
+}
+
+
+.Profile .rowCategory{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    background-color: black;
+    width:70%;
+    height:fit-content;
+    padding-top: 2%;
+    margin-left: 15%;
+    color: aliceblue;
+}
+
+
+
+.Profile .catIcon{
+    position: relative;
+    color: aliceblue;
+    background-color: black;
+    width: 100%;
+    padding-bottom: 1vh;
+    height: 5vh;
+    
+}
+
+.Profile .catIconFocused{
+    position: relative;
+    color: aliceblue;
+    background-color: black;
+    width: 100%;
+    height: 5vh;
+    padding-bottom: 1vh;
+    border-bottom: 2px solid #fff;
+    
+}
+
+.Profile .rowPicnStat{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    background-color: black;
+    color: aliceblue;
+    width:fit-content;
+    height:fit-content;
+    padding-top: 5%;
+    margin-left: 15%;
+
+}
+
+.Profile .row{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    background-color: black;
+    color: aliceblue;
+    width:100%;
+    height:fit-content;
+    margin-left: 20%;
+    margin-top: 15%;
+}
+
+.Profile .rowEditButton{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    background-color:black;
+    color: aliceblue;
+    width:78%;
+    padding-left:11%;
+    height:fit-content;
+    }
+
+.Profile .column{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    color: aliceblue;
+    height:fit-content;
+    width: fit-content;
+    align-items: center;
+    margin-right: 55%;
+    
+}
+
+.Profile .columnBionButton{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    color: aliceblue;
+    height:fit-content;
+    width: 80%;
+    padding-top: 1%;
+    margin-left: 10%;
+}
+
+.Profile .name{
+    position: relative;
+    background-color: black;
+    font-size: x-large;
+    padding-left: 11%;
+
+}
+
+.Profile .bio{
+    position: relative;
+    background-color: black;
+    font-size:small;
+    padding: 1%;
+    padding-left: 11.5%;
+
+}
+
+.Profile .profilePic{
+    display: inline-block;
+    width: fit-content;
+    background-color: black;
+    height:fit-content;
+}
+
+.Profile .number{
+    position: relative;
+    background-color: black;
+    height:fit-content;
+    font-size: xx-large;
+}
+
+.Profile .category{
+    position: relative;
+    background-color: black;
+    height:fit-content;
+    
+}
+
+
+.Profile .space05{
+    position: relative;
+    margin: 0.5%;
+    
+}
+
+
+.Profile .editProfile{
+      min-height: 35px;
+      appearance: button;
+      width: 100%;
+      backface-visibility: hidden;
+      background-color: #405cf5;
+      border-width: 0;
+      box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
+      box-sizing: border-box;
+      color: #fff;
+      cursor: pointer;
+      font-family: -apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif;
+      outline: none;
+      overflow: hidden;
+      padding: 0 25px;
+      text-transform: none;
+      transform: translateZ(0);
+      transition: all .2s,box-shadow .08s ease-in;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+}

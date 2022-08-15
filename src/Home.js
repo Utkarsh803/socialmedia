@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 
 function Home() {
 
-  const [userId, setUserId]=useState("");
+    const [userId, setUserId]=useState("");
     const [name, setUserName]=useState("");
     const [loaded, setLoaded]=useState(true);
     const [loggedIn, setLoggedIn]=useState(true);
@@ -23,20 +23,29 @@ function Home() {
     const [feed, setFeed] = useState(null);
 
     useEffect(()=>{
+
+      const getFeed=async()=>{
+        try {
+          const feedRef = collection(db, `feed/${auth.currentUser.uid}/posts`);
+          const data = await getDocs(feedRef);
+          if(data.size>0){
+          setFeed(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
+          }
+          else{
+            setFeed(null);
+          }
+        }
+      catch(error){
+        console.log(error);
+      }
+    }
+
       getFeed();
+      console.log("got feed");
     }, [] );
 
 
-  const getFeed=async()=>{
-    try {
-      const feedRef = collection(db, `feed/${auth.currentUser.uid}/posts`);
-      const data = await getDocs(feedRef);
-      setFeed(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
-  }
-  catch(error){
-    console.log(error);
-  }
-}
+
 
 
 
@@ -47,7 +56,6 @@ function Home() {
 
   }
 
-
  
   return (<div className="Home">
     <nav>
@@ -56,19 +64,26 @@ function Home() {
     
     
     <div className='secondTray'>
-    <ul>
-        <li><Link to="/josh">Josh</Link></li>
-        <li><Link to="/marie">Marie</Link></li>
-      </ul>
     <div className='posts'> 
+
   {feed &&
       (feed.map((post)=>
     {return <div className="indPost">
       <FeedPost postid={post.postID} authorId={post.author} ></FeedPost>
+      {console.log("feed is not null")}
       </div>
+      
     })
   )} 
-    </div>
+
+{(feed===null) &&
+      (<div className="indPost" style={{marginLeft:'15%'}}>
+      No posts to show. Follow users to see their posts.
+      </div>
+      )
+} 
+
+  </div>
     </div>
     <SidePanel/>
     </div>

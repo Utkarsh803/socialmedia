@@ -10,12 +10,20 @@ import moment from 'react-moment'
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import Avatar from '@mui/material/Avatar';
 
+
+
+
+
+
+
+
+
 function Post({postid, name, authorId, captions, comments, likes, saves, timeStamp, url, profilePic}) {
 
   const[postUrl, SetPostUrl]=useState(null);;
 
     const getPostPic= async()=>{
-    getDownloadURL(ref(storage, `${auth.currentUser.uid}/${url}`))
+    getDownloadURL(ref(storage, `${authorId}/${url}`))
     .then((url) => {
       SetPostUrl(url);
     })

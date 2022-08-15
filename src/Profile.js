@@ -1,10 +1,10 @@
-import './css/MyProfile.css';
+import './css/Profile.css';
 import Header from'./Header.js';
 import Post from'./Post.js';
 import SidePanel from './SidePanel';
 import {useState, useEffect , useRef} from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc, serverTimestamp, query, where} from 'firebase/firestore';
 import {signOut, onAuthStateChanged} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
@@ -14,10 +14,11 @@ import {FcGallery} from 'react-icons/fc';
 import GridImg from './GridImg';
 import {BrowserRouter as Router, Link, Route, Routes} from 'react-router-dom';
 import React from 'react';
+import {useParams} from 'react-router-dom'
 
 function Profile() {
 
-
+    const {uid} =useParams();
 
     const [name, setName]=useState("");    
     const [username, SetUserName]=useState("");
@@ -42,7 +43,204 @@ function Profile() {
     const [focusTags, SetFocusTags]=useState(false);
     const [grid, SetGrid]=useState(true);
 
-    const docRef = doc(db, "users", auth.currentUser.uid);
+
+    const[follow, SetFollow]=useState(null);
+    const[myFollow, SetMyFollow]=useState(null);
+    const[following, SetFollowing]=useState(null);
+    
+    useEffect(()=>{
+
+      const getUsersData = async () => {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+
+          setName(docSnap.data().name);
+          SetUserName(docSnap.data().username);
+          SetBio(docSnap.data().bio);
+          SetWebsite(docSnap.data().website);           
+          SetNumberOfFollowers(docSnap.data().followers);
+          SetNumberOfFollowing(docSnap.data().following);
+          SetNumberOfPosts(docSnap.data().posts);
+
+          getDownloadURL(ref(storage, `${uid}/${docSnap.data().profilePic}`))
+      .then((url) => {
+        SetCurrentPicUrl(url);
+      })
+      .catch((error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        switch (error.code) {
+          case 'storage/object-not-found':
+            console.log("File doesn't exist");
+            break;
+          case 'storage/unauthorized':
+            console.log("User doesn't have permission to access the object");
+            break;
+          case 'storage/canceled':
+            console.log("User canceled the upload");
+            break;
+          case 'storage/unknown':
+            console.log("Unknown error occurred, inspect the server response");
+            break;
+        }
+      });
+          
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+        }
+    };
+
+    const getUserPost =async()=>{
+      const data = await getDocs(postsCollectionRef);
+      SetPosts(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
+    }
+
+    const getFollow=async()=>{
+      try{
+      const docR = doc(db, `users/${auth.currentUser.uid}/followingList`, `${uid}`)
+      const docSnap =  await getDoc(docR);
+  
+          if (docSnap.exists()) {
+              SetFollow(true);
+              console.log("follow is true");
+              console.log({uid}===auth.currentUser.uid);
+          } else {
+          // doc.data() will be undefined in this case
+              SetFollow(false);
+              console.log("follow is false");
+              console.log({uid}===auth.currentUser.uid);
+          }}
+          catch(error){
+            console.log(error);
+          }
+      }
+
+    getFollow();
+    getFollowStats();
+    getUsersData();
+    getUserPost();
+  }, [follow] );
+
+
+
+      const getFollowStats=async()=>{
+        const docRef = doc(db, `users`,`${auth.currentUser.uid}`)
+        const docSnap = await getDoc(docRef);
+
+        if(docSnap.exists()){
+            SetMyFollow(docSnap.data().following);
+            console.log("this"+docSnap.data().following);
+        }
+        else{
+                console.log("error");
+        }
+
+        const docRef2 = doc(db, `users`,`${uid}`)
+        const docSnap2 = await getDoc(docRef2);
+
+        if(docSnap2.exists()){
+            SetFollowing(docSnap2.data().followers);
+            console.log("their"+docSnap2.data().followers);
+        }
+        else{
+                console.log("error");
+        }
+
+        }
+
+
+
+        const increaseFollower=async()=>{
+          try{
+          const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
+          const followerdocRef = doc(db, `users`, `${uid}`)
+          const newfield1 = {following: myFollow + 1};
+          SetMyFollow(myFollow+1);
+          const newfield2 = {followers: following + 1};
+          SetFollowing(following+1);
+          await updateDoc(followingdocRef,newfield1);
+          await updateDoc(followerdocRef,newfield2);
+          console.log("follow stats updated.");
+          }
+          catch(error){
+              console.log(error);
+          }
+      }
+  
+      const decreaseFollower=async()=>{
+          try{
+          const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
+          const followerdocRef = doc(db, `users`, `${uid}`)
+          const newfield1 = {following: myFollow - 1};
+          SetMyFollow(myFollow-1);
+          const newfield2 = {followers: following - 1};
+          SetFollowing(following-1);
+          await updateDoc(followingdocRef,newfield1);
+          await updateDoc(followerdocRef,newfield2);
+          console.log("follow stats updated.")
+          }
+          catch(error){
+              console.log(error);
+          }
+      }
+
+      const handleButttonFollow = async()=>{
+        SetFollow(true);
+        try{
+        const followRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${uid}`)
+
+        await setDoc(followRef,{
+            timeStamp:serverTimestamp()
+        });
+        console.log("You are now folowing"+name);
+
+        const followingRef = doc(db, `users/${uid}/followerList`, `${auth.currentUser.uid}`)
+
+        await setDoc(followingRef,{
+            timeStamp:serverTimestamp()
+        });
+        console.log(uid+"has a new follower.");
+    }
+        catch(error){
+            console.log(error);
+        }
+        increaseFollower();
+    }
+
+    const deleteFeed = async()=>{
+      const q = query(collection(db, `feed/${auth.currentUser.uid}/posts`), where("author", "==", `${uid}`));
+      const querySnapshot = await getDocs(q);
+          querySnapshot.forEach((docc) => {
+            console.log(docc.id);  
+            deleteDoc(doc(db, `feed/${auth.currentUser.uid}/posts/${docc.id}`))
+          });
+          console.log("deleted posts from your feed.")
+  }
+
+    const handleButtonUnfollow = async()=>{
+        SetFollow(false);
+        try{
+        const followRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${uid}`)
+
+        await deleteDoc(followRef);
+        console.log("You are not following"+name+" anymore");
+
+        const followingRef = doc(db, `users/${uid}/followerList`, `${auth.currentUser.uid}`)
+
+        await deleteDoc(followingRef);
+        console.log(uid+"has one less follower.");
+    }
+        catch(error){
+            console.log(error);
+        }
+        decreaseFollower();
+        deleteFeed();
+    }
+
+  
+
+    const docRef = doc(db, "users", uid);
     let navigate = useNavigate(); 
     const myRef = useRef(null)
 
@@ -63,59 +261,9 @@ function Profile() {
       SetFocusImages(false);
     }
 
-    const postsCollectionRef = collection(db, `users/${auth.currentUser.uid}/posts`);
+    const postsCollectionRef = collection(db, `users/${uid}/posts`);
 
 
-    useEffect(()=>{
-
-        const getUsersData = async () => {
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-
-            setName(docSnap.data().name);
-            SetUserName(docSnap.data().username);
-            SetBio(docSnap.data().bio);
-            SetWebsite(docSnap.data().website);           
-            SetNumberOfFollowers(docSnap.data().followers);
-            SetNumberOfFollowing(docSnap.data().following);
-            SetNumberOfPosts(docSnap.data().posts);
-
-            getDownloadURL(ref(storage, `${auth.currentUser.uid}/${docSnap.data().profilePic}`))
-        .then((url) => {
-          SetCurrentPicUrl(url);
-        })
-        .catch((error) => {
-          // A full list of error codes is available at
-          // https://firebase.google.com/docs/storage/web/handle-errors
-          switch (error.code) {
-            case 'storage/object-not-found':
-              console.log("File doesn't exist");
-              break;
-            case 'storage/unauthorized':
-              console.log("User doesn't have permission to access the object");
-              break;
-            case 'storage/canceled':
-              console.log("User canceled the upload");
-              break;
-            case 'storage/unknown':
-              console.log("Unknown error occurred, inspect the server response");
-              break;
-          }
-        });
-            
-          } else {
-            // doc.data() will be undefined in this case
-            console.log("No such document!");
-          }
-      };
-  
-      const getUserPost =async()=>{
-        const data = await getDocs(postsCollectionRef);
-        SetPosts(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
-      }
-      getUsersData();
-      getUserPost();
-    }, [] );
 
   const logout = async () =>
   {
@@ -125,7 +273,7 @@ function Profile() {
   }
 
   function getPostPic(imgName){
-  getDownloadURL(ref(storage, `${auth.currentUser.uid}/${imgName}`))
+  getDownloadURL(ref(storage, `${uid}/${imgName}`))
   .then((url) => {
     console.log("Profile Pic Downloaded");
     return url;
@@ -163,7 +311,7 @@ function Profile() {
   return (<div className="Profile">
     <nav>
     <div className='divider'>
-    <Header handleLogout={logout} name={auth.currentUser.email}></Header>
+    <Header handleLogout={logout} ></Header>
     <div className='firstTray'>
     <div className='rowPicnStat'>
     <div className='profilePic'>  
@@ -193,7 +341,9 @@ function Profile() {
       <p className='bio'>{bio}</p>
       {website && (<a href="www.google.com" target="_blank" rel="noreferrer" className='bio'>{website}</a>)}
       <div className='rowEditButton'>
-        <button className='editProfile' onClick={handleButtonEditProfile}>Edit Profile</button>
+      
+        {follow ? (<button className='editProfile' onClick={handleButtonUnfollow}>UnFollow</button>):(<button className='editProfile' onClick={handleButttonFollow}>Follow</button>)}
+        
       </div>
     </div>
     </div>
@@ -218,7 +368,7 @@ function Profile() {
       {posts && focusImages && grid &&
       (posts.map((post)=>
     {return <div id={post.url} className="indGrid" onClick={handleButtonSetGrid}>
-      <GridImg name={name} captions={post.caption} url={post.url} ></GridImg>
+      <GridImg name={name} captions={post.caption} url={post.url} authorId={post.authorID}></GridImg>
       </div>
     })
   )}  

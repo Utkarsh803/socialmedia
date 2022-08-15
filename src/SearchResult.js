@@ -4,11 +4,14 @@ import { AiOutlineHeart, AiOutlineNotification } from 'react-icons/ai';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where} from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
+import { Link, useNavigate } from 'react-router-dom';
 
 function SearchResult({name, authorId, url}) {
+
+    const navigate = useNavigate();
 
     const[imageUrl, SetImageUrl]=useState(false);
     const[follow, SetFollow]=useState(null);
@@ -51,7 +54,7 @@ function SearchResult({name, authorId, url}) {
         }
 
         }
-    
+
 
     useEffect(()=>{
         function getPostPic(){
@@ -142,6 +145,16 @@ function SearchResult({name, authorId, url}) {
         increaseFollower();
     }
 
+    const deleteFeed = async()=>{
+        const q = query(collection(db, `feed/${auth.currentUser.uid}/posts`), where("author", "==", `${authorId}`));
+        const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+            deleteDoc(doc(db, `feed/${auth.currentUser.uid}/posts/${doc.id}`))
+            console.log(doc.id);    
+        });
+            console.log("deleted "+ {authorId}+"'s posts from your feed.")
+    }
+
     const handleButttonUnfollow = async()=>{
         SetFollow(!follow);
         try{
@@ -159,21 +172,34 @@ function SearchResult({name, authorId, url}) {
             console.log(error);
         }
         decreaseFollower();
+        deleteFeed();
     }
 
+    const handleButtonSendToProfile=()=>{
+       navigate(`/${authorId}`);
+        }
+
+        const handleButtonSendToMyprofile=()=>{
+            navigate(`/myprofile`);
+             }
+    
 
   return (<div className="SearchResult">
-
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
     <Avatar
     alt="preview image"
     src={imageUrl}
     sx={{ width: 40, height: 40, marginTop:'2%'}}
     />
     <h4 className='welcome'>{name}</h4>  
+    </div>
 
-    {follow ? (<button className='icons' onClick={handleButttonUnfollow}>Unfollow</button>):(
+    { (authorId!=auth.currentUser.uid) && (
+    follow ? (<button className='icons' onClick={handleButttonUnfollow}>Unfollow</button>):(
         <button className='icons' onClick={handleButttonFollow}>Follow</button>
+    )
     )}
+
     
   
   </div>);

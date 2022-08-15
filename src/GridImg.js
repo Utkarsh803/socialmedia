@@ -12,7 +12,7 @@ function GridImg({postid, name, authorId, captions, comments, likes, timestamp, 
   const[postUrl, SetPostUrl]=useState(null);
   
   const getPostPic= async()=>{
-  getDownloadURL(ref(storage, `${auth.currentUser.uid}/${url}`))
+  getDownloadURL(ref(storage, `${authorId}/${url}`))
   .then((url) => {
     SetPostUrl(url);
   })

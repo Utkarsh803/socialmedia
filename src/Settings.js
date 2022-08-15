@@ -48,6 +48,7 @@ function Settings() {
     const [uploadProfilePic, SetUploadProfilePic]=useState(false);
     const [profilePicFile, SetProfilePicFile]=useState(false);
     const [preview, SetPreview]=useState(false);
+    const [enteredText, setEnteredText] = useState('')
 
   const [value, setValue] = React.useState('Controlled');
 
@@ -213,31 +214,38 @@ function Settings() {
   }
 
   const handleInputName=(e)=>{
+
     setName(e);
     console.log(name);
   }
   
   const handleInputUsername=(e)=>{
+
     SetUserName(e);
     console.log(username);
   }
   const handleInputBio=(e)=>{
+  
     SetBio(e);
     console.log(bio);
   }
   const handleInputPhone=(e)=>{
+    
     SetPhone(e);
     console.log(phone);
   }
   const handleInputEmail=(e)=>{
+    
     SetEmail(e);
     console.log(email);
   }
   const handleInputGender=(e)=>{
+   
     SetGender(e);
     console.log(gender);
   }
   const handleInputWebsite=(e)=>{
+
     SetWebsite(e);
     console.log(gender);
   }
@@ -269,6 +277,7 @@ function Settings() {
               setIsLoading(false);
               showAlert();
               console.log("Profile updated!");
+            
             } 
       catch(error)
       {
@@ -514,6 +523,7 @@ function Settings() {
       SetProfilePicFile(null);
       SetPercent(0);
       SetUrl(null);
+      window.location.reload();
   }
 
 
@@ -578,14 +588,14 @@ function Settings() {
         </div>
         </div>
         <div className='formInputsColumn'>
-        <div className='bgblack'>Name :<input placeholder={name} className='formInput'></input></div>
+        <div className='bgblack'>Name :<input placeholder={name} className='formInput' onChange={(event)=>{handleInputName(event.target.value)}}></input></div>
         
-        <div className='bgblack'>Username :<input placeholder={username} className='formInput' onChange={(event)=>{handleInputName(event.target.value)}}></input></div>
-        <div className='bgblack'>Website :<input placeholder={website} className='formInput' onChange={(event)=>{handleInputWebsite(event.target.value)}}></input></div>
-        <div className='bgblack'> Bio :<input placeholder={bio} className='formInputBio' onChange={(event)=>{handleInputBio(event.target.value)}}></input></div>
-        <div className='bgblack'>Number :<input placeholder={phone} className='formInput' onChange={(event)=>{handleInputPhone(event.target.value)}}></input></div>
-        <div className='bgblack'>Email :<input placeholder={email} className='formInput' onChange={(event)=>{handleInputEmail(event.target.value)}}></input></div>
-        <div className='bgblack'>Gender :<input placeholder={gender} className='formInput' onChange={(event)=>{handleInputGender(event.target.value)}}></input></div>
+        <div className='bgblack'>Username :<input  placeholder={username} className='formInput' onChange={(event)=>{handleInputUsername(event.target.value)}}></input></div>
+        <div className='bgblack'>Website :<input  placeholder={website} className='formInput' onChange={(event)=>{handleInputWebsite(event.target.value)}}></input></div>
+        <div className='bgblack'> Bio :<input  placeholder={bio} className='formInputBio' onChange={(event)=>{handleInputBio(event.target.value)}}></input></div>
+        <div className='bgblack'>Number :<input  placeholder={phone} className='formInput' onChange={(event)=>{handleInputPhone(event.target.value)}}></input></div>
+        <div className='bgblack'>Email :<input  placeholder={email} className='formInput' onChange={(event)=>{handleInputEmail(event.target.value)}}></input></div>
+        <div className='bgblack'>Gender :<input  placeholder={gender} className='formInput' onChange={(event)=>{handleInputGender(event.target.value)}}></input></div>
         <button className='submit' onClick={addProfileInfo} disabled={isLoading}>Submit </button>
       </div>
     </div>)}

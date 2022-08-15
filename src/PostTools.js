@@ -3,9 +3,11 @@ import {useState, useEffect } from "react";
 import { AiOutlineHeart,AiFillHeart} from 'react-icons/ai';
 import { FaRegComment, FaRegBookmark, FaBookmark} from 'react-icons/fa';
 import { IoMdShareAlt} from 'react-icons/io';
+import { addNotification } from './App';
 
 import {db, auth} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc,serverTimestamp} from 'firebase/firestore';
+import { type } from '@testing-library/user-event/dist/type';
 
 
 function PostTools({postid, authorId, likes, saves}) {
@@ -35,7 +37,7 @@ useEffect(()=>{
 
 const getSave = async () => {
 
-  const docRef = doc(db, `/users/${authorId}/savedPosts`,`${postid}`);
+  const docRef = doc(db, `/users/${auth.currentUser.uid}/savedPosts`,`${postid}`);
 
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
@@ -121,7 +123,11 @@ const addTotalPostLikes=async()=>{
         console.log("Author ID: "+authorId);
         console.log("Post ID: "+postid);
         console.log("Added a like");
-
+        if(authorId != auth.currentUser.uid){
+          const id = {authorId};
+          const pid = {postid};
+        addNotification("like", "liked your post.",pid,id);
+         }
          } 
    catch(error)
    {
@@ -134,7 +140,7 @@ const addTotalPostLikes=async()=>{
 const addTotalPostSaves=async()=>{
   try
   {  
-     const usersCollectionRef = doc(db, `/users/${authorId}/savedPosts`,`${postid}`);
+     const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/savedPosts`,`${postid}`);
      await setDoc(usersCollectionRef,{
        authorID: authorId,
        timeStamp:serverTimestamp()
@@ -155,7 +161,7 @@ const addTotalPostSaves=async()=>{
 const subTotalPostSaves=async()=>{
   try
   {  
-     const usersCollectionRef = doc(db, `/users/${authorId}/savedPosts`,`${postid}`);
+     const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/savedPosts`,`${postid}`);
       await deleteDoc(usersCollectionRef);      
       console.log("Author ID: "+authorId);
       console.log("Post ID: "+postid);
@@ -198,6 +204,8 @@ function handleButtonUnlike() {
     subTotalPostLikes();
     subToPostLikes();
   }
+  //like->create a notification->store the like notif ref in posst
+  //unlike->get post like notif ref->find notif ->delete
 
   function handleButtonComment() {
   }

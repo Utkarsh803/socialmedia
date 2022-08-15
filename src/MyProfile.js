@@ -217,7 +217,7 @@ function MyProfile() {
       {posts && focusImages && grid &&
       (posts.map((post)=>
     {return <div id={post.url} className="indGrid" onClick={handleButtonSetGrid}>
-      <GridImg name={name} captions={post.caption} url={post.url} ></GridImg>
+      <GridImg name={name} captions={post.caption} url={post.url} authorId={post.authorID}></GridImg>
       </div>
     })
   )}  

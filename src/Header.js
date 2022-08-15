@@ -6,7 +6,7 @@ import {FaRegBookmark , FaUserAltSlash}from 'react-icons/fa';
 import logo from'./mslogo.jpg';
 import {useState, useEffect} from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp} from 'firebase/firestore';
+import {collection, getDocs, getDoc,addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp} from 'firebase/firestore';
 import { useNavigate } from "react-router-dom";
 import Settings from './Settings';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
@@ -31,8 +31,14 @@ function Header({handleLogout, name}) {
   const[searchRes, SetSearchRes]=useState(null);
   const[searchInput, SetSearchInput]=useState(null);
   const[followersList, SetFollowersList]=useState(null);
+  const[numPosts, SetNumPosts]=useState(null);
   let navigate = useNavigate(); 
  
+  
+  useEffect(()=>{
+    getPostsStats();
+    }, [] );
+
 
    const search = async(name) =>{
     SetSearchInput(name);
@@ -48,7 +54,32 @@ function Header({handleLogout, name}) {
     }
   }
   
-  
+  const getPostsStats=async()=>{
+    const docRef = doc(db, `users`,`${auth.currentUser.uid}`)
+    const docSnap = await getDoc(docRef);
+
+    if(docSnap.exists()){
+        SetNumPosts(docSnap.data().following);
+        console.log("this many posts"+docSnap.data().posts);
+    }
+    else{
+            console.log("error");
+    }
+    }
+
+    const increasePosts=async()=>{
+      try{
+      const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
+      const newfield1 = {posts: numPosts + 1};
+      SetNumPosts(numPosts+1);
+      await updateDoc(followingdocRef,newfield1);
+      console.log("Post stats updated.");
+      }
+      catch(error){
+          console.log(error);
+      }
+  }
+
   const addToStorage = async(imgName) =>{
 
   if (imageFile == null) {
@@ -202,6 +233,7 @@ catch(error){
         createLikeList(addedDoc.id);
         createCommentList(addedDoc.id);
         addToFeed(addedDoc.id);
+        increasePosts();
         console.log("Post ID : "+ addedDoc.id);   
          } 
    catch(error)
