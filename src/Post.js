@@ -3,7 +3,7 @@ import logo from './mslogo.jpg';
 import PostHeader from './PostHeader';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc} from 'firebase/firestore';
+import {collection, getDocs, addDoc, setDoc, serverTimestamp, updateDoc, deleteDoc, doc} from 'firebase/firestore';
 import PostTools from './PostTools';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import moment from 'react-moment'
@@ -19,8 +19,11 @@ import Avatar from '@mui/material/Avatar';
 
 
 function Post({postid, name, authorId, captions, comments, likes, saves, timeStamp, url, profilePic}) {
+  const NotRef = collection(db, `users/${authorId}/notifications`);
 
-  const[postUrl, SetPostUrl]=useState(null);;
+  const[postUrl, SetPostUrl]=useState(null);
+  const[comment, SetComment]=useState(null);
+  const[totalComments, SetTotalComments]=useState(null);
 
     const getPostPic= async()=>{
     getDownloadURL(ref(storage, `${authorId}/${url}`))
@@ -51,7 +54,7 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
 
   useEffect(()=>{
     try{
-      getPostPic();
+        getPostPic();
 
     }
     catch(error){
@@ -59,6 +62,55 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
     }
   }, [] );
 
+  
+const addTotalPostComments=async()=>{
+  try
+  {  
+     const usersCollectionRef = doc(db, `/users/${authorId}/comments/${postid}/ids`, `${auth.currentUser.uid}`);
+     await setDoc(usersCollectionRef,{
+       comment: comment,
+       author:auth.currentUser.uid,
+       postid:postid,
+       timeStamp:serverTimestamp()
+     });      
+      console.log("Author ID: "+authorId);
+      console.log("Post ID: "+postid);
+      console.log("Added a comment");
+       } 
+ catch(error)
+ {
+     console.log(error.message);
+     console.log("Comment was not registered :("); 
+ }
+}
+
+
+
+const addToPostComments=async()=>{
+  try{
+    const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
+    const newFields = {comments: comments + 1};
+    await updateDoc(userDoc, newFields);
+  }
+  catch(error){
+    console.log(error);
+  }
+  }
+
+  const addComment=async()=>{    
+      addTotalPostComments();
+      addToPostComments();
+      if(authorId != auth.currentUser.uid){
+    await addDoc(NotRef,{
+      type:"comment",
+      content:"commented on your post.",
+      author:auth.currentUser.uid,
+      postid:postid,
+      timeStamp:serverTimestamp(),
+    })
+    console.log("Posted a notification about a comment.")
+  }
+}
 
   return (<div className="Post">
     <nav>
@@ -87,9 +139,9 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
     src={profilePic}
     sx={{ width: 25, height: 25, marginTop:'1%', marginLeft:'3%'}}
     />
-    <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'80%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }}>
+    <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'80%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }} onChange={(event)=>{SetComment(event.target.value)}}>
     </input>
-    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}}>Post</button>
+    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>
     </div>
     <div style={{color:'grey',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}></div>
     <div className='footer'></div>

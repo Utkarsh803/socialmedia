@@ -100,17 +100,8 @@ function Profile() {
       try{
       const docR = doc(db, `users/${auth.currentUser.uid}/followingList`, `${uid}`)
       const docSnap =  await getDoc(docR);
-  
-          if (docSnap.exists()) {
-              SetFollow(true);
-              console.log("follow is true");
-              console.log({uid}===auth.currentUser.uid);
-          } else {
-          // doc.data() will be undefined in this case
-              SetFollow(false);
-              console.log("follow is false");
-              console.log({uid}===auth.currentUser.uid);
-          }}
+      {docSnap.exists() ? (SetFollow(true)):(SetFollow(false))}
+    }
           catch(error){
             console.log(error);
           }
@@ -120,7 +111,7 @@ function Profile() {
     getFollowStats();
     getUsersData();
     getUserPost();
-  }, [follow] );
+  }, [] );
 
 
 
@@ -206,6 +197,15 @@ function Profile() {
             console.log(error);
         }
         increaseFollower();
+
+        const NotRef = collection(db, `users/${uid}/notifications`);
+        await addDoc(NotRef,{
+          type:"follow",
+          content:"started following you.",
+          author:auth.currentUser.uid,
+          timeStamp:serverTimestamp(),
+        })
+        console.log("Posted a notification about a follow.")
     }
 
     const deleteFeed = async()=>{

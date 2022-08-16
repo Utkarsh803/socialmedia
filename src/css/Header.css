@@ -177,6 +177,19 @@ width: 20%;
   border-radius: 2.5%;
 }
 
+.Header .NotifTray{
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 105%;
+  right: 10%;
+  width: 25%;
+  min-height: 10vh;
+  z-index: 2;
+  background-color: black;
+  border-radius: 2.5%;
+}
+
 .Header .closeButton{
   position: relative;
   width: 7%;

@@ -13,6 +13,7 @@ import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/
 import {v4} from 'uuid'
 import { query, where, orderBy, limit } from "firebase/firestore";  
 import SearchResult from './SearchResult';
+import NotifLike from './NotifLike';
 
 
 
@@ -29,15 +30,38 @@ function Header({handleLogout, name}) {
   const[postID, SetPostID]=useState(null);
   const[url, SetUrl]=useState(null);
   const[searchRes, SetSearchRes]=useState(null);
+  const[viewNotif, SetViewNotif]=useState(null);
+  const[Notif, SetNotif]=useState(null);
   const[searchInput, SetSearchInput]=useState(null);
   const[followersList, SetFollowersList]=useState(null);
   const[numPosts, SetNumPosts]=useState(null);
+
   let navigate = useNavigate(); 
  
   
   useEffect(()=>{
     getPostsStats();
+    getNotif();
     }, [] );
+
+    const getNotif= async()=>{
+      try{
+      const notifRef = collection(db, `users/${auth.currentUser.uid}/notifications`);
+      const data = await getDocs(notifRef);
+      if(data.size>0){
+      SetNotif(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      }
+      else{
+        SetNotif(null);
+      }
+    }
+    catch(error)
+    {
+      console.log(error);
+    }
+    }
+
+
 
 
    const search = async(name) =>{
@@ -381,6 +405,10 @@ catch(error){
    }
 
 
+   const handleButtonNotif=()=>{
+    SetViewNotif(!viewNotif);
+   }
+
   return (<div className="Header">
 
     <img src={logo} className="logo" />
@@ -431,8 +459,34 @@ catch(error){
   )}
 
     
-    <AiOutlineHeart className='icons'/>
+    <AiOutlineHeart className='icons' onClick={handleButtonNotif}/>
+        
+        {viewNotif && Notif && (
+        <div className='NotifTray'>
+         {( Notif.map((res)=>
+            {return <div>
+             <NotifLike authorId={res.author} content={res.content} postid={res.postid} timestamp={res.timeStamp} type={res.type}></NotifLike>
+              </div>;
+            })
+            )
+    }
+    </div>
+    )}
     
+    
+            
+        {viewNotif && (Notif==null) && (
+        
+          (
+            <div class="NotifTray">
+           <div  style={{display:'relative', width:'100%', backgroundColor:'black', color:'white', padding:'5%'}}>
+             <div style={{display:'relative', width:'100%', backgroundColor:'black', color:'white', textAlign:'center'}}>No Notifications.</div>
+              </div>
+              </div>
+            )
+         )}
+        
+     
     <BiMessageRounded className='icons'/>
     
     <CgProfile className='icons' onClick={handleButtonProfileMenu}/>

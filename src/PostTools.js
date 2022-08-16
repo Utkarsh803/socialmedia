@@ -15,6 +15,8 @@ function PostTools({postid, authorId, likes, saves}) {
 const[like, setLike]=useState(false);
 const[mark, setMark]=useState(false);
 
+const NotRef = collection(db, `users/${authorId}/notifications`);
+
 
 
 
@@ -124,9 +126,14 @@ const addTotalPostLikes=async()=>{
         console.log("Post ID: "+postid);
         console.log("Added a like");
         if(authorId != auth.currentUser.uid){
-          const id = {authorId};
-          const pid = {postid};
-        addNotification("like", "liked your post.",pid,id);
+          await addDoc(NotRef,{
+            type:"like",
+            content:"liked your post.",
+            author:auth.currentUser.uid,
+            postid:postid,
+            timeStamp:serverTimestamp(),
+          })
+          console.log("Posted a notification about a like.")
          }
          } 
    catch(error)
@@ -208,6 +215,7 @@ function handleButtonUnlike() {
   //unlike->get post like notif ref->find notif ->delete
 
   function handleButtonComment() {
+    //show comments
   }
 
   function handleButtonMark() {

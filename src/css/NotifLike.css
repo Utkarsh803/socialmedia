@@ -1,0 +1,88 @@
+.NotifLike {
+    background-color:black;
+     position:relative;
+     display:flex;
+     flex-direction: row;
+     padding:3%;
+     width: fit-content;
+     border-bottom: 1px grey;
+     border-bottom-style:outset;
+    }
+ 
+
+    .NotifLike .logo{
+ position:relative;
+ display: block;
+ max-width: 8%;
+ height:70%;
+ margin-left: 3%;
+ margin-top: 1.5%;
+ border-radius:100%
+ }
+ 
+ 
+ .NotifLike .welcome{
+    position: relative;
+    height: fit-content;
+    width: fit-content;
+    margin-top:5%;
+    margin-left:5%;
+    font-size: large;
+    background-color: black;
+    }
+
+    .NotifLike .icons{
+        position: relative;
+        margin: 1%;
+        margin-left:6% ;
+        width: fit-content;
+        height:80% ;
+
+        
+}
+
+.NotifLike .icons:active {
+    vertical-align: top;
+    padding: 8px 13px 6px;
+}
+
+.NotifLike .dropdown {
+    position: absolute;
+    top: 10%;
+    right: 0%;
+    width: 150px;
+    z-index: 1;
+    background-color: black;
+    
+  }
+
+
+
+  .NotifLike .selectionIcon{
+    background-color: black;
+  }
+  
+  .NotifLike .Header .ul {
+    list-style: none;
+    background-color: black;
+    
+
+  }
+  .NotifLike .selection {
+    position: relative;
+    background-color: black;
+    right: 35%;
+    width: 135%;
+    font-size: large;
+    margin-bottom: -3%;
+    white-space: nowrap;
+    text-align: left;
+
+
+  }
+  
+  .NotifLike.selection:hover {
+    background-color:rgba(255, 255, 255, 0.049);
+    cursor: pointer;
+    color:white;
+  }

@@ -1,4 +1,4 @@
-import './css/SearchResult.css';
+import './css/NotifLike.css';
 import {CgProfile} from 'react-icons/cg';
 import { AiOutlineHeart, AiOutlineNotification } from 'react-icons/ai';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
@@ -8,16 +8,19 @@ import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, 
 import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { Link, useNavigate } from 'react-router-dom';
+import GridImg from './GridImg';
 
-function SearchResult({name, authorId, url}) {
+function NotifLike({authorId,postid,content, timestamp, type}) {
     const NotRef = collection(db, `users/${authorId}/notifications`);
     const navigate = useNavigate();
 
     const[imageUrl, SetImageUrl]=useState(false);
+    const[postUrl, SetPostUrl]=useState(false);
     const[follow, SetFollow]=useState(null);
     const[myFollow, SetMyFollow]=useState(null);
     const[following, SetFollowing]=useState(null);
-
+    const[profilePic, SetProfilePic]=useState(null);
+    const[username, SetUsername]=useState(false);
     const getFollow=async()=>{
     const docRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${authorId}`)
     const docSnap = await getDoc(docRef);
@@ -57,9 +60,13 @@ function SearchResult({name, authorId, url}) {
 
 
     useEffect(()=>{
-        function getPostPic(){
+        const getProfilePic=async()=>{
+
+            const docRef = doc(db, `users/${authorId}`);
+            const data = await getDoc(docRef);
+            SetUsername(data.data().username);
             
-            getDownloadURL(ref(storage, `${authorId}/${url}`))
+            getDownloadURL(ref(storage, `${authorId}/${data.data().profilePic}`))
             .then((url) => {
               SetImageUrl(url);
             })
@@ -80,8 +87,41 @@ function SearchResult({name, authorId, url}) {
                   console.log("Unknown error occurred, inspect the server response");
                   break;
               }
+            });}
+
+            const getPostPic=async()=>{
+
+            if(type!="follow"){
+            const postRef = doc(db, `users/${auth.currentUser.uid}/posts`, `${postid}`)
+            console.log({authorId});
+            console.log({postid})
+            const postData = await getDoc(postRef);
+
+            getDownloadURL(ref(storage, `/${auth.currentUser.uid}/${postData.data().url}`))
+            .then((postUrl) => {
+              SetPostUrl(postUrl);
+            })
+            .catch((error) => {
+              // A full list of error codes is available at
+              // https://firebase.google.com/docs/storage/web/handle-errors
+              switch (error.code) {
+                case 'storage/object-not-found':
+                  console.log("File doesn't exist");
+                  break;
+                case 'storage/unauthorized':
+                  console.log("User doesn't have permission to access the object");
+                  break;
+                case 'storage/canceled':
+                  console.log("User canceled the upload");
+                  break;
+                case 'storage/unknown':
+                  console.log("Unknown error occurred, inspect the server response");
+                  break;
+              }
             });
-            }
+        }
+    }
+            getProfilePic();
             getPostPic();
             getFollow();
             getFollowStats();
@@ -130,7 +170,6 @@ function SearchResult({name, authorId, url}) {
         await setDoc(followRef,{
             timeStamp:serverTimestamp()
         });
-        console.log("You are now folowing"+name);
 
         const followingRef = doc(db, `users/${authorId}/followerList`, `${auth.currentUser.uid}`)
 
@@ -146,7 +185,7 @@ function SearchResult({name, authorId, url}) {
         await addDoc(NotRef,{
             type:"follow",
             content:"started following you.",
-            author:auth.currentUser.uid,
+            author:authorId,
             timeStamp:serverTimestamp(),
           })
           console.log("Posted a notification about a follow.")
@@ -168,7 +207,7 @@ function SearchResult({name, authorId, url}) {
         const followRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${authorId}`)
 
         await deleteDoc(followRef);
-        console.log("You are not following"+name+" anymore");
+
 
         const followingRef = doc(db, `users/${authorId}/followerList`, `${auth.currentUser.uid}`)
 
@@ -189,27 +228,50 @@ function SearchResult({name, authorId, url}) {
         const handleButtonSendToMyprofile=()=>{
             navigate(`/myprofile`);
              }
-    
+    const like = "like";
 
-  return (<div className="SearchResult">
+  return (
+    <div className="NotifLike">
+    {type === "like" && (
     <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
     <Avatar
     alt="preview image"
     src={imageUrl}
     sx={{ width: 40, height: 40, marginTop:'2%'}}
     />
-    <h4 className='welcome'>{name}</h4>  
+    <h4 className='welcome'>{username}</h4>  
+    <div style={{backgroundColor:'black', width:'150px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'5%'}}> liked a post.</div>
+    <img src={postUrl} style={{height:'70%'}}></img>
     </div>
+   )}
 
-    { (authorId!=auth.currentUser.uid) && (
-    follow ? (<button className='icons' onClick={handleButttonUnfollow}>Unfollow</button>):(
-        <button className='icons' onClick={handleButttonFollow}>Follow</button>
-    )
-    )}
+    {type === "comment" && (
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
+    <Avatar
+    alt="preview image"
+    src={imageUrl}
+    sx={{ width: 40, height: 40, marginTop:'2%'}}
+    />
+    <h4 className='welcome'>{username}</h4>  
+    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'5%'}}> commented on a post.</div>
+    <img src={postUrl} style={{backgroundColor:'black'}}></img>
+    </div>
+   )}
 
-    
-  
-  </div>);
+    {type === "follow" && (
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
+    <Avatar
+    alt="preview image"
+    src={imageUrl}
+    sx={{ width: 40, height: 40, marginTop:'2%'}}
+    />
+    <h4 className='welcome'>{username}</h4>  
+    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'5%'}}> started follwing you.</div>
+    </div>
+   )}
+   
+    </div>
+    );
 }
 
-export default SearchResult;
+export default NotifLike;
