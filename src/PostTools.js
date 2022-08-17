@@ -231,7 +231,7 @@ function handleButtonUnlike() {
   }
 
 return (<div className="PostTools">
-    {like ? (<AiFillHeart className='icons' onClick={handleButtonUnlike}/>):(<AiOutlineHeart className='icons' onClick={handleButtonLike}/>)}
+    {like ? (<AiFillHeart className='icons' style={{color:'red'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart className='icons' style={{color:'white'}} onClick={handleButtonLike}/>)}
     <FaRegComment className='icons' onClick={handleButtonComment}/>
     <IoMdShareAlt className='icons'/>
     <div className='space'></div>

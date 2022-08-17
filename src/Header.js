@@ -454,7 +454,7 @@ catch(error){
 <textarea placeholder='Type yor caption...' className='captionInput' onChange={(event)=>{SetCaption(event.target.value)}}>
 </textarea>
   </div>
-  <button className="uploadImage" onClick={handleButtonNext}>Post</button><p>{percent}% done</p>
+  <button className="uploadImage" onClick={handleButtonNext}>Post</button><p style={{backgroundColor:'black', color:'white'}}>{percent}% done</p>
 </div>
   )}
 

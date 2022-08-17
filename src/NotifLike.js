@@ -237,11 +237,11 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
     <Avatar
     alt="preview image"
     src={imageUrl}
-    sx={{ width: 40, height: 40, marginTop:'2%'}}
+    sx={{ width: 40, height: 40, marginTop:'3%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'150px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'5%'}}> liked a post.</div>
-    <img src={postUrl} style={{height:'70%'}}></img>
+    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> liked a post.</div>
+    <img src={postUrl} style={{height:'60%', backgroundColor:'black',height:'fit-content', maxHeight:'10vh', maxWidth:'10vh'}}></img>
     </div>
    )}
 
@@ -250,11 +250,11 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
     <Avatar
     alt="preview image"
     src={imageUrl}
-    sx={{ width: 40, height: 40, marginTop:'2%'}}
+    sx={{ width: 40, height: 40, marginTop:'3%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'5%'}}> commented on a post.</div>
-    <img src={postUrl} style={{backgroundColor:'black'}}></img>
+    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> commented on a post.</div>
+    <img src={postUrl} style={{height:'60%', backgroundColor:'black',height:'fit-content', maxHeight:'10vh', maxWidth:'10vh'}}></img>
     </div>
    )}
 
@@ -263,10 +263,10 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
     <Avatar
     alt="preview image"
     src={imageUrl}
-    sx={{ width: 40, height: 40, marginTop:'2%'}}
+    sx={{ width: 40, height: 40, marginTop:'3%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'5%'}}> started follwing you.</div>
+    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> started follwing you.</div>
     </div>
    )}
    
