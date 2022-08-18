@@ -239,6 +239,8 @@ catch(error){
    const createPost = async() =>{
     try
     {  
+      const hashtagArray = caption.match(/#[\p{L}]+/ugi);
+      console.log("This post has hashtags"+hashtagArray);
        const imageName = imageFile.name + v4();
        await addToStorage(imageName);
        const usersCollectionRef = collection(db,  `/users/${auth.currentUser.uid}/posts`);
@@ -251,6 +253,7 @@ catch(error){
         url:imageName,
         reported:0,
         saved:0,
+        tags:hashtagArray,
         timeStamp:serverTimestamp(),
         });       
         addToAlbum(addedDoc.id, imageName);
@@ -492,7 +495,7 @@ catch(error){
     <CgProfile className='icons' onClick={handleButtonProfileMenu}/>
     {profileMenu && (
     <div class="dropdown">
-      <ul>
+      <ul style={{background:'black', height:'fit-content'}}>
         <button className='selection'  onClick={goToMyProfile}> <CgProfile className='selectionIcon'/>  My Profile</button>
         <button className='selection' onClick={goToSettings}><AiFillSetting className='selectionIcon' />  Settings</button>
         <button className='selection'><FaRegBookmark className='selectionIcon' /> Saved</button>

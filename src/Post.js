@@ -129,15 +129,14 @@ const addTotalPostComments=async()=>{
   try
   {  
      incCommentNum();
-     const usersCollectionRef = doc(db, `/users/${authorId}/comments/${postid}/ids`, `${auth.currentUser.uid}`);
-     await setDoc(usersCollectionRef,{
+     const usersCollectionRef = collection(db, `/users/${authorId}/comments/${postid}/ids`);
+     await addDoc(usersCollectionRef,{
        id: totalComments+1,
        parent:null,
        comment: comment,
        author:auth.currentUser.uid,
        postAuthor:authorId,
        postid:postid,
-       numChildren:0,
        timeStamp:serverTimestamp()
      });      
       SetTotalComments(totalComments+1);

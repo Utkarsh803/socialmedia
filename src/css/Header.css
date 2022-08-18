@@ -70,13 +70,28 @@ width: 20%;
 
 .Header .dropdown {
     position: absolute;
-    top: 70%;
-    right:1%;
-    width: 150px;
+    top: 115%;
+    right:1.5%;
+    width: 185px;
+    height: fit-content;
     z-index: 2;
     background-color: black;
-    
+    border-radius: 2.5%;
   }
+
+  .Header .selection {
+    position: relative;
+    background-color: black;
+    right: 22%;
+    width: 170px;
+    font-size: large;
+    margin-bottom: 0%;
+    white-space: nowrap;
+    text-align: center;
+
+
+  }
+  
 
   .Header .middletray{
     position: absolute;
@@ -107,21 +122,9 @@ width: 20%;
     
 
   }
-  .Header .selection {
-    position: relative;
-    background-color: black;
-    right: 40%;
-    width: 140%;
-    font-size: large;
-    margin-bottom: -3%;
-    white-space: nowrap;
-    text-align: center;
 
-
-  }
-  
   .Header .selection:hover {
-    background-color:rgba(255, 255, 255, 0.049);
+    background-color:rgba(255, 255, 255, 0.162);
     cursor: pointer;
     color:white;
   }
