@@ -1,13 +1,13 @@
-.MyProfile{
-    color: aliceblue;
-    background-color: aliceblue;
+.MyProfile{ 
+    color: #fff;  
+    background-color:rgba(0, 0, 0, 0.896);
   }
 
 
   .MyProfile .divider{
     position: relative;
     display: flex;
-    background-color: rgba(0, 0, 0, 0.797);
+
     flex-direction: column;
     margin-top: 9%;    
   }
@@ -49,7 +49,7 @@
     height: 60vh;
    margin-top: 0%;
     padding-left: 7%;
-    margin-top: -5%;
+    margin-bottom: 5%;
 }
 
 .MyProfile .secondTray{
@@ -59,6 +59,7 @@
     background-color: rgba(0, 0, 0, 0.078);
     width:100%;
     height:fit-content;
+
 }
 
 .MyProfile .posts{
@@ -233,8 +234,11 @@
 
 .MyProfile .space05{
     position: relative;
-    margin: 0.5%;
-    
+    margin: 1%;
+    height: 2vh;
+    width: 105%;
+    right:2.5%;
+    background-color: rgb(18, 17, 17);;
 }
 
 

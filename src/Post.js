@@ -185,7 +185,7 @@ const addToPostComments=async()=>{
     <nav>
     <PostHeader name = {name} url={profilePic}></PostHeader>
     <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />
-    <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves}></PostTools>
+    <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={profilePic}></PostTools>
     <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
     <div className='caption'>
     <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'1%', marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'1%', width:'90%'}}>

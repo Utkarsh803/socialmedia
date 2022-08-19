@@ -196,7 +196,7 @@ function MyProfile() {
       </div>
     </div>
     </div>
-    
+    <div className='space05'></div>
     <div className='secondTray'>
       <div className='rowCategory'>
       {focusImages ?

@@ -32,3 +32,37 @@
     background-color: black;
     width: 62%;
 }
+
+.PostTools .commentTray{
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    box-shadow:0 0 2px grey;
+    top: 6%;
+    right:25%;
+    width: 50%;
+    height: 93vh;
+    z-index: 3;
+    background-color: black;
+    border-radius: 2.5%;
+    
+  }
+
+  .PostTools .comments{
+    padding-top: 2.5%;
+    padding-left: 5%;
+    padding-right: 5%;
+    border-radius: 2%;
+
+    height: 95%;
+    overflow: scroll;
+    scroll-behavior: smooth;
+    margin-bottom: 0%;
+  }
+
+  .PostTools .input{
+    height: fit-content;
+    width: 100%;
+    border-radius: 2%;
+
+  }

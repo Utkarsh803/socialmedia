@@ -1,6 +1,5 @@
-.App{
-  color: aliceblue;
-  background-color: aliceblue;
+*{
+  background-color:rgba(0, 0, 0, 0.923);
 }
 
 .App button{

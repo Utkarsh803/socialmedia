@@ -414,11 +414,11 @@ catch(error){
 
   return (<div className="Header">
 
-    <img src={logo} className="logo" />
+    <h1 style={{fontSize:'xxx-large', marginLeft:'4%', marginRight:'9%', marginTop:'1.7%'}}>Lyfy</h1>
 
-
+  
    <div style={{ display:'flex', flexDirection:'column', width:'57%', backgroundColor:'black', color:'white'}}>
-    <input style={{width:'60%', marginTop:'5%'}} placeholder='search...' onChange={(event)=>search(event.target.value)}></input>
+    <input style={{width:'60%', marginTop:'5%', backgroundColor:'white', borderRadius:'1%', color:'white'}} placeholder='search...' onChange={(event)=>search(event.target.value)}></input>
     {searchRes && 
     (
     searchRes.map((res)=>
