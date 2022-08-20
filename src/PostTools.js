@@ -23,6 +23,7 @@ const[comment, SetComment]=useState(null);
 const[totalComments, SetTotalComments]=useState(null);
 const NotRef = collection(db, `users/${authorId}/notifications`);
 const[commentTree, SetCommentTree]=useState(null);
+const[saveNum, SetSaveNum]=useState(saves);
 
 
 
@@ -179,10 +180,11 @@ const subToPostLikes=async()=>{
   const addToPostSaves=async()=>{
     try{
       const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
-      const newFields = {saved: saves + 1};
+      const newFields = {saved: saveNum + 1};
       await updateDoc(userDoc, newFields);   
       console.log("Author ID: "+authorId);
       console.log("Post ID: "+postid);
+      SetSaveNum(saveNum+1);
     }
     catch(error){
       console.log(error);
@@ -192,10 +194,11 @@ const subToPostLikes=async()=>{
     const subToPostSaves=async()=>{
       try{
         const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
-        const newFields = {saved: saves - 1};
+        const newFields = {saved: saveNum - 1};
         await updateDoc(userDoc, newFields);   
         console.log("Author ID: "+authorId);
         console.log("Post ID: "+postid);
+        SetSaveNum(saveNum-1);
 
       }
       catch(error){

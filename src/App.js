@@ -11,6 +11,7 @@ import MyProfile from "./MyProfile";
 import Settings from "./Settings";
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import Profile from "./Profile";
+import SavedPosts from "./SavedPosts";
 
 export const addNotification=async(type,content,postid, authorid)=>{
   const NotRef = collection(db, `users/${authorid}/notifications`);
@@ -110,6 +111,9 @@ function App() {
        )} ;
         {user &&(
         <Route path="/settings" element={<Settings />}></Route>
+       )} ;
+               {user &&(
+        <Route path="/saved-posts" element={<SavedPosts />}></Route>
        )} ;
 
        <Route path='/:uid' element={<Profile />}>

@@ -1,0 +1,82 @@
+.SavedPosts{
+    color: aliceblue;
+    background-color:rgba(0, 0, 0, 0.896);
+    }
+    
+    .SavedPosts button{
+      position: relative;
+      display: block;
+      width:10%;
+      min-height: 35px;
+        appearance: button;
+        backface-visibility: hidden;
+        background-color: #405cf5;
+        border-width: 0;
+        box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
+        box-sizing: border-box;
+        color: #fff;
+        cursor: pointer;
+        font-family: -apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif;
+        margin-top:3%;
+        margin-bottom:9%;
+        outline: none;
+        overflow: hidden;
+        padding: 0 25px;
+        text-transform: none;
+        transform: translateZ(0);
+        transition: all .2s,box-shadow .08s ease-in;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+    }
+  
+    .SavedPosts .divider{
+      position: relative;
+      background-color: rgb(16, 15, 15);
+      display: flex;
+      flex-direction: row;
+      margin-top: 9%;
+    }
+  
+    .SavedPosts .pagehaedspace{
+      margin-top: 0%;
+    }
+  
+    .SavedPosts .secondTray{
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background-color: black;
+      width:80%;
+      height:fit-content;
+      margin-Top: 2%;
+      margin-left: 10%;
+      border-radius: 2%;
+      border-top-left-radius: 2%;
+      border-bottom-left-radius: 2%;
+  }
+  
+  .SavedPosts .posts{
+    position: relative;
+    display: flex;
+    flex: 1;
+    background-color: black;
+    flex-wrap: wrap;
+    flex-direction: 'row';
+    width: 90%;
+    height: fit-content;
+    margin-left: 5%;
+    padding-top: 2%;
+    border-radius: 2%;
+    margin-bottom: 2%;
+    
+  }
+  
+  .SavedPosts .indPost{ 
+    position: relative;
+    width: 85%;
+    padding-left: 7.5%;
+    background-color:black;
+    margin-bottom: 0.5%;
+    border: 1px solid black;
+  }

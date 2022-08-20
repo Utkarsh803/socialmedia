@@ -412,6 +412,12 @@ catch(error){
     SetViewNotif(!viewNotif);
    }
 
+
+   const goToSavedPosts=()=>{
+    navigate("/saved-posts");
+   }
+
+
   return (<div className="Header">
 
     <h1 style={{fontSize:'xxx-large', marginLeft:'4%', marginRight:'9%', marginTop:'1.7%'}}>Lyfy</h1>
@@ -498,7 +504,7 @@ catch(error){
       <ul style={{background:'black', height:'fit-content'}}>
         <button className='selection'  onClick={goToMyProfile}> <CgProfile className='selectionIcon'/>  My Profile</button>
         <button className='selection' onClick={goToSettings}><AiFillSetting className='selectionIcon' />  Settings</button>
-        <button className='selection'><FaRegBookmark className='selectionIcon' /> Saved</button>
+        <button className='selection'  onClick={goToSavedPosts}><FaRegBookmark className='selectionIcon' /> Saved</button>
         <button className='selection'><BiHelpCircle className='selectionIcon'/>  Help Center</button>
         <button className='selection' onClick={handleLogout}>Logout</button>
       </ul>
