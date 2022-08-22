@@ -1,4 +1,4 @@
-import {useState, useEffect } from "react";
+import {useState, useEffect, useContext, createContext } from "react";
 import {db, auth, storage} from './firebase-config';
 import Login from './Login';
 import Home from './Home';
@@ -12,6 +12,7 @@ import Settings from "./Settings";
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import Profile from "./Profile";
 import SavedPosts from "./SavedPosts";
+import Chats from "./Chats";
 
 export const addNotification=async(type,content,postid, authorid)=>{
   const NotRef = collection(db, `users/${authorid}/notifications`);
@@ -70,6 +71,7 @@ export const addNotification=async(type,content,postid, authorid)=>{
 //to do mention
 }
 
+
 function App() {
 
     const [user, setUser] = useState(null);
@@ -114,6 +116,10 @@ function App() {
        )} ;
                {user &&(
         <Route path="/saved-posts" element={<SavedPosts />}></Route>
+       )} ;
+
+          {user &&(
+        <Route path="/chats" element={<Chats />}></Route>
        )} ;
 
        <Route path='/:uid' element={<Profile />}>

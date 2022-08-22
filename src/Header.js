@@ -417,6 +417,9 @@ catch(error){
     navigate("/saved-posts");
    }
 
+   const handleButtonChats=()=>{
+    navigate("/chats");
+   }
 
   return (<div className="Header">
 
@@ -496,7 +499,7 @@ catch(error){
          )}
         
      
-    <BiMessageRounded className='icons'/>
+    <BiMessageRounded className='icons'onClick={handleButtonChats}/>
     
     <CgProfile className='icons' onClick={handleButtonProfileMenu}/>
     {profileMenu && (
