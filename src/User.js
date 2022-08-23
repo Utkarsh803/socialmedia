@@ -7,7 +7,7 @@ import { collection, query, where, onSnapshot, getDoc, snapshotEqual, doc } from
 import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 
-const User=({user})=> {
+const User=({user, selectUser})=> {
 
     const [picUrl, SetPicUrl]= useState(null);
     const [name, SetName]= useState(null);
@@ -52,7 +52,7 @@ const User=({user})=> {
 
     
     return (
-    <div className="SearchResult">
+    <div className="SearchResult" onClick={()=>{selectUser(user)}}>
     <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} >
     <Avatar
     alt="preview image"
