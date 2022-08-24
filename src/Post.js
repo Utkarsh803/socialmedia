@@ -4,13 +4,14 @@ import createTree from './createTree';
 import PostHeader from './PostHeader';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, setDoc, serverTimestamp, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
+import {collection, getDocs, addDoc, setDoc, serverTimestamp, updateDoc, deleteDoc, doc, getDoc, Timestamp, orderBy, query, onSnapshot} from 'firebase/firestore';
 import PostTools from './PostTools';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import {moment} from 'moment'
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import Avatar from '@mui/material/Avatar';
 import Comment from './Comment';
+import Moment from 'react-moment';
 
 
 
@@ -82,10 +83,10 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
 
   const getComments=async()=>{
     const comRef = collection(db, `users/${authorId}/comments/${postid}/ids`)
-    const data = await getDocs(comRef)
-    SetComments(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
-    SetCommentTree(createTree(data.docs.map((doc)=>({...doc.data()}))));
-    console.log("got comments");
+    const q = query(comRef,orderBy('timeStamp', 'desc'))
+    onSnapshot(q, querySnapshot=>{
+      SetCommentTree(createTree(querySnapshot.docs.map((doc)=>({...doc.data()}))));
+    })
   }
 
   const getCommentNum=async()=>{
@@ -137,7 +138,7 @@ const addTotalPostComments=async()=>{
        author:auth.currentUser.uid,
        postAuthor:authorId,
        postid:postid,
-       timeStamp:serverTimestamp()
+       timeStamp:Timestamp.fromDate(new Date()),
      });      
       SetTotalComments(totalComments+1);
       console.log("Author ID: "+authorId);
@@ -175,7 +176,7 @@ const addToPostComments=async()=>{
       content:"commented on your post.",
       author:auth.currentUser.uid,
       postid:postid,
-      timeStamp:serverTimestamp(),
+      timeStamp:Timestamp.fromDate(new Date()),
     })
     console.log("Posted a notification about a comment.")
   }
@@ -223,7 +224,7 @@ const addToPostComments=async()=>{
     )
     )}
   </div>
-  <div style={{color:'grey',backgroundColor:'black',paddingLeft:'3%',paddingTop:'2%', fontSize:'small'}}>{(timeStamp).toDate().toLocaleDateString("en-IN")}</div>
+  <div style={{color:'grey',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></div>
     <div className='footer'></div>
     </nav>
   </div>);

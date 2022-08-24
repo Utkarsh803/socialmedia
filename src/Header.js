@@ -6,7 +6,7 @@ import {FaRegBookmark , FaUserAltSlash}from 'react-icons/fa';
 import logo from'./mslogo.jpg';
 import {useState, useEffect} from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, getDoc,addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp} from 'firebase/firestore';
+import {collection, getDocs, getDoc,addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp, Timestamp,onSnapshot} from 'firebase/firestore';
 import { useNavigate } from "react-router-dom";
 import Settings from './Settings';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
@@ -47,21 +47,18 @@ function Header({handleLogout, name}) {
     const getNotif= async()=>{
       try{
       const notifRef = collection(db, `users/${auth.currentUser.uid}/notifications`);
-      const data = await getDocs(notifRef);
-      if(data.size>0){
-      SetNotif(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
-      }
-      else{
-        SetNotif(null);
-      }
+      const q = query(notifRef,orderBy('timeStamp', 'desc'))
+      onSnapshot(q, querySnapshot=>{
+        SetNotif(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      })
+    
+
     }
     catch(error)
     {
       console.log(error);
     }
     }
-
-
 
 
    const search = async(name) =>{
@@ -80,24 +77,23 @@ function Header({handleLogout, name}) {
   
   const getPostsStats=async()=>{
     const docRef = doc(db, `users`,`${auth.currentUser.uid}`)
-    const docSnap = await getDoc(docRef);
 
-    if(docSnap.exists()){
-        SetNumPosts(docSnap.data().following);
-        console.log("this many posts"+docSnap.data().posts);
-    }
-    else{
-            console.log("error");
-    }
+    const q = query(docRef);
+    onSnapshot(q, querySnapshot=>{
+      SetNumPosts(querySnapshot.data().posts);
+      console.log("NUm of posts",querySnapshot.data().posts);
+    })
+
+
     }
 
     const increasePosts=async()=>{
       try{
       const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
       const newfield1 = {posts: numPosts + 1};
-      SetNumPosts(numPosts+1);
       await updateDoc(followingdocRef,newfield1);
       console.log("Post stats updated.");
+      SetNumPosts(numPosts+1);
       }
       catch(error){
           console.log(error);
@@ -220,7 +216,7 @@ catch(error){
       const feedRef = doc(db, `feed/${docc.id}/posts`, `${postid}`);
 
       setDoc(feedRef, {
-        added:serverTimestamp(),
+        added:Timestamp.fromDate(new Date()),
         author:auth.currentUser.uid,
         postID:postid,
       });
@@ -254,8 +250,10 @@ catch(error){
         reported:0,
         saved:0,
         tags:hashtagArray,
-        timeStamp:serverTimestamp(),
+        timeStamp:Timestamp.fromDate(new Date()),
         });       
+
+       // addHash(hashtagArray);
         addToAlbum(addedDoc.id, imageName);
         createLikeList(addedDoc.id);
         createCommentList(addedDoc.id);
@@ -269,6 +267,21 @@ catch(error){
        console.log("Post was not created :("); 
    }
    }
+
+
+   const addHash = async(hashtagArray)=>{
+    for (var i in hashtagArray){
+    const hashRef= collection(db, "hashtags", {i})
+    const hashVal = await getDoc(hashRef);
+
+    const num = 0;
+    if(hashVal){
+      num=hashVal.data().value;
+    } 
+    updateDoc(hashRef, {num:num+1});
+    console.log(`hashtag ${i} added!`);
+  
+  }}
 
    const createLikeList = async(postId) =>{
     try
@@ -427,7 +440,7 @@ catch(error){
 
   
    <div style={{ display:'flex', flexDirection:'column', width:'57%', backgroundColor:'black', color:'white'}}>
-    <input style={{width:'60%', marginTop:'5%', backgroundColor:'white', borderRadius:'1%', color:'white'}} placeholder='search...' onChange={(event)=>search(event.target.value)}></input>
+    <input style={{width:'60%', marginTop:'5%', backgroundColor:'white', borderRadius:'1%', color:'black'}} placeholder='search...' onChange={(event)=>search(event.target.value)}></input>
     {searchRes && 
     (
     searchRes.map((res)=>

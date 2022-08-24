@@ -85,6 +85,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    height: 70vh;
+    overflow: scroll;
     width: 100%;
-    padding-top: 2%;
+    padding-top: 1%;
   }

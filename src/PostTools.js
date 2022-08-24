@@ -6,7 +6,7 @@ import { IoMdShareAlt} from 'react-icons/io';
 import { addNotification } from './App';
 
 import {db, auth} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc,serverTimestamp} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc,serverTimestamp, Timestamp} from 'firebase/firestore';
 import { type } from '@testing-library/user-event/dist/type';
 import Comment from './Comment';
 import createTree from './createTree';
@@ -103,8 +103,8 @@ const addTotalPostComments=async()=>{
        author:auth.currentUser.uid,
        postAuthor:authorId,
        postid:postid,
-       timeStamp:serverTimestamp()
-     });      
+       timeStamp:Timestamp.fromDate(new Date()),
+            });      
       SetTotalComments(totalComments+1);
       console.log("Author ID: "+authorId);
       console.log("Post ID: "+postid);
@@ -140,7 +140,8 @@ const addToPostComments=async()=>{
       content:"commented on your post.",
       author:auth.currentUser.uid,
       postid:postid,
-      timeStamp:serverTimestamp(),
+      timeStamp:Timestamp.fromDate(new Date()),
+    
     })
     console.log("Posted a notification about a comment.")
   }
@@ -221,12 +222,12 @@ const addTotalPostLikes=async()=>{
         console.log("Post ID: "+postid);
         console.log("Added a like");
         if(authorId != auth.currentUser.uid){
-          await addDoc(NotRef,{
+           await addDoc(NotRef,{
             type:"like",
             content:"liked your post.",
             author:auth.currentUser.uid,
             postid:postid,
-            timeStamp:serverTimestamp(),
+            timeStamp:Timestamp.fromDate(new Date()),
           })
           console.log("Posted a notification about a like.")
          }

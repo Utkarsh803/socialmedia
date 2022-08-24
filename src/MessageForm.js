@@ -10,9 +10,11 @@ import Avatar from '@mui/material/Avatar';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 
-const MessageForm=()=>{
+const MessageForm=(handleSubmit, text, setText)=>{
 return(
-    <div></div>
+    <form className='message_form'>
+
+    </form>
 )
 }
 

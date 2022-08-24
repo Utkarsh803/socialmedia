@@ -4,7 +4,7 @@ import Post from'./Post.js';
 import SidePanel from './SidePanel';
 import {useState, useEffect , useRef} from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, orderBy, query, onSnapshot} from 'firebase/firestore';
 import {signOut, onAuthStateChanged} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
@@ -109,8 +109,11 @@ function MyProfile() {
       };
   
       const getUserPost =async()=>{
-        const data = await getDocs(postsCollectionRef);
-        SetPosts(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
+        const q = query(postsCollectionRef,orderBy('timeStamp', 'desc'))
+        onSnapshot(q, querySnapshot=>{
+          SetPosts(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+        })
+ 
       }
       getUsersData();
       getUserPost();

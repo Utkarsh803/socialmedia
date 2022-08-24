@@ -3,7 +3,7 @@ import './css/SearchResult.css';
 import {CgProfile} from 'react-icons/cg';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where, Timestamp} from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { AiOutlineHeart,AiFillHeart} from 'react-icons/ai';
@@ -87,7 +87,7 @@ const Comment = ({ comment })=> {
          author:auth.currentUser.uid,
          postAuthor:comment.postAuthor,
          postid:comment.postid,
-         timeStamp:serverTimestamp()
+         timeStamp:Timestamp.fromDate(new Date()),
        });      
        SetTotalComments(totalComments+1);
         console.log("Author ID: "+comment.postAuthor);
@@ -133,7 +133,7 @@ const Comment = ({ comment })=> {
     content:"Replied to a comment.",
     author:auth.currentUser.uid,
     postid:comment.postid,
-    timeStamp:serverTimestamp(),
+    timeStamp:Timestamp.fromDate(new Date()),
   })
   console.log("Posted a notification about a comment.")
 }

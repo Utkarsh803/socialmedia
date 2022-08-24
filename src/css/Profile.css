@@ -1,13 +1,13 @@
-.Profile{
-    color: aliceblue;
-    background-color: aliceblue;
+.Profile{ 
+    color: #fff;  
+    background-color:rgba(0, 0, 0, 0.896);
   }
 
 
   .Profile .divider{
     position: relative;
     display: flex;
-    background-color: rgb(26, 3, 71);
+
     flex-direction: column;
     margin-top: 9%;    
   }
@@ -44,34 +44,29 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: black;
-    width:70%;
-    height:fit-content;
-    margin-left: 15%;
-    border-radius: 2%;
-    border-top-left-radius: 2%;
-    border-bottom-left-radius: 2%;
+    background-color: rgba(0, 0, 0, 0.078);
+    width:93%;
+    height: 60vh;
+   margin-top: 0%;
+    padding-left: 7%;
+    margin-bottom: 5%;
 }
 
 .Profile .secondTray{
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: black;
-    width:70%;
+    background-color: rgba(0, 0, 0, 0.078);
+    width:100%;
     height:fit-content;
-    margin-left: 15%;
-    
-    border-radius: 2%;
-    border-top-left-radius: 2%;
-    border-bottom-left-radius: 2%;
+
 }
 
 .Profile .posts{
     position: relative;
     display: flex;
     flex: 1;
-    background-color: black;
+    background-color:rgba(0, 0, 0, 0.078);
     flex-wrap: wrap;
     flex-direction: 'row';
     width: 71%;
@@ -87,7 +82,7 @@
     position: relative;
     width: 85%;
     padding-left: 7.5%;
-    background-color:black;
+    background-color:rgba(0, 0, 0, 0.078);
     margin-bottom: 0.5%;
     border: 1px solid black;
 }
@@ -95,7 +90,7 @@
 .Profile .indGrid{ 
     position: relative;
     width: 32.5%;
-    background-color:black;
+    background-color:rgba(0, 0, 0, 0.797);
     margin-right: 0.5%;
     margin-bottom: 0.5%;
     border: 1px solid black;
@@ -106,7 +101,7 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     width:70%;
     height:fit-content;
     padding-top: 2%;
@@ -119,7 +114,7 @@
 .Profile .catIcon{
     position: relative;
     color: aliceblue;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     width: 100%;
     padding-bottom: 1vh;
     height: 5vh;
@@ -129,19 +124,18 @@
 .Profile .catIconFocused{
     position: relative;
     color: aliceblue;
-    background-color: black;
+    background-color:rgba(0, 0, 0, 0.797);
     width: 100%;
     height: 5vh;
     padding-bottom: 1vh;
-    border-bottom: 2px solid #fff;
-    
+    border-bottom: 2px solid #fff;    
 }
 
 .Profile .rowPicnStat{
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     color: aliceblue;
     width:fit-content;
     height:fit-content;
@@ -154,7 +148,7 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color: black;
+    background-color:rgba(0, 0, 0, 0.797);
     color: aliceblue;
     width:100%;
     height:fit-content;
@@ -166,7 +160,7 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color:black;
+    background-color:rgba(0, 0, 0, 0.797);
     color: aliceblue;
     width:78%;
     padding-left:11%;
@@ -177,7 +171,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     color: aliceblue;
     height:fit-content;
     width: fit-content;
@@ -190,7 +184,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     color: aliceblue;
     height:fit-content;
     width: 80%;
@@ -200,7 +194,7 @@
 
 .Profile .name{
     position: relative;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     font-size: x-large;
     padding-left: 11%;
 
@@ -208,9 +202,9 @@
 
 .Profile .bio{
     position: relative;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     font-size:small;
-    padding: 1%;
+    
     padding-left: 11.5%;
 
 }
@@ -218,20 +212,21 @@
 .Profile .profilePic{
     display: inline-block;
     width: fit-content;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     height:fit-content;
+    margin-left: 7%;
 }
 
 .Profile .number{
     position: relative;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     height:fit-content;
     font-size: xx-large;
 }
 
 .Profile .category{
     position: relative;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.797);
     height:fit-content;
     
 }
@@ -239,15 +234,18 @@
 
 .Profile .space05{
     position: relative;
-    margin: 0.5%;
-    
+    margin: 1%;
+    height: 2vh;
+    width: 105%;
+    right:2.5%;
+    background-color: rgb(18, 17, 17);;
 }
 
 
 .Profile .editProfile{
       min-height: 35px;
       appearance: button;
-      width: 100%;
+      width: 85%;
       backface-visibility: hidden;
       background-color: #405cf5;
       border-width: 0;

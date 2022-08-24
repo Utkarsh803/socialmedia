@@ -4,7 +4,7 @@ import Post from'./Post.js';
 import SidePanel from './SidePanel';
 import {useState, useEffect , useRef} from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc, serverTimestamp, query, where} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc, serverTimestamp, query, where, Timestamp, orderBy, onSnapshot} from 'firebase/firestore';
 import {signOut, onAuthStateChanged} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
@@ -18,7 +18,9 @@ import {useParams} from 'react-router-dom'
 
 function Profile() {
 
+   
     const {uid} =useParams();
+    console.log("Welcome to", {uid});
 
     const [name, setName]=useState("");    
     const [username, SetUserName]=useState("");
@@ -50,10 +52,10 @@ function Profile() {
     
     useEffect(()=>{
 
-      const getUsersData = async () => {
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-
+      SetCurrentPicUrl(null);
+      const getUsersData = () => {
+        const q = query(docRef);
+        onSnapshot(q,docSnap=>{
           setName(docSnap.data().name);
           SetUserName(docSnap.data().username);
           SetBio(docSnap.data().bio);
@@ -85,20 +87,18 @@ function Profile() {
         }
       });
           
-        } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
-    };
+        });}
 
     const getUserPost =async()=>{
-      const data = await getDocs(postsCollectionRef);
-      SetPosts(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      const q = query(postsCollectionRef,orderBy('timeStamp', 'desc'))
+      onSnapshot(q, querySnapshot=>{
+        SetPosts(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      })
     }
 
     const getFollow=async()=>{
       try{
-      const docR = doc(db, `users/${auth.currentUser.uid}/followingList`, `${uid}`)
+      const docR = doc(db, `users/${auth.currentUser.uid}/followingList`, `${uid}`)    
       const docSnap =  await getDoc(docR);
       {docSnap.exists() ? (SetFollow(true)):(SetFollow(false))}
     }
@@ -111,21 +111,16 @@ function Profile() {
     getFollowStats();
     getUsersData();
     getUserPost();
-  }, [] );
+  }, [uid] );
 
 
 
       const getFollowStats=async()=>{
         const docRef = doc(db, `users`,`${auth.currentUser.uid}`)
-        const docSnap = await getDoc(docRef);
-
-        if(docSnap.exists()){
+          const q = query(docRef);
+          onSnapshot(q,docSnap=>{
             SetMyFollow(docSnap.data().following);
-            console.log("this"+docSnap.data().following);
-        }
-        else{
-                console.log("error");
-        }
+          });
 
         const docRef2 = doc(db, `users`,`${uid}`)
         const docSnap2 = await getDoc(docRef2);
@@ -182,7 +177,7 @@ function Profile() {
         const followRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${uid}`)
 
         await setDoc(followRef,{
-            timeStamp:serverTimestamp()
+            timeStamp:serverTimestamp(),
         });
         console.log("You are now folowing"+name);
 
@@ -199,11 +194,11 @@ function Profile() {
         increaseFollower();
 
         const NotRef = collection(db, `users/${uid}/notifications`);
-        await addDoc(NotRef,{
+         await addDoc(NotRef,{
           type:"follow",
           content:"started following you.",
           author:auth.currentUser.uid,
-          timeStamp:serverTimestamp(),
+          timeStamp:Timestamp.fromDate(new Date()),
         })
         console.log("Posted a notification about a follow.")
     }

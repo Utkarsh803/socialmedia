@@ -4,7 +4,7 @@ import { AiOutlineHeart, AiOutlineNotification } from 'react-icons/ai';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where, Timestamp} from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { Link, useNavigate } from 'react-router-dom';
@@ -128,14 +128,14 @@ function SearchResult({name, authorId, url}) {
         const followRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${authorId}`)
 
         await setDoc(followRef,{
-            timeStamp:serverTimestamp()
+            timeStamp:serverTimestamp(),
         });
         console.log("You are now folowing"+name);
 
         const followingRef = doc(db, `users/${authorId}/followerList`, `${auth.currentUser.uid}`)
 
         await setDoc(followingRef,{
-            timeStamp:serverTimestamp()
+            timeStamp:serverTimestamp(),
         });
         console.log(authorId+"has a new follower.");
     }
@@ -147,7 +147,7 @@ function SearchResult({name, authorId, url}) {
             type:"follow",
             content:"started following you.",
             author:auth.currentUser.uid,
-            timeStamp:serverTimestamp(),
+            timeStamp:Timestamp.fromDate(new Date()),
           })
           console.log("Posted a notification about a follow.")
     }
@@ -184,6 +184,7 @@ function SearchResult({name, authorId, url}) {
 
     const handleButtonSendToProfile=()=>{
        navigate(`/${authorId}`);
+       console.log("sent to ", authorId);
         }
 
         const handleButtonSendToMyprofile=()=>{

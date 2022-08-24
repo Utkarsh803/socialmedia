@@ -6,7 +6,7 @@ import FeedPost from './FeedPost';
 import SidePanel from './SidePanel';
 import {useState, useEffect } from "react";
 import {db, auth} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, orderBy, query, onSnapshot} from 'firebase/firestore';
 import {signOut, onAuthStateChanged} from "firebase/auth";
 import { Link } from "react-router-dom";
 
@@ -28,12 +28,11 @@ function Home() {
         try {
           const feedRef = collection(db, `feed/${auth.currentUser.uid}/posts`);
           const data = await getDocs(feedRef);
-          if(data.size>0){
-          setFeed(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
-          }
-          else{
-            setFeed(null);
-          }
+          const q = query(feedRef,orderBy('added', 'desc'))
+          onSnapshot(q, querySnapshot=>{
+            setFeed(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+          })
+        
         }
       catch(error){
         console.log(error);
@@ -63,28 +62,36 @@ function Home() {
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
     
     
+    
+
+    {feed && feed.length > 0 ? (
+
     <div className='secondTray'>
     <div className='posts'> 
 
-  {feed &&
-      (feed.map((post)=>
+   {feed.map((post)=>
     {return <div className="indPost">
       <FeedPost postid={post.postID} authorId={post.author} ></FeedPost>
       {console.log("feed is not null")}
       </div>
       
-    })
-  )} 
-
-{(feed===null) &&
-      (<div className="indPost" style={{marginLeft:'15%'}}>
+    })}
+    </div>
+    </div>
+    ):
+    (
+      <div className='secondTray'>
+    <div className='posts'> 
+      <div className="indPost" style={{marginLeft:'15%'}}>
       No posts to show. Follow users to see their posts.
       </div>
-      )
-} 
+      </div>
+      </div>
+    )}
 
-  </div>
-    </div>
+
+
+
     <SidePanel/>
     </div>
     </nav>

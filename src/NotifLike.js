@@ -233,6 +233,7 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
   return (
     <div className="NotifLike">
     {type === "like" && (
+      
     <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)} >
     <Avatar
     alt="preview image"

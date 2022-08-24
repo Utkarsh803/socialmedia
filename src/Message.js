@@ -1,17 +1,24 @@
-import React from 'react'
+import React, {useRef, useEffect} from 'react'
 import { MdSportsGolf } from 'react-icons/md';
 import Moment from 'react-moment'
 import './css/Message.css'
 
-const Message=({msg})=>{
+const Message=({msg, user1})=>{
+    
+    const scrollRef =useRef()
+
+    useEffect(()=>{
+        scrollRef.current?.scrollIntoView({behaviour:"smooth"});
+    }, [msg]);
+
 return(
-    <div className='Message_wrapper'>
-        <p style={{padding:'10px', display:'inline-block', maxWidth:'50%', textAlign:'left', borderRadius:'5px' }}>
-            {msg.media ? (<img src ={msg.media} alt = {msg.text} style={{width:'100%', borderRadius:'5px'}}/>):null}
+    <div className={`message_wrapper ${msg.from === user1?"":"own"}`} ref={scrollRef}>
+        <p className={msg.from === user1 ? "friend":"me"}>
+            {msg.media ? (<img src ={msg.media} alt = {msg.text} />):null}
         {msg.text}
         <br/>
-        <small style={{display:'inline-block', marginTop:'15px', opacity:'0.8'}}>
-            <Moment fromNow>{msg.createdAt.toDate()}</Moment>
+        <small >
+            <Moment fromNow style={{backgroundColor:'transparent'}}>{msg.createdAt.toDate()}</Moment>
         </small>
         </p>
     </div>

@@ -1,5 +1,5 @@
 .SearchResult{
-    background-color:black;
+    
      position:relative;
      display:flex;
      flex-direction: row;
@@ -86,4 +86,9 @@
     background-color:rgba(255, 255, 255, 0.049);
     cursor: pointer;
     color:white;
+  }
+
+    
+ .selected-user {
+    background-color:#333;
   }

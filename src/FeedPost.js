@@ -3,13 +3,14 @@ import logo from './mslogo.jpg';
 import PostHeader from './PostHeader';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection,getDoc ,getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp} from 'firebase/firestore';
+import {collection,getDoc ,getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, Timestamp, orderBy, query, onSnapshot} from 'firebase/firestore';
 import PostTools from './PostTools';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import moment from 'react-moment'
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import Avatar from '@mui/material/Avatar';
 import Comment from './Comment';
+import Moment from 'react-moment';
 import createTree from './createTree';
 
 function FeedPost({postid,authorId}) {
@@ -143,9 +144,11 @@ getComments();
 
 const getComments=async()=>{
   const comRef = collection(db, `users/${authorId}/comments/${postid}/ids`)
-  const data = await getDocs(comRef)
-  SetCommentTree(createTree(data.docs.map((doc)=>({...doc.data()}))));
-  console.log("got comments");
+  const q = query(comRef,orderBy('timeStamp', 'desc'))
+  onSnapshot(q, querySnapshot=>{
+    SetCommentTree(createTree(querySnapshot.docs.map((doc)=>({...doc.data()}))));
+  })
+
 }
 
 
@@ -169,7 +172,7 @@ const addTotalPostComments=async()=>{
        author:auth.currentUser.uid,
        postAuthor:authorId,
        postid:postid,
-       timeStamp:serverTimestamp()
+       timeStamp:Timestamp.fromDate(new Date()),
      });      
       SetTotalComments(comments+1);
       console.log("Author ID: "+authorId);
@@ -206,7 +209,7 @@ const addComment=async()=>{
   content:"commented on your post.",
   author:auth.currentUser.uid,
   postid:postid,
-  timeStamp:serverTimestamp(),
+  timeStamp:Timestamp.fromDate(new Date()),
 })
 console.log("Posted a notification about a comment.")
 }
@@ -256,7 +259,7 @@ console.log("Posted a notification about a comment.")
     )}
   </div>
    
-    <div style={{color:'grey',backgroundColor:'black',paddingLeft:'3%',paddingTop:'2%', fontSize:'small'}}></div>
+    <small><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></small>
     <div className='footer'></div>
     </nav>
   </div>);
