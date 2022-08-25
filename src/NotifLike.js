@@ -9,6 +9,7 @@ import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { Link, useNavigate } from 'react-router-dom';
 import GridImg from './GridImg';
+import Moment from 'react-moment'
 
 function NotifLike({authorId,postid,content, timestamp, type}) {
     const NotRef = collection(db, `users/${authorId}/notifications`);
@@ -241,7 +242,8 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
     sx={{ width: 40, height: 40, marginTop:'3%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> liked a post.</div>
+    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> liked a post. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+    
     <img src={postUrl} style={{height:'60%', backgroundColor:'black',height:'fit-content', maxHeight:'10vh', maxWidth:'10vh'}}></img>
     </div>
    )}
@@ -254,7 +256,8 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
     sx={{ width: 40, height: 40, marginTop:'3%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> commented on a post.</div>
+    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> commented on a post. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+    
     <img src={postUrl} style={{height:'60%', backgroundColor:'black',height:'fit-content', maxHeight:'10vh', maxWidth:'10vh'}}></img>
     </div>
    )}
@@ -267,7 +270,8 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
     sx={{ width: 40, height: 40, marginTop:'3%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'200px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> started follwing you.</div>
+    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> started follwing you. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+   
     </div>
    )}
    

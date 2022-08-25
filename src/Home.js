@@ -6,7 +6,7 @@ import FeedPost from './FeedPost';
 import SidePanel from './SidePanel';
 import {useState, useEffect } from "react";
 import {db, auth} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, orderBy, query, onSnapshot} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, orderBy, query, onSnapshot, limit} from 'firebase/firestore';
 import {signOut, onAuthStateChanged} from "firebase/auth";
 import { Link } from "react-router-dom";
 
@@ -83,16 +83,16 @@ function Home() {
       <div className='secondTray'>
     <div className='posts'> 
       <div className="indPost" style={{marginLeft:'15%'}}>
-      No posts to show. Follow users to see their posts.
+      
       </div>
       </div>
       </div>
     )}
-
-
-
-
     <SidePanel/>
+  
+    </div>
+    <div>
+
     </div>
     </nav>
   </div>);

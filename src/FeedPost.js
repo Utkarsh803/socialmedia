@@ -3,7 +3,7 @@ import logo from './mslogo.jpg';
 import PostHeader from './PostHeader';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection,getDoc ,getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, Timestamp, orderBy, query, onSnapshot} from 'firebase/firestore';
+import {collection,getDoc ,getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, Timestamp, orderBy, query, onSnapshot, setDoc, QuerySnapshot} from 'firebase/firestore';
 import PostTools from './PostTools';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import moment from 'react-moment'
@@ -144,10 +144,23 @@ getComments();
 
 const getComments=async()=>{
   const comRef = collection(db, `users/${authorId}/comments/${postid}/ids`)
-  const q = query(comRef,orderBy('timeStamp', 'desc'))
+  const q = query(comRef, orderBy("timeStamp", "desc"));
+  
   onSnapshot(q, querySnapshot=>{
     SetCommentTree(createTree(querySnapshot.docs.map((doc)=>({...doc.data()}))));
   })
+
+  /*
+  await getDocs(comRef);
+
+
+  if(q.size>0){
+    SetCommentTree(createTree(q.docs.map((doc)=>({...doc.data()}))));
+  }
+  else{
+    SetCommentTree(null);
+  }
+*/
 
 }
 
@@ -164,13 +177,15 @@ const addTotalPostComments=async()=>{
   try
   {  
      incCommentNum();
-     const usersCollectionRef = collection(db, `/users/${authorId}/comments/${postid}/ids`);
-     await addDoc(usersCollectionRef,{
+     const num= comments+1;
+     const usersCollectionRef = doc(db, `/users/${authorId}/comments/${postid}/ids`, `${num}`);
+     await setDoc(usersCollectionRef,{
        id: comments+1,
        parent:null,
        comment: comCaption,
        author:auth.currentUser.uid,
        postAuthor:authorId,
+       likes:0,
        postid:postid,
        timeStamp:Timestamp.fromDate(new Date()),
      });      
@@ -229,12 +244,16 @@ console.log("Posted a notification about a comment.")
     </span>
     </div>
 
-    {(comments > 2 && comments > 0) &&
-    <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>View {comments} comments</div>}
     
-    {(comments < 2 ) && (
+    {(comments >= 2) && (
      <div>
      <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>{comments} comments</div>    </div>
+    )
+    }
+
+  {(comments == 1) && (
+     <div>
+     <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>{comments} comment</div>    </div>
     )
     }
 

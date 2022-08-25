@@ -253,7 +253,10 @@ catch(error){
         timeStamp:Timestamp.fromDate(new Date()),
         });       
 
-       // addHash(hashtagArray);
+        for(const hash of hashtagArray){
+        addHash(hash);
+          console.log("added hash");
+        }
         addToAlbum(addedDoc.id, imageName);
         createLikeList(addedDoc.id);
         createCommentList(addedDoc.id);
@@ -269,19 +272,29 @@ catch(error){
    }
 
 
-   const addHash = async(hashtagArray)=>{
-    for (var i in hashtagArray){
-    const hashRef= collection(db, "hashtags", {i})
-    const hashVal = await getDoc(hashRef);
+   const addHash = async(hash)=>{
 
-    const num = 0;
-    if(hashVal){
-      num=hashVal.data().value;
-    } 
-    updateDoc(hashRef, {num:num+1});
-    console.log(`hashtag ${i} added!`);
+      const hashRef= doc(db, "hashtags", `${hash}`);
+      const hashVal = await getDoc(hashRef);
+      console.log(hashVal)
+      
+        if(hashVal.exists()){
+          console.log("Hashtag exists "+ hash);
+          updateDoc(hashRef, {val:hashVal.data().val+1});}
+        else{
+          console.log("Hashtag does not exists "+ hash);
+          setDoc(doc(db, `hashtags`, `${hash}`), {
+            tag:hash,
+            val:1,
+           });}
+        
+      }
+
+      
+
+      
+    
   
-  }}
 
    const createLikeList = async(postId) =>{
     try

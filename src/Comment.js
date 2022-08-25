@@ -3,17 +3,20 @@ import './css/SearchResult.css';
 import {CgProfile} from 'react-icons/cg';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where, Timestamp} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where, Timestamp, onSnapshot, QuerySnapshot} from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { AiOutlineHeart,AiFillHeart} from 'react-icons/ai';
-
+import Moment from 'react-moment'
+import { async } from "@firebase/util";
 
 const Comment = ({ comment })=> {
 
   const nestedComments = (comment.children || []).map((comment) => {
     return <Comment key={comment.id} comment={comment} type="child" />
   })
+
+ 
 
   const[imageUrl, SetImageUrl]=useState(null);
   const[name, SetName]=useState(null);
@@ -24,6 +27,10 @@ const Comment = ({ comment })=> {
   const[like,SetLike]=useState(null);
   const[reply,SetReply]=useState(false);
   const[commentInput,SetCommentInput]=useState(null);
+  const[commentLikes,SetCommentLikes]=useState(comment.likes);
+
+  
+
 
   useEffect(()=>{
     const getPostPic=async()=>{
@@ -70,6 +77,21 @@ const Comment = ({ comment })=> {
               SetTotalComments(null);
           }
           }
+
+
+       const getLiked =async()=>{
+            const docRef = doc(db, `/users/${comment.postAuthor}/commentsLikes/${comment.postid}/ids/${comment.id}/ids`, `${auth.currentUser.uid}`);
+            const docSnap = await getDoc(docRef);
+            if(docSnap.exists()){
+              SetLike(true)
+            }
+            else{
+              SetLike(false)
+            }
+          }
+
+        
+        getLiked();  
         getCommentNum();
         getPostPic();
   }, [] );
@@ -79,8 +101,9 @@ const Comment = ({ comment })=> {
     try
     {  
        incCommentNum();
-       const usersCollectionRef = collection(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`);
-       await addDoc(usersCollectionRef,{
+       const num = totalComments+1;
+       const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${num}`);
+       await setDoc(usersCollectionRef,{
          id: totalComments+1,
          parent:comment.id,
          comment: commentInput,
@@ -140,8 +163,59 @@ const Comment = ({ comment })=> {
 }
 
 
+const  addCommentLikes=async()=>{
+
+const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${comment.id}`);
+const docRef = updateDoc(usersCollectionRef,{
+  likes:commentLikes+1,
+})
+
+SetCommentLikes(commentLikes+1);
+console.log("added likes")
+}
+
+
+
+const  addUserToLikeList=async()=>{
+const docRef = doc(db, `/users/${comment.postAuthor}/commentsLikes/${comment.postid}/ids/${comment.id}/ids`, `${auth.currentUser.uid}`);
+await setDoc(docRef, {
+  createdAt:Timestamp.fromDate(new Date()),
+  author:auth.currentUser.uid,
+})
+console.log("added user to ike list")
+}
+
   const handleButtonLike=()=>{
-    SetLike(!like);
+    SetLike(true);
+    addCommentLikes();
+    addUserToLikeList();
+  }
+
+  
+const  subCommentLikes=()=>{
+
+  const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${comment.id}`);
+  const docRef = updateDoc(usersCollectionRef,{
+    likes:commentLikes-1,
+  })
+  
+  SetCommentLikes(commentLikes-1);
+  console.log("subbed likes")
+  }
+  
+  
+  
+  const  subUserToLikeList=async()=>{
+  const docRef = doc(db, `/users/${comment.postAuthor}/commentsLikes/${comment.postid}/ids/${comment.id}/ids`, `${auth.currentUser.uid}`);
+  await deleteDoc(docRef)
+  console.log("deleted user to ike list")
+  }
+  
+
+  const handleButtonUnlike=()=>{
+    SetLike(false);
+    subCommentLikes();
+    subUserToLikeList();
   }
 
   const handleButtonReply=()=>{
@@ -167,10 +241,10 @@ const Comment = ({ comment })=> {
       </div>
       <div style={{backgroundColor:'black', color:'white', fontSize: '10pt', marginLeft:'7%', marginTop:'1%'}}>{comment.comment}</div>
       <div style={{display:'flex', flexDirection:'row', backgroundColor:'black',marginLeft:'7%', paddingTop:'2%', paddingBottom:'2%'}}>
-        <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>6w</div>
-        <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>2 likes</div>
-        <div style={{color:'grey', backgroundColor:'black'}} onClick={handleButtonReply}>Reply</div>
-        {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonLike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonLike}/>)}
+        <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey'}}>{ comment.timeStamp ? (comment.timeStamp.toDate()):null}</Moment></div>
+        <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>{commentLikes} likes</div>
+        <div style={{color:'grey', backgroundColor:'black'}} onClick={handleButtonReply}>Reply </div>
+        {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonLike}/>)}
       </div>
       {reply &&(
         <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', color:'white', paddingLeft:'7%', height:'50px'}}>
@@ -197,10 +271,10 @@ const Comment = ({ comment })=> {
         </div>
         <div style={{backgroundColor:'black', color:'white', fontSize: '10pt', marginLeft:'7%', marginTop:'1%', paddingLeft:'2.5%'}}>{comment.comment}</div>
         <div style={{display:'flex', flexDirection:'row', backgroundColor:'black',marginLeft:'7%', paddingTop:'2%', paddingBottom:'2%', paddingLeft:'2.5%'}}>
-          <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>6w</div>
-          <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>2 likes</div>
+          <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey'}}>{ comment.timeStamp ? (comment.timeStamp.toDate()):null}</Moment></div>
+          <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>{commentLikes} likes</div>
           <div style={{color:'grey', backgroundColor:'black'}} onClick={handleButtonReply}>Reply</div>
-          {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonLike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonLike}/>)}
+          {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonLike}/>)}
         </div>
         {reply &&(
         <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', color:'white', paddingLeft:'7%', height:'50px'}}>

@@ -137,6 +137,7 @@ const addTotalPostComments=async()=>{
        comment: comment,
        author:auth.currentUser.uid,
        postAuthor:authorId,
+       likes:0,
        postid:postid,
        timeStamp:Timestamp.fromDate(new Date()),
      });      

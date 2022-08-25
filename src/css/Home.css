@@ -49,11 +49,10 @@
     background-color: black;
     width:60%;
     height:fit-content;
+    border:1px solid transparent;
     margin-Top: 2%;
     margin-left: 1.5%;
-    border-radius: 2%;
-    border-top-left-radius: 2%;
-    border-bottom-left-radius: 2%;
+    border-radius: 5px;
 }
 
 .Home .posts{
