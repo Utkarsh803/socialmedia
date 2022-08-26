@@ -46,7 +46,7 @@
 
 .PostHeader .dropdown {
     position: absolute;
-    top: 10%;
+    top: 5%;
     right: 0%;
     width: 150px;
     z-index: 1;
@@ -78,9 +78,15 @@
 
 
   }
+
+  .PostHeader .selection:active {
+    background-color: #333;
+   
+    transform: translateY(4px);
+  }
   
   .PostHeader.selection:hover {
-    background-color:rgba(255, 255, 255, 0.049);
+    background-color:rgb(255, 255, 255);
     cursor: pointer;
-    color:white;
+    color:rgb(184, 182, 182);
   }

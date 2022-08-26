@@ -223,7 +223,7 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
     }
 
     const handleButtonSendToProfile=()=>{
-       navigate(`/${authorId}`);
+       navigate(`/profile/${authorId}`);
         }
 
         const handleButtonSendToMyprofile=()=>{

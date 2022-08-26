@@ -2,9 +2,11 @@ import './css/SidePanel.css';
 import {useState, useEffect } from "react";
 import {db} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, limit, onSnapshot} from 'firebase/firestore';
+import { Link, useNavigate } from 'react-router-dom';
 
 function SidePanel() {
   const[trends, SetTrends]= useState(null);
+  const navigate =useNavigate();
 
   useEffect(()=>{
     
@@ -21,19 +23,23 @@ function SidePanel() {
   }, [])
 
 
+const goToHash=(hash)=>{
+const tag = hash.substring(1, hash.length); 
+navigate(`/hashTag/${tag}`);
+}
 
   return (
   <div className="SidePanel" >
-    <nav>
+    
         <div className='trend'>Trending</div>
         <div style={{padding:'5%'}}>
         { trends && (
           trends.map((res)=>
-            {return <div>
-            <div style={{padding:'2%', fontSize:'x-large'}}>
-                {res.tag}{' '}
+            {return <div >
+            <div style={{padding:'2%', fontSize:'x-large'}} >
+               <div onClick={()=>goToHash(res.tag)}> {res.tag}{' '}</div>
               </div>
-              <small style={{fontSize:'small', color:'grey'}}>{res.val}{' '} posts</small>
+              <small style={{fontSize:'small', color:'grey', paddingLeft:'3%'}} >{res.val}{' '} posts</small>
               </div>
             })
     )}
@@ -43,7 +49,7 @@ function SidePanel() {
 <span style={{whiteSpace:'pre',width:'33%', backgroundColor:'transparent'}}> About us</span>
 <span style={{whiteSpace:'pre',width:'33%', backgroundColor:'transparent'}}> Contact</span>
 </div>
-    </nav>
+   
   </div>)
 }
 

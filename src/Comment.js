@@ -144,7 +144,8 @@ const Comment = ({ comment })=> {
     }
 
 
-    const addComment=async()=>{    
+    const addComment=async()=>{   
+    SetReply(null); 
     addTotalPostComments();
     addToPostComments();
     console.log(comment.postAuthor)
@@ -160,6 +161,7 @@ const Comment = ({ comment })=> {
   })
   console.log("Posted a notification about a comment.")
 }
+
 }
 
 

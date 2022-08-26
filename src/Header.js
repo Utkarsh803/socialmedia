@@ -14,6 +14,7 @@ import {v4} from 'uuid'
 import { query, where, orderBy, limit } from "firebase/firestore";  
 import SearchResult from './SearchResult';
 import NotifLike from './NotifLike';
+import SearchResultHash from './SearchResHash';
 
 
 
@@ -30,6 +31,7 @@ function Header({handleLogout, name}) {
   const[postID, SetPostID]=useState(null);
   const[url, SetUrl]=useState(null);
   const[searchRes, SetSearchRes]=useState(null);
+  const[searchResHash, SetSearchResHash]=useState(null);
   const[viewNotif, SetViewNotif]=useState(null);
   const[Notif, SetNotif]=useState(null);
   const[searchInput, SetSearchInput]=useState(null);
@@ -63,16 +65,35 @@ function Header({handleLogout, name}) {
 
    const search = async(name) =>{
     SetSearchInput(name);
+    const charact = name.substring(0,1);
+    if(charact !== '#'){
     console.log(name);
-    if(name != ''){
+    if(name != '' && name!=null){
     const citiesRef = collection(db, "users");
     const q = query(citiesRef, where("username", ">=", `${name}`), where("username", "<=", `${name + "~"}`), limit(3));
     const querySnapshot = await getDocs(q);
       SetSearchRes(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      SetSearchResHash(null);
     }
     else{
       SetSearchRes(null);
+    }}
+    else{
+
+      console.log(name);
+    if(name != ''){
+    const citiesRef = collection(db, "hashtags");
+    const q = query(citiesRef, where("tag", ">=", `${name}`), where("tag", "<=", `${name + "~"}`), limit(3));
+    const querySnapshot = await getDocs(q);
+      SetSearchResHash(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      SetSearchRes(null);
+        }
+    else{
+      SetSearchResHash(null);
     }
+    }
+  
+  
   }
   
   const getPostsStats=async()=>{
@@ -181,7 +202,13 @@ catch(error){
 
   
   const handleButtonNext = async() => {
+    console.log("Height", imageFile.height)
+    console.log("Weight", imageFile.width )
+    if(imageFile.width==imageFile.height){
     await createPost();
+  }else{
+    console.log("File resolution not supported")
+  }
     SetUpload(false);
     SetNext(false);
     SetImage(null);
@@ -202,6 +229,8 @@ catch(error){
     if (event.target.files && event.target.files[0]) {
       SetImage(URL.createObjectURL(event.target.files[0]));
       SetImageFile(event.target.files[0]);
+      console.log("Height", (event.target.files[0]).size)
+
     }
    }
 
@@ -254,7 +283,7 @@ catch(error){
         });       
 
         for(const hash of hashtagArray){
-        addHash(hash);
+        addHash(hash, addedDoc.id);
           console.log("added hash");
         }
         addToAlbum(addedDoc.id, imageName);
@@ -272,7 +301,7 @@ catch(error){
    }
 
 
-   const addHash = async(hash)=>{
+   const addHash = async(hash, id)=>{
 
       const hashRef= doc(db, "hashtags", `${hash}`);
       const hashVal = await getDoc(hashRef);
@@ -280,13 +309,40 @@ catch(error){
       
         if(hashVal.exists()){
           console.log("Hashtag exists "+ hash);
-          updateDoc(hashRef, {val:hashVal.data().val+1});}
+          updateDoc(hashRef, {val:hashVal.data().val+1});
+        
+          const pid = auth.currentUser.uid + id;
+          await setDoc(doc(db, `hashtags/${hash}/posts/`, `${pid}`),{
+            authorId:auth.currentUser.uid,
+            postId:id,
+            likes:0,
+            comments:0,
+            saves:0,
+            reported:0,
+            createdAt:Timestamp.fromDate(new Date()),
+          });
+        
+        }
         else{
           console.log("Hashtag does not exists "+ hash);
           setDoc(doc(db, `hashtags`, `${hash}`), {
             tag:hash,
             val:1,
            });}
+
+           const pid = auth.currentUser.uid + id;
+
+           await setDoc(doc(db, `hashtags/${hash}/posts`, `${pid}`),{
+            authorId:auth.currentUser.uid,
+            postId:id,
+            likes:0,
+            comments:0,
+            saves:0,
+            reported:0,
+            createdAt:Timestamp.fromDate(new Date()),
+          });
+
+          console.log("added post to hastag array")
         
       }
 
@@ -462,6 +518,16 @@ catch(error){
       </div>;
     })
     )}
+
+{searchResHash && 
+    (
+    searchResHash.map((res)=>
+    {return <div  style={{width:'60%', marginLeft:'4%'}}>
+     <SearchResultHash hash={res.tag}></SearchResultHash>
+      </div>;
+    })
+    )}
+
     </div>
     <AiOutlineHome className='icons' onClick={goToHome}/>
     

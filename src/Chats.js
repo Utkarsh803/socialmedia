@@ -57,6 +57,7 @@ const Chats=()=>{
     console.log(users);
 
     const selectUser=async(user)=>{
+        SetPicUrl(null);
         SetChat(user);
         fetchData(user);
         console.log(user);

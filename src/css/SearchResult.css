@@ -8,6 +8,9 @@
      border-bottom-style:outset;
     }
  
+    .SearchResult:hover{
+      background-color: #333;
+    }
 
     .SearchResult .logo{
  position:relative;
@@ -29,7 +32,7 @@
     margin-left:10%;
     margin-right: 40%;
     font-size: large;
-    background-color: black;
+    background-color: transparent;
     }
 
     .SearchResult .icons{

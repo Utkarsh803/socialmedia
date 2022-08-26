@@ -1,0 +1,118 @@
+.HashTag{
+    color: #fff;  
+    background-color:rgba(0, 0, 0, 0.896);
+}
+
+.HashTag button{
+    position: relative;
+    display: block;
+    width:10%;
+    min-height: 35px;
+      appearance: button;
+      backface-visibility: hidden;
+      background-color: #405cf5;
+      border-width: 0;
+      box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
+      box-sizing: border-box;
+      color: #fff;
+      cursor: pointer;
+      font-family: -apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif;
+      margin-top:3%;
+      margin-bottom:9%;
+      outline: none;
+      overflow: hidden;
+      padding: 0 25px;
+      text-transform: none;
+      transform: translateZ(0);
+      transition: all .2s,box-shadow .08s ease-in;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+  }
+
+
+.HashTag .divider{
+    position: relative;
+    display: flex;
+    background-color: rgb(16, 15, 15);
+    flex-direction: column;
+    margin-top: 8%;    
+  }
+
+.HashTag .secondTray{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.078);
+    width:100%;
+    max-height:70vh ;
+    overflow: scroll;
+
+
+}
+
+.HashTag .posts{
+    position: relative;
+    display: flex;
+    flex: 1;
+    background-color:rgba(0, 0, 0, 0.078);
+    flex-wrap: wrap;
+    flex-direction: 'row';
+    width: 70%;
+    height: fit-content;
+    margin-left: 15%;
+    padding-top: 1%;
+    border-radius: 2%;
+    margin-bottom: 2%;
+    
+}
+
+.HashTag .indPost{ 
+    position: relative;
+    width: 70%;
+    padding-left: 15%;
+    background-color:rgba(0, 0, 0, 0.078);
+    margin-bottom: 0.5%;
+    border: 1px solid black;
+}
+
+.HashTag .indGrid{ 
+    position: relative;
+    width: 32.5%;
+    background-color:rgba(0, 0, 0, 0.797);
+    margin-right: 0.5%;
+    margin-bottom: 0.5%;
+    border: 1px solid black;
+    
+}
+
+
+.HashTag .rowCategory{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(0, 0, 0, 0.797);
+    width:70%;
+    height:fit-content;
+    padding-top: 0%;
+    margin-left: 15%;
+    color: aliceblue;
+}
+
+.HashTag .popular{
+width:50%;
+padding-bottom: 1%;
+text-align: center;
+font-size:large;
+}
+
+.HashTag .recent{
+    width:50%;
+    padding-bottom: 1%;
+    text-align: center;
+        font-size:large;
+    }
+
+.HashTag .underlined{
+    border-bottom:1px solid grey
+}

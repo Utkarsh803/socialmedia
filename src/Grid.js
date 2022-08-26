@@ -13,7 +13,7 @@ import Comment from './Comment';
 import Moment from 'react-moment';
 import createTree from './createTree';
 
-function FeedPost({postid,authorId}) {
+function Grid({postid,authorId}) {
 
   const[commentTree, SetCommentTree]=useState(null);
   const [name, setName]=useState("");    
@@ -230,59 +230,10 @@ console.log("Posted a notification about a comment.")
 }
 }
 
-
-
-  return (<div className="FeedPost">
-    <nav>
-    <PostHeader name = {name} url={currentPicUrl} postid={postid} authorId={authorId}></PostHeader>
-    <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />
-    <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves}></PostTools>
-    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
-    <div className='caption'>
-    <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'1%', marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'1%', width:'90%', marginLeft:'0%'}}>
-{captions}
-    </span>
-    </div>
-
-    
-    {(comments >= 2) && (
-     <div>
-     <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>{comments} comments</div>    </div>
-    )
-    }
-
-  {(comments == 1) && (
-     <div>
-     <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>{comments} comment</div>    </div>
-    )
-    }
-
-<div style={{display:'flex', flexDirection:'row', backgroundColor:'black', height:'9vh'}}>
-<Avatar
-    alt="preview image"
-    src={profilePicUrl}
-    sx={{ width: 25, height: 25, marginTop:'1%', marginLeft:'3%'}}
-    />
-    <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'80%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }} onChange={(event)=>{SetComCaption(event.target.value)}}>
-    </input>
-    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>
-    </div>
-   
-   {comments < 3 && (
-    <div style={{color:'white',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}>
-    {commentTree && 
-    (commentTree.map((comment) => 
-      {
-        return <Comment key={comment.id} comment={comment}></Comment>
-      }
-    )
-    )}
-  </div>)}
-   
-    <small><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></small>
-    <div className='footer'></div>
-    </nav>
+return (<div >
+    <img src={postUrl} style={{width:'100%', backgroundColor:'black', marginBottom:"-1.7%"}}/>
   </div>);
+
 }
 
-export default FeedPost;
+export default Grid;
