@@ -12,6 +12,7 @@ import Comment from './Comment';
 import createTree from './createTree';
 import Avatar from '@mui/material/Avatar';
 import { width } from '@mui/system';
+import { runTransaction } from "firebase/firestore";
 
 function PostTools({postid, authorId, likes, saves, profilePic}) {
 
@@ -97,31 +98,68 @@ const getCommentNum=async()=>{
 }
 
 const incCommentNum=async()=>{
+  try{
+  await runTransaction(db, async (transaction) => { 
   const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
   const newfield={totalComments:totalComments+1};
   const data = updateDoc(comRef, newfield);
-
   console.log("total counts updated");
+    });
+  }
+  catch(e){
+    console.log(e.message)
+  }
 }
 
 const addTotalPostComments=async()=>{
   try
   {  
-     incCommentNum();
-     const usersCollectionRef = collection(db, `/users/${authorId}/comments/${postid}/ids`);
-     await addDoc(usersCollectionRef,{
-       id: totalComments+1,
+    await runTransaction(db, async (transaction) => {   
+
+    
+        const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
+        const docRef = await transaction.get(comRef) 
+
+        const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
+        const docRef1 = await transaction.get(userDoc) 
+        
+        const newfield={totalComments: docRef.data().totalComments+1};
+        transaction.update(comRef, newfield);
+        console.log("total counts updated");
+
+    const num=docRef.data().totalComments+1;
+     const usersCollectionRef = doc(db, `/users/${authorId}/comments/${postid}/ids`, `${num}`);
+     transaction.set(usersCollectionRef,{
+       id: docRef.data().totalComments+1,
        parent:null,
        comment: comCaption,
        author:auth.currentUser.uid,
        postAuthor:authorId,
+       likes:0,
        postid:postid,
        timeStamp:Timestamp.fromDate(new Date()),
             });      
-      SetTotalComments(totalComments+1);
+     // SetTotalComments(totalComments+1);
       console.log("Author ID: "+authorId);
       console.log("Post ID: "+postid);
       console.log("Added a comment");
+
+    
+    const newFields1 = {comments: docRef1.data().comments + 1};
+    transaction.update(userDoc, newFields1);
+
+    console.log(authorId)
+    console.log( auth.currentUser.uid)
+
+    if(authorId != auth.currentUser.uid){
+    transaction.set((doc(NotRef)),{
+      type:"comment",
+      content:"commented on your post.",
+      author:auth.currentUser.uid,
+      postid:postid,
+      timeStamp:Timestamp.fromDate(new Date()),
+    })}
+          });
        } 
  catch(error)
  {
@@ -309,16 +347,75 @@ const subTotalPostLikes=async()=>{
 
 }
 
-function handleButtonLike() {
-    setLike(!like);
-    addTotalPostLikes();
-    addToPostLikes();
+const handleButtonLike=async()=> {
+   
+    try
+    {
+      setLike(!like);  
+      await runTransaction(db, async (transaction) => { 
+
+        const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
+        const docslike = await transaction.get(userDoc)
+
+       const usersCollectionRef = doc(db, `/users/${authorId}/likes/${postid}/ids`, `${auth.currentUser.uid}`);
+       transaction.set(usersCollectionRef,{
+         timeStamp:serverTimestamp()
+       });      
+        console.log("Author ID: "+authorId);
+        console.log("Post ID: "+postid);
+        console.log("Added a like");
+        if(authorId != auth.currentUser.uid){
+           transaction.set(doc(NotRef),{
+            type:"like",
+            content:"liked your post.",
+            author:auth.currentUser.uid,
+            postid:postid,
+            timeStamp:Timestamp.fromDate(new Date()),
+          })
+          console.log("Posted a notification about a like.")
+         }
+
+         
+          const newFields = {likes: docslike.data().likes + 1};
+          transaction.update(userDoc, newFields);   
+          console.log("Author ID: "+authorId);
+          console.log("Post ID: "+postid);
+          console.log("updated a like on the post.");
+        });
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Like was not registered :("); 
+   }
   }
 
-function handleButtonUnlike() {
-    setLike(!like);
-    subTotalPostLikes();
-    subToPostLikes();
+const handleButtonUnlike=async()=> {
+    try{
+      setLike(!like);
+      await runTransaction(db, async (transaction) => { 
+
+      const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
+      const docslike = await transaction.get(userDoc)
+
+      const usersCollectionRef = doc(db, `/users/${authorId}/likes/${postid}/ids`, `${auth.currentUser.uid}`);
+      transaction.delete(usersCollectionRef);      
+       console.log("Author ID: "+authorId);
+       console.log("Post ID: "+postid);
+       console.log("Removed your like");
+
+       const newFields = {likes: docslike.data().likes - 1};
+       transaction.update(userDoc, newFields);   
+       console.log("Author ID: "+authorId);
+       console.log("Post ID: "+postid);
+       console.log("updated a like on the post.");
+
+      });
+    }
+    catch(error){
+      console.log(error.message);
+      console.log("Like was not registered :("); 
+    }
   }
   //like->create a notification->store the like notif ref in posst
   //unlike->get post like notif ref->find notif ->delete
@@ -327,16 +424,64 @@ function handleButtonUnlike() {
     setCommentBox(!commentBox);
   }
 
-  function handleButtonMark() {
-    setMark(!mark);
-    addTotalPostSaves();
-    addToPostSaves();
-  }
+  const handleButtonMark=async()=> {
+    try{
+      setMark(!mark);
+    await runTransaction(db, async (transaction) => { 
+    const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/savedPosts`,`${postid}`);
+    const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
+    const docRef = transaction.get(userDoc)
 
-  function handleButtonUnmark() {
-    setMark(!mark);
-    subTotalPostSaves();
-    subToPostSaves();
+
+    transaction.set(usersCollectionRef,{
+      authorID: authorId,
+      timeStamp:serverTimestamp()
+    });      
+     console.log("Author ID: "+authorId);
+     console.log("Post ID: "+postid);
+     console.log("Added to your saved list.");
+
+     
+     const newFields = {saved: docRef.data().saved + 1};
+     await updateDoc(userDoc, newFields);   
+     console.log("Author ID: "+authorId);
+     console.log("Post ID: "+postid);
+     //SetSaveNum(saveNum+1);
+  })
+  }
+  catch(e){
+    console.log(e.message)
+  }
+}
+
+  const handleButtonUnmark=async()=> {
+    try
+    {  
+      setMark(!mark);
+      await runTransaction(db, async (transaction) => { 
+       const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/savedPosts`,`${postid}`);
+       const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
+       const docRef = await transaction.get(userDoc) 
+
+        await transaction.delete(usersCollectionRef);      
+        console.log("Author ID: "+authorId);
+        console.log("Post ID: "+postid);
+        console.log("Removed from saved list.");
+
+       
+        const newFields = {saved: docRef.data().saved - 1};
+        await transaction.update(userDoc, newFields);   
+        console.log("Author ID: "+authorId);
+        console.log("Post ID: "+postid);
+//        SetSaveNum(saveNum-1);
+      });
+  
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Did not remove from saved list. :("); 
+   }
   }
 
 
@@ -365,7 +510,7 @@ return (<div className="PostTools">
     />
     <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'80%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white',marginBottom:'0%' }} onChange={(event)=>{SetComCaption(event.target.value)}}>
     </input>
-    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%',marginBottom:'0%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>
+    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%',marginBottom:'0%', color:'deepskyblue',fontSize:'large'}} onClick={addTotalPostComments}>Post</button>
     </div>
       </div>)
     }

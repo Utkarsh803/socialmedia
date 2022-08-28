@@ -10,6 +10,7 @@ import { AiOutlineHeart,AiFillHeart} from 'react-icons/ai';
 import Moment from 'react-moment'
 import { async } from "@firebase/util";
 import './css/Comment.css'
+import { runTransaction } from "firebase/firestore";
 
 const Comment = ({ comment })=> {
 
@@ -148,21 +149,58 @@ const Comment = ({ comment })=> {
 
     const addComment=async()=>{   
     SetReply(null); 
-    addTotalPostComments();
-    addToPostComments();
-    console.log(comment.postAuthor)
-    console.log( auth.currentUser.uid)
-    if(comment.postAuthor != auth.currentUser.uid){
-    const NotRef = collection(db, `users/${comment.postAuthor}/notifications`);
-    await addDoc(NotRef,{
-    type:"comment",
-    content:"Replied to a comment.",
-    author:auth.currentUser.uid,
-    postid:comment.postid,
-    timeStamp:Timestamp.fromDate(new Date()),
-  })
-  console.log("Posted a notification about a comment.")
-}
+    try
+    {  
+      await runTransaction(db, async (transaction) => {   
+  
+      
+          const comRef = doc(db, `users/${comment.postAuthor}/comments`, `${comment.postid}`)
+          const docRef = await transaction.get(comRef) 
+  
+          const userDoc = doc(db, `/users/${comment.postAuthor}/posts`, `${comment.postid}`);
+          const docRef1 = await transaction.get(userDoc) 
+          
+          const newfield={totalComments: docRef.data().totalComments+1};
+          transaction.update(comRef, newfield);
+          console.log("total counts updated");
+  
+      const num=docRef.data().totalComments+1;
+       const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${num}`);
+       transaction.set(usersCollectionRef,{
+         id: docRef.data().totalComments+1,
+         parent:comment.id,
+         comment: commentInput,
+         author:auth.currentUser.uid,
+         postAuthor:comment.postAuthor,
+         likes:0,
+         postid:comment.postid,
+         timeStamp:Timestamp.fromDate(new Date()),
+              });      
+       // SetTotalComments(totalComments+1);
+        console.log("Author ID: "+comment.postAuthor);
+        console.log("Post ID: "+comment.postid);
+        console.log("Added a comment");
+  
+      
+      const newFields1 = {comments: docRef1.data().comments + 1};
+      transaction.update(userDoc, newFields1);
+
+      const NotRef = collection(db, `users/${comment.postAuthor}/notifications`);  
+      if(comment.postAuthor != auth.currentUser.uid){
+      transaction.set((doc(NotRef)),{
+        type:"comment",
+        content:"commented on your post.",
+        author:auth.currentUser.uid,
+        postid:comment.postid,
+        timeStamp:Timestamp.fromDate(new Date()),
+      })}
+            });
+         } 
+   catch(error)
+   {
+       console.log(error.message);
+       console.log("Comment was not registered :("); 
+   }
 
 }
 
@@ -189,11 +227,35 @@ await setDoc(docRef, {
 console.log("added user to ike list")
 }
 
-  const handleButtonLike=()=>{
-    SetLike(true);
-    addCommentLikes();
-    addUserToLikeList();
+  const handleButtonLike=async()=>{
+    try{
+      SetLike(true);
+      await runTransaction(db, async (transaction) => {  
+    const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${comment.id}`);
+    const mydoc = await transaction.get(usersCollectionRef);
+
+    const docRef1 = doc(db, `/users/${comment.postAuthor}/commentsLikes/${comment.postid}/ids/${comment.id}/ids`, `${auth.currentUser.uid}`);
+
+    const comNum = mydoc.data().likes
+    transaction.update(usersCollectionRef,{
+      likes:comNum+1,
+    })
+
+   // SetCommentLikes(commentLikes+1);
+    console.log("added likes")
+
+   
+    transaction.set(docRef1, {
+      createdAt:Timestamp.fromDate(new Date()),
+      author:auth.currentUser.uid,
+    })
+    console.log("added user to ike list")
+  });
   }
+  catch(e){
+    console.log(e.message);
+  }
+}
 
   
 const  subCommentLikes=()=>{
@@ -216,11 +278,33 @@ const  subCommentLikes=()=>{
   }
   
 
-  const handleButtonUnlike=()=>{
-    SetLike(false);
-    subCommentLikes();
-    subUserToLikeList();
+  const handleButtonUnlike=async()=>{
+    try{
+      SetLike(false);
+      await runTransaction(db, async (transaction) => {  
+
+        const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${comment.id}`);
+        const mydoc = await transaction.get(usersCollectionRef);
+
+        const docRef1 = doc(db, `/users/${comment.postAuthor}/commentsLikes/${comment.postid}/ids/${comment.id}/ids`, `${auth.currentUser.uid}`);
+
+        const comNum=mydoc.data().likes
+        transaction.update(usersCollectionRef,{
+          likes:comNum-1,
+        })
+        
+       // SetCommentLikes(commentLikes-1);
+        console.log("subbed likes")
+
+        
+        transaction.delete(docRef1)
+        console.log("deleted user to ike list")
+
+      })
   }
+  catch(e){
+console.log(e.message)
+  }}
 
   const handleButtonReply=()=>{
     SetReply(!reply);

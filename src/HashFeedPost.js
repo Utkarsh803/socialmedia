@@ -12,6 +12,7 @@ import Avatar from '@mui/material/Avatar';
 import Comment from './Comment';
 import Moment from 'react-moment';
 import createTree from './createTree';
+import { runTransaction } from "firebase/firestore";
 
 function HashFeedPost({postid,authorId}) {
 
@@ -220,22 +221,60 @@ const addToPostComments=async()=>{
   }
   }
 
-const addComment=async()=>{ 
-  console.log("Process bega")
-  const NotRef = collection(db, `users/${authorId}/notifications`);   
-  addTotalPostComments();
-  addToPostComments();
-  if(authorId != auth.currentUser.uid){
-  await addDoc(NotRef,{
-  type:"comment",
-  content:"commented on your post.",
-  author:auth.currentUser.uid,
-  postid:postid,
-  timeStamp:Timestamp.fromDate(new Date()),
-})
-console.log("Posted a notification about a comment.")
-}
-}
+  const addComment=async()=>{ 
+    try{
+      await runTransaction(db, async (transaction) => {   
+    
+    
+      console.log("Process began")
+    const NotRef = collection(db, `users/${authorId}/notifications`);   
+   
+    const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
+    const docRef = await transaction.get(comRef) 
+  
+    const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
+    const docRef1 = await transaction.get(userDoc) 
+   
+   
+    const newfield={totalComments:docRef.data().totalComments+1};
+    transaction.update(comRef, newfield);
+  
+    const num=docRef.data().totalComments+1;
+    const usersCollectionRef = doc(db, `/users/${authorId}/comments/${postid}/ids`, `${num}`);
+    transaction.set(usersCollectionRef,{
+      id: docRef.data().totalComments+1,
+      parent:null,
+      comment: comCaption,
+      author:auth.currentUser.uid,
+      postAuthor:authorId,
+      likes:0,
+      postid:postid,
+      timeStamp:Timestamp.fromDate(new Date()),
+    });      
+    
+     console.log("Author ID: "+authorId);
+     console.log("Post ID: "+postid);
+     console.log("Added a comment");
+     
+    const newFields1 = {comments: docRef1.data().comments + 1};
+    transaction.update(userDoc, newFields1);
+    
+    
+    if(authorId != auth.currentUser.uid){
+      transaction.set((doc(NotRef)),{
+        type:"comment",
+        content:"commented on your post.",
+        author:auth.currentUser.uid,
+        postid:postid,
+        timeStamp:Timestamp.fromDate(new Date()),
+      })}
+      })
+  }
+  catch(e)
+  {
+    console.log(e.message)
+  }
+  }
 
 
 

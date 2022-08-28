@@ -12,6 +12,7 @@ import {BiDotsVerticalRounded } from 'react-icons/bi';
 import Avatar from '@mui/material/Avatar';
 import Comment from './Comment';
 import Moment from 'react-moment';
+import { runTransaction } from "firebase/firestore";
 
 
 
@@ -167,22 +168,66 @@ const addToPostComments=async()=>{
   }
   }
 
-  const addComment=async()=>{    
-      addTotalPostComments();
-      addToPostComments();
-      console.log(authorId)
-      console.log( auth.currentUser.uid)
-      if(authorId != auth.currentUser.uid){
-    await addDoc(NotRef,{
-      type:"comment",
-      content:"commented on your post.",
+  const addComment=async()=>{ 
+    try{
+      await runTransaction(db, async (transaction) => {   
+    
+    
+      console.log("Process began")
+    const NotRef = collection(db, `users/${authorId}/notifications`);   
+   
+    console.log("Step1")
+    const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
+    console.log("Step2")
+    const docRef = await transaction.get(comRef) 
+    console.log("Step3")
+    console.log(docRef.data())
+  
+    const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
+    console.log("Step4")
+    const docRef1 = await transaction.get(userDoc) 
+    console.log("Step5")
+   
+    const num = docRef.data().totalComments+1;
+    console.log("Step6")
+    const newfield={totalComments:num+1};
+    transaction.update(comRef, newfield);
+  
+    const usersCollectionRef = doc(db, `/users/${authorId}/comments/${postid}/ids`, `${num}`);
+    transaction.set(usersCollectionRef,{
+      id: docRef.data().totalComments+1,
+      parent:null,
+      comment: comment,
       author:auth.currentUser.uid,
+      postAuthor:authorId,
+      likes:0,
       postid:postid,
       timeStamp:Timestamp.fromDate(new Date()),
-    })
-    console.log("Posted a notification about a comment.")
+    });      
+    
+     console.log("Author ID: "+authorId);
+     console.log("Post ID: "+postid);
+     console.log("Added a comment");
+     
+    const newFields1 = {comments: docRef1.data().comments + 1};
+    transaction.update(userDoc, newFields1);
+    
+    
+    if(authorId != auth.currentUser.uid){
+      transaction.set((doc(NotRef)),{
+        type:"comment",
+        content:"commented on your post.",
+        author:auth.currentUser.uid,
+        postid:postid,
+        timeStamp:Timestamp.fromDate(new Date()),
+      })}
+      })
   }
-}
+  catch(e)
+  {
+    console.log(e.message)
+  }
+  }
 
   return (<div className="Post">
     <nav>

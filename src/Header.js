@@ -16,6 +16,7 @@ import SearchResult from './SearchResult';
 import NotifLike from './NotifLike';
 import SearchResultHash from './SearchResHash';
 import React, {useRef} from 'react';
+import { runTransaction } from "firebase/firestore";
 
 
 
@@ -326,15 +327,30 @@ catch(error){
 
 
    const createPost = async() =>{
+    const hashtagArray = caption.match(/#[\p{L}]+/ugi);
+    console.log("This post has hashtags"+hashtagArray);
+    const imageName = imageFile.name + v4();
     try
-    {  
-      const hashtagArray = caption.match(/#[\p{L}]+/ugi);
-      console.log("This post has hashtags"+hashtagArray);
-       const imageName = imageFile.name + v4();
+    {
+    await runTransaction(db, async (transaction) => { 
+      console.log("Step0")   
+      const followerRef = collection(db, `users/${auth.currentUser.uid}/followerList`);
+      const data = await getDocs(followerRef);
+      console.log("Step1")
+
+      var arr=[];
+      for(const hash of hashtagArray){
+        const hashRef= doc(db, "hashtags", `${hash}`);
+        const hashVal = await transaction.get(hashRef);
+        arr.push({hashVal:hashVal, hashRef:hashRef, hash:hash});
+      }
+      console.log("Step2")
+
        await addToStorage(imageName);
-       const usersCollectionRef = collection(db,  `/users/${auth.currentUser.uid}/posts`);
-       const addedDoc = await addDoc (usersCollectionRef, {
-        author: "Utkarsh",
+       console.log("Step2i")
+       const usersCollectionRef = doc(collection(db,  `/users/${auth.currentUser.uid}/posts`));
+       console.log("Step2ii")
+       const addedDoc =  transaction.set(usersCollectionRef, {
         authorID: auth.currentUser.uid,
         likes:0,
         comments:0,
@@ -346,39 +362,20 @@ catch(error){
         timeStamp:Timestamp.fromDate(new Date()),
         });       
 
-        for(const hash of hashtagArray){
-        addHash(hash, addedDoc.id);
-          console.log("added hash");
-        }
-        addToAlbum(addedDoc.id, imageName);
-        createLikeList(addedDoc.id);
-        createCommentList(addedDoc.id);
-        addToFeed(addedDoc.id);
-        increasePosts();
-        console.log("Post ID : "+ addedDoc.id);   
-         } 
-   catch(error)
-   {
-       console.log(error.message);
-       console.log("Post was not created :("); 
-   }
-   }
+        console.log("Step3")
 
-
-   const addHash = async(hash, id)=>{
-
-      const hashRef= doc(db, "hashtags", `${hash}`);
-      const hashVal = await getDoc(hashRef);
-      console.log(hashVal)
+      var a=0;
+      for(const hashVal of arr ){
+      console.log(arr[a].hashVal)
       
-        if(hashVal.exists()){
-          console.log("Hashtag exists "+ hash);
-          updateDoc(hashRef, {val:hashVal.data().val+1});
+        if((arr[a].hashVal).exists()){
+          console.log("Hashtag exists "+ arr[a].hash);
+          transaction.update(arr[a].hashRef, {val:(arr[a].hashVal).data().val+1});
         
-          const pid = auth.currentUser.uid + id;
-          await setDoc(doc(db, `hashtags/${hash}/posts/`, `${pid}`),{
+          const pid = auth.currentUser.uid + usersCollectionRef.id;
+          transaction.set(doc(db, `hashtags/${arr[a].hash}/posts/`, `${pid}`),{
             authorId:auth.currentUser.uid,
-            postId:id,
+            postId:usersCollectionRef.id,
             likes:0,
             comments:0,
             saves:0,
@@ -388,17 +385,17 @@ catch(error){
         
         }
         else{
-          console.log("Hashtag does not exists "+ hash);
-          setDoc(doc(db, `hashtags`, `${hash}`), {
-            tag:hash,
+          console.log("Hashtag does not exists "+ arr[a].hash);
+          transaction.set(doc(db, `hashtags`, `${arr[a].hash}`), {
+            tag:arr[a].hash,
             val:1,
            });}
 
-           const pid = auth.currentUser.uid + id;
+           const pid = auth.currentUser.uid + usersCollectionRef.id;
 
-           await setDoc(doc(db, `hashtags/${hash}/posts`, `${pid}`),{
+            transaction.set(doc(db, `hashtags/${arr[a].hash}/posts`, `${pid}`),{
             authorId:auth.currentUser.uid,
-            postId:id,
+            postId:usersCollectionRef.id,
             likes:0,
             comments:0,
             saves:0,
@@ -407,14 +404,71 @@ catch(error){
           });
 
           console.log("added post to hastag array")
+          a=a+1;
+        }
+        console.log("Step4")
         
-      }
+         transaction.set(doc(db,  `/users/${auth.currentUser.uid}/album`, `${usersCollectionRef.id}`), {
+          img:imageName,
+         });         
+          console.log("Image added to album with url : "+ imageName);   
+          
+       // createLikeList(addedDoc.id);
+        
+         transaction.set(doc(db,  `/users/${auth.currentUser.uid}/likes`, `${usersCollectionRef.id}`), {
+          totalLikes:0,
+         });         
+          console.log("A like list was created for the post: "+usersCollectionRef.id);   
 
-      
+      //  createCommentList(addedDoc.id);
 
+        transaction.set(doc(db,  `/users/${auth.currentUser.uid}/comments`, `${usersCollectionRef.id}`), {
+          totalComments:0,
+         });       
+          console.log("A comment list was created for the post: "+ usersCollectionRef.id); 
       
-    
+      
+      
+      //addToFeed(addedDoc.id);
+      
+      data.forEach((docc) => {
   
+        console.log(docc.id, " => ", docc.data());
+        const feedRef = doc(db, `feed/${docc.id}/posts`, `${usersCollectionRef.id}`);
+  
+        transaction.set(feedRef, {
+          added:Timestamp.fromDate(new Date()),
+          author:auth.currentUser.uid,
+          postID:usersCollectionRef.id,
+        })  
+       // SetFollowersList(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
+       console.log("Added doc to"+ docc.id +"'s feed.");  
+      });
+      
+      
+        //increasePosts();
+
+        const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
+        const newfield1 = {posts: numPosts + 1};
+        transaction.update(followingdocRef,newfield1);
+        console.log("Post stats updated.");
+        SetNumPosts(numPosts+1);
+        console.log("Post ID : "+ usersCollectionRef.id);
+        })
+      }     
+      catch(error)
+        {
+            console.log(error.message);
+            console.log("Post was not created :("); 
+        }
+        }
+
+
+
+
+
+
+
 
    const createLikeList = async(postId) =>{
     try
@@ -431,20 +485,6 @@ catch(error){
    }
    }
 
-   const  addToAlbum = async(postId, url) =>{
-    try
-    {  
-      await setDoc(doc(db,  `/users/${auth.currentUser.uid}/album`, `${postId}`), {
-        img:url,
-       });         
-        console.log("Image added to album with url : "+ url);   
-         } 
-   catch(error)
-   {
-       console.log(error.message);
-       console.log("Image could not be added to album. Try Again :("); 
-   }
-   }
 
    const createCommentList = async(postId) =>{
     try
