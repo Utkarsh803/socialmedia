@@ -11,6 +11,12 @@ font-size:x-large;
 background-color:rgba(255, 255, 255, .0) ;
 }
 
+
+
+.Login button:hover{
+  transform: translateY(-4px);
+}
+
 .divider{
 display: flex;
 flex-direction: row;
@@ -47,6 +53,7 @@ box-sizing: border-box;
 background: rgba(255, 255, 255, 0.1);
 color: #fff;
 letter-spacing: 1px;
+border-radius: 5px;
 }
 
 input:focus {
@@ -70,7 +77,7 @@ input:focus {
       backface-visibility: hidden;
       background-color: #405cf5;
 
-      border-width: 0;
+      border-radius: 5px;
       box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
       box-sizing: border-box;
       color: #fff;
@@ -80,6 +87,7 @@ input:focus {
 margin-bottom:9%;
       outline: none;
       overflow: hidden;
+      text-align: center;
       padding: 0 25px;
       text-transform: none;
       transform: translateZ(0);

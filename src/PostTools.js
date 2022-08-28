@@ -4,7 +4,7 @@ import { AiOutlineHeart,AiFillHeart,AiOutlineCloseCircle} from 'react-icons/ai';
 import { FaRegComment, FaRegBookmark, FaBookmark} from 'react-icons/fa';
 import { IoMdShareAlt} from 'react-icons/io';
 import { addNotification } from './App';
-
+import React, {useRef} from 'react';
 import {db, auth} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc,serverTimestamp, Timestamp} from 'firebase/firestore';
 import { type } from '@testing-library/user-event/dist/type';
@@ -25,9 +25,17 @@ const NotRef = collection(db, `users/${authorId}/notifications`);
 const[commentTree, SetCommentTree]=useState(null);
 const[saveNum, SetSaveNum]=useState(saves);
 
-
+const commentRef = useRef();
 
 useEffect(()=>{
+
+    let handler = (event)=>{
+      if(!commentRef.current.contains(event.target)){
+      setCommentBox(false);}
+    }
+
+    document.addEventListener("mousedown", handler);
+
   const getLike = async () => {
 
     const docRef = doc(db, `/users/${authorId}/likes/${postid}/ids`, `${auth.currentUser.uid}`);
@@ -61,6 +69,11 @@ getCommentNum();
 getComments();
 getLike();
 getSave();
+
+return()=>{
+  document.removeEventListener("mousedown", handler)
+}
+
 }, [] );
 
 const getComments=async()=>{
@@ -331,7 +344,7 @@ return (<div className="PostTools">
     {like ? (<AiFillHeart className='icons' style={{color:'red'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart className='icons' style={{color:'white'}} onClick={handleButtonLike}/>)}
     <FaRegComment className='icons' onClick={handleButtonComment}/>
     {commentBox && 
-      (<div className='commentTray'>
+      (<div className='commentTray' ref={commentRef}>
         <div className='comments'>
           <div style={{height:'auto',width:'fit-content',marginLeft:'auto', marginRight:'2%'}} onClick={()=>{setCommentBox(!commentBox)}}>
         <AiOutlineCloseCircle></AiOutlineCloseCircle>

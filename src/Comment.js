@@ -9,6 +9,7 @@ import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/
 import { AiOutlineHeart,AiFillHeart} from 'react-icons/ai';
 import Moment from 'react-moment'
 import { async } from "@firebase/util";
+import './css/Comment.css'
 
 const Comment = ({ comment })=> {
 
@@ -27,7 +28,7 @@ const Comment = ({ comment })=> {
   const[like,SetLike]=useState(null);
   const[reply,SetReply]=useState(false);
   const[commentInput,SetCommentInput]=useState(null);
-  const[commentLikes,SetCommentLikes]=useState(comment.likes);
+  const[commentLikes,SetCommentLikes]=useState(comment.likes?(comment.likes):(0));
 
   
 
@@ -109,6 +110,7 @@ const Comment = ({ comment })=> {
          comment: commentInput,
          author:auth.currentUser.uid,
          postAuthor:comment.postAuthor,
+         likes:0,
          postid:comment.postid,
          timeStamp:Timestamp.fromDate(new Date()),
        });      
@@ -225,7 +227,7 @@ const  subCommentLikes=()=>{
   }
 
   return (
-    <div style={{backgroundColor:'black'}}>
+    <div style={{backgroundColor:'black'}} className='Comment'>
     {comment.parent===null ?
     (
     <div style={{ display:'flex',flexDirection:'column',marginLeft: '0px', marginTop: '0px' ,backgroundColor:'black', color:'white', paddingBottom:'3%'}}>
@@ -246,7 +248,9 @@ const  subCommentLikes=()=>{
         <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey'}}>{ comment.timeStamp ? (comment.timeStamp.toDate()):null}</Moment></div>
         <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>{commentLikes} likes</div>
         <div style={{color:'grey', backgroundColor:'black'}} onClick={handleButtonReply}>Reply </div>
-        {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonLike}/>)}
+      <div className='pointer' style={{marginRight:'1%' ,marginLeft:'auto'}}>  
+        {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red', cursor:'pointer'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto', cursor:'pointer'}} onClick={handleButtonLike}/>)}
+      </div>
       </div>
       {reply &&(
         <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', color:'white', paddingLeft:'7%', height:'50px'}}>
@@ -276,7 +280,9 @@ const  subCommentLikes=()=>{
           <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey'}}>{ comment.timeStamp ? (comment.timeStamp.toDate()):null}</Moment></div>
           <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>{commentLikes} likes</div>
           <div style={{color:'grey', backgroundColor:'black'}} onClick={handleButtonReply}>Reply</div>
-          {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto'}} onClick={handleButtonLike}/>)}
+        <div  className='pointer' style={{marginRight:'1%' ,marginLeft:'auto'}}>  
+          {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red', cursor:'pointer'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto',cursor:'pointer'}} onClick={handleButtonLike}/>)}
+        </div>
         </div>
         {reply &&(
         <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', color:'white', paddingLeft:'7%', height:'50px'}}>

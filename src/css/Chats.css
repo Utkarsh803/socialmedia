@@ -51,9 +51,7 @@
       height:fit-content;
       margin-Top: 2%;
       margin-left: 1.5%;
-      border-radius: 2%;
-      border-top-left-radius: 2%;
-      border-bottom-left-radius: 2%;
+      border-radius: 5px;
   }
   
   .Chats .posts{
@@ -67,7 +65,7 @@
     height: fit-content;
     margin-left: 5%;
     padding-top: 2%;
-    border-radius: 2%;
+    border-radius: 5px;
     margin-bottom: 2%;
     
   }
@@ -89,4 +87,8 @@
     overflow: scroll;
     width: 100%;
     padding-top: 1%;
+  }
+
+  .Chats button:hover{
+    transform: translateY(-4px);
   }

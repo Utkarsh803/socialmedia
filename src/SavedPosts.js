@@ -76,8 +76,8 @@ function SavedPosts() {
   )} 
 
 {(feed===null) &&
-      (<div className="indPost" style={{marginLeft:'15%'}}>
-      No posts to show. Follow users to see their posts.
+      (<div className="indPost" style={{textAlign:'center'}}>
+      No saved posts. 
       </div>
       )
 } 

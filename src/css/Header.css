@@ -15,10 +15,13 @@
     height: 100px;
     bottom: 84%;
     margin-left: -1%;  
-    z-index: 2;
+    z-index: 3;
     border-bottom: 1px solid grey;
 }
 
+.Header .pointer{
+  cursor: pointer;
+}
 
 .Header input{
     position:relative;
@@ -67,6 +70,7 @@ width: 20%;
     margin-right: 2.5%;
     width: 2%;
     height:25% ;
+    cursor: pointer;
 }
 
 
@@ -106,7 +110,7 @@ width: 20%;
     right: 35%;
     width: 40%;
     height: 200%;
-    z-index: 2;
+    z-index: 3;
     background-color: black;
     border-radius: 2.5%;
 
@@ -188,7 +192,7 @@ width: 20%;
   right: 35%;
   width: 40%;
   height: fit-content;
-  z-index: 2;
+  z-index: 3;
   background-color: black;
   border-radius: 2.5%;
 }
@@ -203,7 +207,7 @@ width: 20%;
   height: 70vh;
   overflow: scroll;
   scroll-behavior: smooth;
-  z-index: 2;
+  z-index: 3;
   background-color: black;
   border-radius: 2.5%;
   

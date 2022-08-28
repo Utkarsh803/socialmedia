@@ -1,4 +1,4 @@
-.MyProfile{ 
+.MyProfile{
     color: #fff;  
     background-color:rgba(0, 0, 0, 0.896);
   }
@@ -20,7 +20,7 @@
       appearance: button;
       backface-visibility: hidden;
       background-color: #405cf5;
-      border-width: 0;
+      border-radius: 5px;
       box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
       box-sizing: border-box;
       color: #fff;
@@ -78,14 +78,39 @@
     
 }
 
+.Header .middletray{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    color: azure;
+    top: 250%;
+    right: 35%;
+    width: 40%;
+    height: 200%;
+    z-index: 2;
+    background-color: black;
+    border-radius: 2.5%;
+
+    
+  }
+
 .MyProfile .indPost{ 
-    position: relative;
-    width: 85%;
-    padding-left: 7.5%;
+    position: fixed;
+    width: 100%;
+    top:15.8%;
+    height: fit-content;
+    z-index: 2;
+    margin-left: 0%;
     background-color:rgba(0, 0, 0, 0.078);
     margin-bottom: 0.5%;
     border: 1px solid black;
+    overflow: scroll;
+
 }
+
+.MyProfile button:hover{
+    transform: translateY(-4px);
+  }
 
 .MyProfile .indGrid{ 
     position: relative;
@@ -94,6 +119,10 @@
     margin-right: 0.5%;
     margin-bottom: 0.5%;
     border: 1px solid black;
+}
+
+.MyProfile .indGrid:hover{
+    transform: translateY(-4px);
 }
 
 

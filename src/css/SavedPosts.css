@@ -41,6 +41,10 @@
     .SavedPosts .pagehaedspace{
       margin-top: 0%;
     }
+
+    .SavedPosts button:hover{
+      transform: translateY(-4px);
+    }
   
     .SavedPosts .secondTray{
       position: relative;

@@ -20,12 +20,21 @@
     
 }
 
+.PostTools .icons:hover{
+  transform: translateY(-4px);
+}
+
 .PostTools .save{
     position: relative;
     background-color: black;
     height: 80%;
     width:5%;
    margin-top: 3.5%;
+   cursor: pointer;
+}
+
+.PostTools .save:hover{
+  transform: translateY(-4px);
 }
 
 .PostTools .space{
@@ -44,7 +53,7 @@
     height: 93vh;
     z-index: 3;
     background-color: black;
-    border-radius: 2.5%;
+    border-radius: 5px;
     
   }
 

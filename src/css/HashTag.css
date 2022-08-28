@@ -68,16 +68,21 @@
 }
 
 .HashTag .indPost{ 
-    position: relative;
-    width: 70%;
-    padding-left: 15%;
+    position: fixed;
+    width: 100%;
+    top:15.8%;
+    height: fit-content;
+    z-index: 1;
+    padding-left: 0%;
     background-color:rgba(0, 0, 0, 0.078);
     margin-bottom: 0.5%;
+    overflow: scroll;
     border: 1px solid black;
 }
 
 .HashTag .indGrid{ 
     position: relative;
+    z-index:0;
     width: 32.5%;
     background-color:rgba(0, 0, 0, 0.797);
     margin-right: 0.5%;
@@ -115,4 +120,18 @@ font-size:large;
 
 .HashTag .underlined{
     border-bottom:1px solid grey
+}
+
+.HashTag .hash{
+    display: inline-block;
+    color:white;
+    font-size:xxx-large; 
+    padding-left:0%;
+    width:100%;
+    text-align:center;
+    cursor: pointer;
+}
+
+.HashTag .hash:hover{
+    cursor: pointer;
 }

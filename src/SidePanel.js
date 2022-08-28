@@ -32,19 +32,18 @@ navigate(`/hashTag/${tag}`);
   <div className="SidePanel" >
     
         <div className='trend'>Trending</div>
-        <div style={{padding:'5%'}}>
+        <div style={{padding:'0%'}}>
         { trends && (
           trends.map((res)=>
             {return <div >
-            <div style={{padding:'2%', fontSize:'x-large'}} >
-               <div onClick={()=>goToHash(res.tag)}> {res.tag}{' '}</div>
+            <div style={{padding:'1%',fontSize:'x-large', display:'flex', flexDirection:'column'}} >
+               <div onClick={()=>goToHash(res.tag)} className='pointer'> {res.tag}{' '}<div><small style={{fontSize:'small', color:'grey', paddingLeft:'3%'}} >{res.val}{' '} posts</small></div></div>
               </div>
-              <small style={{fontSize:'small', color:'grey', paddingLeft:'3%'}} >{res.val}{' '} posts</small>
               </div>
             })
     )}
         </div>
-        <div style={{position:'fixed', display:'flex', flexDirection:'row', bottom:'6%', fontSize:'small', width:'38%', backgroundColor:'transparent'}}>
+        <div style={{position:'fixed', display:'flex', flexDirection:'row', bottom:'9%', fontSize:'small', width:'38%', backgroundColor:'transparent'}}>
 <span style={{width:'33%', backgroundColor:'transparent'}}> Privacy Policy</span>
 <span style={{whiteSpace:'pre',width:'33%', backgroundColor:'transparent'}}> About us</span>
 <span style={{whiteSpace:'pre',width:'33%', backgroundColor:'transparent'}}> Contact</span>

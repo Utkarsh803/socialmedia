@@ -11,6 +11,9 @@ import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/
 import Avatar from '@mui/material/Avatar';
 import {AiFillTag, AiOutlineVideoCamera} from 'react-icons/ai';
 import {FcGallery} from 'react-icons/fc';
+import {FcNext, FcPrevious} from 'react-icons/fc';
+import {MdKeyboardBackspace} from 'react-icons/md';
+
 import GridImg from './GridImg';
 import {BrowserRouter as Router, Link, Route, Routes} from 'react-router-dom';
 
@@ -40,6 +43,9 @@ function MyProfile() {
     const [focusVideos, SetFocusVideos]=useState(false);
     const [focusTags, SetFocusTags]=useState(false);
     const [grid, SetGrid]=useState(true);
+    const [postArray, SetPostArray]=useState();
+    const [index, SetIndex]=useState([]);
+    const[collectionSize, SetCollectionSize]=useState();
 
     const docRef = doc(db, "users", auth.currentUser.uid);
     let navigate = useNavigate(); 
@@ -112,12 +118,17 @@ function MyProfile() {
         const q = query(postsCollectionRef,orderBy('timeStamp', 'desc'))
         onSnapshot(q, querySnapshot=>{
           SetPosts(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+          let mymap = querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id}))
+          let keys = [...mymap.values()]
+          SetCollectionSize(keys.length);
+          SetPostArray(keys);
+          console.log("There are "+((keys.length)-1)+" posts");
         })
  
       }
       getUsersData();
       getUserPost();
-    }, [] );
+    }, [index] );
 
   const logout = async () =>
   {
@@ -126,10 +137,37 @@ function MyProfile() {
 
   }
 
+  const getIndex=(item)=>{
+    var index = 0;
+    postArray.forEach((post)=>{
+      if(post.id === item){
+        SetIndex(index);
+        console.log("index",index);
+      }
+      else{
+        index=index+1;
+      }
+    })
+  }
+
+  const goToNextPost = () => {
+if(index < collectionSize-1){
+    SetIndex((index) => index + 1);
+}
+  };
+
+  const goToPreviousPost = () => {
+    if(index >= 1 ){
+      SetIndex((index) => index - 1);
+    console.log("going to previous post")
+  }
+  };
+
+
   function getPostPic(imgName){
   getDownloadURL(ref(storage, `${auth.currentUser.uid}/${imgName}`))
   .then((url) => {
-    console.log("Profile Pic Downloaded");
+    
     return url;
   })
   .catch((error) => {
@@ -153,8 +191,12 @@ function MyProfile() {
 
   }
 
+  const handleButtonClosePosts=()=>{
+    SetGrid(!grid);
+  }
 
-  const handleButtonSetGrid=()=>{
+  const handleButtonSetGrid=(id)=>{
+    getIndex(id);
     SetGrid(!grid);
   }
 
@@ -166,6 +208,24 @@ function MyProfile() {
     <nav>
     <div className='divider'>
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
+
+    {posts && focusImages && !grid &&
+      (<div className="indPost">
+      <div style={{display:'flex', flexDirection:'row', width:'100%'}}>
+      <div style={{width:'10%', display:'flex', flexDirection:'column'}}>
+
+      <MdKeyboardBackspace style={{marginTop:'10%', width:'100%', height:'5%', cursor:'pointer'}} onClick={()=>{handleButtonClosePosts()}}>Back</MdKeyboardBackspace>
+      <FcPrevious style={{color:'white', marginTop:'150%', width:'100%', cursor:'pointer'}} disabled={index === 0} onClick={()=>{goToPreviousPost()}}>Previous</FcPrevious>
+      
+      </div>
+      <div style={{width:'80%'}}>
+      <Post postid={postArray[index].id} name={name} authorId={postArray[index].authorID} captions={postArray[index].caption} url={postArray[index].url} profilePic={currentPicUrl} likes={postArray[index].likes} saves={postArray[index].saved} comments={postArray[index].comments} timeStamp={postArray[index].timeStamp}></Post>
+      </div>
+      <div style={{width:'10%', color:'white'}}><FcNext style={{ marginLeft:'0%', color:'white', width:'100%', marginTop:'180%', cursor:'pointer'}} disabled={index === collectionSize - 1} onClick={()=>{goToNextPost()}} >Next</FcNext></div>
+      </div>
+      </div>
+  )} 
+
     <div className='firstTray'>
     <div className='rowPicnStat'>
     <div className='profilePic'>  
@@ -217,21 +277,15 @@ function MyProfile() {
     
       </div>
       <div className='posts'>  
-      {posts && focusImages && grid &&
+      {posts && focusImages && 
       (posts.map((post)=>
-    {return <div id={post.url} className="indGrid" onClick={handleButtonSetGrid}>
+    {return <div id={post.url} className="indGrid" onClick={()=>{handleButtonSetGrid(post.id)}}>
       <GridImg name={name} captions={post.caption} url={post.url} authorId={post.authorID}></GridImg>
       </div>
     })
   )}  
 
-{posts && focusImages && !grid &&
-      (posts.map((post)=>
-    {return <div className="indPost">
-      <Post postid={post.id} name={name} authorId={post.authorID} captions={post.caption} url={post.url} profilePic={currentPicUrl} likes={post.likes} saves={post.saved} comments={post.comments} timeStamp={post.timeStamp}></Post>
-      </div>
-    })
-  )} 
+
 
 
  

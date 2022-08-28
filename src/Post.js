@@ -112,6 +112,7 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
 
   useEffect(()=>{
     try{
+        SetPostUrl(null)
         getComments();
         getPostPic();
         getCommentNum();
@@ -120,7 +121,7 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
     catch(error){
       console.log(error);
     }
-  }, [] );
+  }, [url] );
 
   const min = 1;
   const max = 100;
@@ -185,15 +186,21 @@ const addToPostComments=async()=>{
 
   return (<div className="Post">
     <nav>
-    <PostHeader name = {name} url={profilePic} postid={postid} authorId={authorId}></PostHeader>
+    <div style={{display:'flex', flexDirection:'row', height:'78vh'}}>
+    <div style={{width:'60%', height:'90%'}}>
+    <PostHeader name = {name} url={profilePic} postid={postid} authorId={authorId} typ="horizontal"></PostHeader>
     <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />
+    </div>
+    <div style={{width:'40%', paddingLeft:'2%', height:'100%'}}>
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={profilePic}></PostTools>
     <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
     <div className='caption'>
-    <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'1%', marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'1%', width:'90%'}}>
+    <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'2%',paddingTop:'2%', marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'2%',paddingTop:'2%', width:'90%'}}>
 {captions}
     </span>
     </div>
+
+    <div style={{color:'grey',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></div>
 
     {(comments > 2 && comments > 0) &&
     <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>View {comments} comments</div>}
@@ -204,19 +211,7 @@ const addToPostComments=async()=>{
     )
     }
 
-<div style={{display:'flex', flexDirection:'row', backgroundColor:'black', height:'9vh'}}>
-<Avatar
-    alt="preview image"
-    src={profilePicUrl}
-    sx={{ width: 25, height: 25, marginTop:'1%', marginLeft:'3%'}}
-    />
-    <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'80%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white',marginBottom:'0%' }} onChange={(event)=>{SetComment(event.target.value)}}>
-    </input>
-    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%',marginBottom:'0%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>
-    </div>
-
-
-    <div style={{color:'white',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}>
+<div style={{color:'white',backgroundColor:'black',paddingLeft:'3%',overflow:'scroll', fontSize:'small', height:'45vh', marginTop:'0'}}>
     {commentTree && 
     (commentTree.map((comment) => 
       {
@@ -225,8 +220,22 @@ const addToPostComments=async()=>{
     )
     )}
   </div>
-  <div style={{color:'grey',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></div>
+
+<div style={{position:'absolute',display:'flex', flexDirection:'row', backgroundColor:'black', height:'fit-content', bottom:'8px', width:'40%'}}>
+<Avatar
+    alt="preview image"
+    src={profilePicUrl}
+    sx={{ width: 25, height: 25, marginLeft:'3%'}}
+    />
+    <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'60%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white',marginBottom:'0%' }} onChange={(event)=>{SetComment(event.target.value)}}>
+    </input>
+    <button style={{backgroundColor:'black', width:'fit-content', textAlign:'left', height:'6vh',marginBottom:'2.5%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>
+    </div>
+
+  
     <div className='footer'></div>
+    </div>
+    </div>
     </nav>
   </div>);
 }

@@ -24,6 +24,8 @@ function Home() {
 
     useEffect(()=>{
 
+
+
       const getFeed=async()=>{
         try {
           const feedRef = collection(db, `feed/${auth.currentUser.uid}/posts`);
@@ -62,32 +64,31 @@ function Home() {
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
     
     
-    
-
-    {feed && feed.length > 0 ? (
-
     <div className='secondTray'>
     <div className='posts'> 
 
-   {feed.map((post)=>
+   {feed && (feed.map((post)=>
     {return <div className="indPost">
       <FeedPost postid={post.postID} authorId={post.author} ></FeedPost>
       {console.log("feed is not null")}
       </div>
       
-    })}
+    }))}
+
+  {(feed===null) &&
+        (<div className="indPost" style={{textAlign:'center'}}>
+        No posts to show. Follow other users to view their posts. 
+        </div>
+        )
+  } 
+
     </div>
     </div>
-    ):
-    (
-      <div className='secondTray'>
-    <div className='posts'> 
-      <div className="indPost" style={{marginLeft:'15%'}}>
-      
-      </div>
-      </div>
-      </div>
-    )}
+ 
+ 
+
+
+
     <SidePanel/>
   
     </div>

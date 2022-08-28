@@ -1,19 +1,21 @@
-.FeedPost{
+.HashFeedPost{
     position: relative;
     display: flex;
     flex-direction: column;
     background-color: black;
     width:100%;
     margin-top: 1%;
+    padding-bottom: 5%;
+    z-index: 2;
 }
 
-.FeedPost .media{
+.HashFeedPost .media{
     position:relative;
     width: 100%;
     height:450px;
 }
 
-.FeedPost .caption{
+.HashFeedPost .caption{
     position:relative;
     display: flex;
     flex-direction: row;
@@ -26,11 +28,11 @@
     margin-bottom: 0%;
     padding-left: 2%;
 }
-.FeedPost button:hover{
+.HashFeedPost button:hover{
     transform: translateY(-4px);
 }
 
-.FeedPost .nametag{
+.HashFeedPost .nametag{
     position:relative;
     background-color: black;
     color: aliceblue;
@@ -41,7 +43,7 @@
     font-weight: bold;
 }
 
-.FeedPost .captiontext{
+.HashFeedPost .captiontext{
     position:relative;
     background-color: black;
     color: aliceblue;
@@ -50,7 +52,7 @@
     margin-left: 2%;
 }
 
-.FeedPost .footer{
+.HashFeedPost .footer{
     position: relative;
     background-color: black;
     width: 100%;

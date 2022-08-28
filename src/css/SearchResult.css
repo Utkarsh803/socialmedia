@@ -72,6 +72,13 @@
     
 
   }
+  .SearchResult button{
+    border-radius: 5px;
+}
+  .SearchResult button:hover{
+    transform: translateY(-4px);
+  }
+
   .PostHeader .selection {
     position: relative;
     background-color: black;

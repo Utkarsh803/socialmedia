@@ -32,6 +32,7 @@
     margin-right: 58%;
     font-size: large;
     background-color: black;
+    cursor: pointer;
     }
 
 .PostHeader .icons{
@@ -40,14 +41,25 @@
         margin-left:6% ;
         width: 5%;
         height:80% ;
+        cursor: pointer;
 
         
 }
 
 .PostHeader .dropdown {
     position: absolute;
-    top: 5%;
+    top: 6%;
     right: 0%;
+    width: 150px;
+    z-index: 1;
+    background-color: black;
+    
+  }
+
+  .PostHeader .dropdownH {
+    position: absolute;
+    top: 8%;
+    right: 41%;
     width: 150px;
     z-index: 1;
     background-color: black;
@@ -75,18 +87,17 @@
     margin-bottom: -3%;
     white-space: nowrap;
     text-align: left;
+    cursor: pointer;
+  }
 
-
+    
+  .PostHeader button:hover {
+    background-color:#333;
+    transform: translateY(4px);
   }
 
   .PostHeader .selection:active {
     background-color: #333;
    
     transform: translateY(4px);
-  }
-  
-  .PostHeader.selection:hover {
-    background-color:rgb(255, 255, 255);
-    cursor: pointer;
-    color:rgb(184, 182, 182);
   }

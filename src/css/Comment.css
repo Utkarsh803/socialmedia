@@ -1,0 +1,8 @@
+.Comment .pointer:hover{
+    transform: translateY(-4px);
+    behavior: smooth;
+}
+
+.Comment button{
+    border-radius: 5px;
+}

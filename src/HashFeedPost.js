@@ -1,4 +1,4 @@
-import './css/FeedPost.css';
+import './css/HashFeedPost.css';
 import logo from './mslogo.jpg';
 import PostHeader from './PostHeader';
 import {useState, useEffect } from "react";
@@ -13,7 +13,7 @@ import Comment from './Comment';
 import Moment from 'react-moment';
 import createTree from './createTree';
 
-function FeedPost({postid,authorId}) {
+function HashFeedPost({postid,authorId}) {
 
   const[commentTree, SetCommentTree]=useState(null);
   const [name, setName]=useState("");    
@@ -28,6 +28,7 @@ function FeedPost({postid,authorId}) {
   const[totalComments, SetTotalComments]=useState(null);
   const[comCaption, SetComCaption]=useState(null);
   const[profilePicUrl, SetProfilePicUrl]=useState(null);
+  const[typ, SetTyp]=useState("horizontal");
 
   //to get: name, captions, comments, likes, saves, url 
 
@@ -136,19 +137,25 @@ const getUserPost =async()=>{
     
 }
 }
+SetPostUrl(null);
+SetProfilePicUrl(null);
 getMyPic();
 getUserPost();
 getUsersData();
 getComments();
-}, [] );
+}, [postid, authorId, comments] );
 
 const getComments=async()=>{
   const comRef = collection(db, `users/${authorId}/comments/${postid}/ids`)
   const q = query(comRef, orderBy("timeStamp", "desc"));
-  
-  onSnapshot(q, querySnapshot=>{
-    SetCommentTree(createTree(querySnapshot.docs.map((doc)=>({...doc.data()}))));
-  })
+  const docSnap = await getDocs(q);
+
+  if(docSnap.size>0){
+    SetCommentTree(createTree(docSnap.docs.map((doc)=>({...doc.data()}))));
+  }
+  else{
+    SetCommentTree(null);
+  }
 
   /*
   await getDocs(comRef);
@@ -232,17 +239,23 @@ console.log("Posted a notification about a comment.")
 
 
 
-  return (<div className="FeedPost">
+  return (<div className="HashFeedPost">
     <nav>
-    <PostHeader name = {name} url={currentPicUrl} postid={postid} authorId={authorId} typ="vertical"></PostHeader>
+    <div style={{display:'flex', flexDirection:'row', height:'78vh'}}>
+    <div style={{width:'60%', height:'90%'}}>
+    <PostHeader name = {name} url={currentPicUrl} postid={postid} authorId={authorId} typ={typ}></PostHeader>
     <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />
+    </div>
+    <div style={{width:'40%', paddingLeft:'2%', height:'70vh'}}>
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={currentPicUrl}></PostTools>
     <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
     <div className='caption'>
-    <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'1%', marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'1%', width:'90%', marginLeft:'0%'}}>
+    <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'2%', paddingTop:'2%',marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'2%', width:'90%',paddingTop:'2%', marginLeft:'0%'}}>
 {captions}
     </span>
     </div>
+
+    <small><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></small>
 
     
     {(comments >= 2) && (
@@ -257,8 +270,8 @@ console.log("Posted a notification about a comment.")
     )
     }
    
-   {comments < 3 && (
-    <div style={{color:'white',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}>
+
+    <div style={{color:'white',backgroundColor:'black',paddingLeft:'3%', fontSize:'small', overflow:'scroll', height:'42vh'}}>
     {commentTree && 
     (commentTree.map((comment) => 
       {
@@ -266,23 +279,23 @@ console.log("Posted a notification about a comment.")
       }
     )
     )}
-  </div>)}
+  </div>
 
-  <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', height:'9vh'}}>
+  <div style={{position:'absolute', display:'flex', flexDirection:'row', backgroundColor:'black', height:'fit-content',bottom:'11px', width:'40%'}}>
 <Avatar
     alt="preview image"
     src={profilePicUrl}
     sx={{ width: 25, height: 25, marginTop:'1%', marginLeft:'3%'}}
     />
-    <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'80%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }} onChange={(event)=>{SetComCaption(event.target.value)}}>
+    <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'90%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }} onChange={(event)=>{SetComCaption(event.target.value)}}>
     </input>
-    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>
+    <button style={{backgroundColor:'black', width:'fit-content', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>
     </div>
-   
-    <small><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></small>
     <div className='footer'></div>
+    </div>
+    </div>
     </nav>
   </div>);
 }
 
-export default FeedPost;
+export default HashFeedPost;

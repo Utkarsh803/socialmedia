@@ -15,6 +15,7 @@ import { query, where, orderBy, limit } from "firebase/firestore";
 import SearchResult from './SearchResult';
 import NotifLike from './NotifLike';
 import SearchResultHash from './SearchResHash';
+import React, {useRef} from 'react';
 
 
 
@@ -39,11 +40,71 @@ function Header({handleLogout, name}) {
   const[numPosts, SetNumPosts]=useState(null);
 
   let navigate = useNavigate(); 
+  let notifRef = useRef();
+  let profileRef = useRef();
+  let addPostRef= useRef();
+  let uploadRef= useRef();
+  let nextRef= useRef();
+  let searchRef= useRef();
+  let searchRefHash= useRef();
  
   
   useEffect(()=>{
+
+    let handler = (event)=>{
+      if(!notifRef.current.contains(event.target)){
+      SetViewNotif(false);}
+    }
+
+    let handler2 = (event)=>{
+      if(!profileRef.current.contains(event.target)){
+      SetProfileMenu(false);}
+    }
+
+    let handler3 = (event)=>{
+      if(!addPostRef.current.contains(event.target)){
+        handleButtonUploadImage();
+      SetAddPost(false);}
+    }
+    let handler4 = (event)=>{
+      if(!uploadRef.current.contains(event.target)){
+        handleButtonUploadImage();
+      SetUpload(false);}
+    }
+    let handler5 = (event)=>{
+      if(!nextRef.current.contains(event.target)){
+        handleButtonClose();
+      SetNext(false);}
+    }
+    let handler6 = (event)=>{
+      if(!searchRef.current.contains(event.target)){
+      SetSearchRes(false);}
+    }
+    let handler7 = (event)=>{
+      if(!searchRefHash.current.contains(event.target)){
+      SetSearchResHash(false);}
+    }
+
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("mousedown", handler2);
+    document.addEventListener("mousedown", handler3);
+    document.addEventListener("mousedown", handler4);
+    document.addEventListener("mousedown", handler5);
+    document.addEventListener("mousedown", handler6);
+    document.addEventListener("mousedown", handler7);
+
+
     getPostsStats();
     getNotif();
+    return()=>{
+      document.removeEventListener("mousedown", handler)
+      document.removeEventListener("mousedown", handler2)
+      document.removeEventListener("mousedown", handler3)
+      document.removeEventListener("mousedown", handler4)
+      document.removeEventListener("mousedown", handler5)
+      document.removeEventListener("mousedown", handler6)
+      document.removeEventListener("mousedown", handler7)
+    }
     }, [] );
 
     const getNotif= async()=>{
@@ -166,13 +227,16 @@ catch(error){
     navigate("/myprofile");
   }
 
+  function goToHome() {
+    navigate("/");
+  }
+
+
   function goToSettings() {
     navigate("/settings");
   }
 
-  function goToHome() {
-    navigate("/");
-  }
+
 
 
 
@@ -505,15 +569,15 @@ catch(error){
 
   return (<div className="Header">
 
-    <h1 style={{fontSize:'xxx-large', marginLeft:'4%', marginRight:'9%', marginTop:'1.7%'}}>Lyfy</h1>
+    <h1 style={{fontSize:'xxx-large', marginLeft:'4%', marginRight:'9%', marginTop:'1.7%'}} className='pointer'  onClick={goToHome}>Lyfy</h1>
 
   
    <div style={{ display:'flex', flexDirection:'column', width:'57%', backgroundColor:'black', color:'white'}}>
-    <input style={{width:'60%', marginTop:'5%', backgroundColor:'white', borderRadius:'1%', color:'black'}} placeholder='search...' onChange={(event)=>search(event.target.value)}></input>
+    <input style={{width:'60%', marginTop:'5%', backgroundColor:'white', borderRadius:'5px', color:'black'}} placeholder='search...' onChange={(event)=>search(event.target.value)}></input>
     {searchRes && 
     (
     searchRes.map((res)=>
-    {return <div  style={{width:'60%', marginLeft:'4%'}}>
+    {return <div  style={{width:'60%', marginLeft:'4%'}} ref={searchRef}>
      <SearchResult name={res.username} authorId={res.id} url={res.profilePic}></SearchResult>
       </div>;
     })
@@ -522,7 +586,7 @@ catch(error){
 {searchResHash && 
     (
     searchResHash.map((res)=>
-    {return <div  style={{width:'60%', marginLeft:'4%'}}>
+    {return <div  style={{width:'60%', marginLeft:'4%'}}  ref={searchRefHash}>
      <SearchResultHash hash={res.tag}></SearchResultHash>
       </div>;
     })
@@ -533,14 +597,14 @@ catch(error){
     
     <BiImageAdd className='icons'  onClick={handleButtonAddPost}/>
     {addPost && (
-    <div class="middletray">
+    <div class="middletray" ref={addPostRef}>
         <button className='addMedia' onClick={handleButtonUploadImage}> <BiImageAdd className='selectionIcon' />  Add Image</button>
         <button className='addMedia'><AiOutlineVideoCameraAdd className='selectionIcon' /> Add Video</button>
     </div>
   )}
 
   {upload && (   
- <div class="uploadtray">
+ <div class="uploadtray" ref={uploadRef}>
   <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton"></AiOutlineCloseCircle>
 <div className='chooseAndDisplay'>
   <input type="file" className='chooseImage' onChange={onImageChange} ></input>
@@ -551,7 +615,7 @@ catch(error){
   )}
 
 {next&& (   
- <div class="uploadtray">
+ <div class="uploadtray" ref={nextRef}>
   <AiOutlineCloseCircle onClick={handleButtonClose} className="closeButton"></AiOutlineCloseCircle>  
 <div className='flex-column'>
 {image &&(<img src={image} alt="preview image" className='previewSmall' />)}
@@ -566,7 +630,7 @@ catch(error){
     <AiOutlineHeart className='icons' onClick={handleButtonNotif}/>
         
         {viewNotif && Notif && (
-        <div className='NotifTray'>
+        <div ref={notifRef} className='NotifTray'>
          {( Notif.map((res)=>
             {return <div>
              <NotifLike authorId={res.author} content={res.content} postid={res.postid} timestamp={res.timeStamp} type={res.type}></NotifLike>
@@ -595,7 +659,7 @@ catch(error){
     
     <CgProfile className='icons' onClick={handleButtonProfileMenu}/>
     {profileMenu && (
-    <div class="dropdown">
+    <div  ref={profileRef} className="dropdown">
       <ul style={{background:'black', height:'fit-content'}}>
         <button className='selection'  onClick={goToMyProfile}> <CgProfile className='selectionIcon'/>  My Profile</button>
         <button className='selection' onClick={goToSettings}><AiFillSetting className='selectionIcon' />  Settings</button>

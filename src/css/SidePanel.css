@@ -17,3 +17,11 @@
     text-align: center;
     font-size: larger;
 }
+.SidePanel .pointer{
+    cursor: pointer;
+}
+
+.SidePanel .pointer:hover{
+    cursor: pointer;
+    transform: translateY(-4px);
+}

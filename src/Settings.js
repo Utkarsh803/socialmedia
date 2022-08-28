@@ -50,7 +50,7 @@ function Settings() {
     const [preview, SetPreview]=useState(false);
     const [enteredText, setEnteredText] = useState('')
 
-  const [value, setValue] = React.useState('Controlled');
+  const [val, setVal] = React.useState();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -107,6 +107,7 @@ function Settings() {
   useEffect(()=>{
     const getUsersData = async () => {
       const docSnap = await getDoc(docRef);
+      
       if (docSnap.exists()) {
         setName(docSnap.data().name);
         SetUserName(docSnap.data().username);
@@ -572,7 +573,7 @@ function Settings() {
             <button className='sideButtons' onClick={handleButtonEmailAndSms}>Email and SMS</button>
             <button className='sideButtons' onClick={handleButtonPrivacy}>Privacy</button>
             <button className='sideButtons' onClick={handleButtonSecurity}>Security</button>
-            <button disabled className='sideButtons' onClick={handleButtonLoginActivity}>Login Activity {'('}Coming Soon!{')'}</button>
+            <button  className='sideButtons'>Login Activity {'('}Coming Soon!{')'}</button>
     </div>
     {editProfile && (
     <div className="formContainer">

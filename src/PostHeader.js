@@ -6,14 +6,42 @@ import {useState, useEffect } from "react";
 import {db, auth} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, Timestamp, serverTimestamp, getDoc} from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
+import React, {useRef} from 'react';
 
-function PostHeader({name, url, postid, authorId}) {
+function PostHeader({name, url, postid, authorId, typ}) {
 
     const[option, SetOption]=useState(false);
     const[reported, SetReported]=useState(false);
+    const[horizontal, SetHorizontal]=useState("horizontal");
+    const[vertical, SetVertical]=useState("vertical");
+
     
+    const optionRef = useRef();
+    const optionRefH = useRef();
+
+    useEffect(()=>{
+      let handler = (event)=>{
+        if(!optionRef.current.contains(event.target)){
+        SetOption(false);}
+      }
+
+      let handler2 = (event)=>{
+        if(!optionRefH.current.contains(event.target)){
+        SetOption(false);}
+      }
+  
+      document.addEventListener("mousedown", handler);
+      document.addEventListener("mousedown", handler2);
+
+      return()=>{
+        document.removeEventListener("mousedown", handler)
+        document.removeEventListener("mousedown", handler2)
+      }
+
+    }, [])
+
     function handleButtonOptiont() {
-        SetOption(!option);
+        SetOption(true);
       }
 
 
@@ -45,16 +73,26 @@ function PostHeader({name, url, postid, authorId}) {
     
 
   return (<div className="PostHeader">
-
+ 
     <Avatar
     alt="preview image"
     src={url}
-    sx={{ width: 40, height: 40, marginTop:'2%'}}
+    sx={{ width: 40, height: 40, marginTop:'2%', cursor:'pointer'}}
     />
     <h4 className='welcome'>{name}</h4>
     <BiDotsVerticalRounded className='icons'  onClick={handleButtonOptiont}/>
-    {option && (
-    <div className="dropdown">
+
+    {option && typ===vertical && (
+    <div className="dropdown" ref={optionRef}>
+      <ul>
+        <button className='selection' onClick={handleButtonNotInterested}> Not Interested</button>
+        {reported ? (<button className='selection'> Reported</button>):(<button className='selection'onClick={handleButtonReport}> Report</button>)}
+      </ul>
+    </div>
+  )}
+
+{option && typ===horizontal && (
+    <div className="dropdownH" ref={optionRefH} >
       <ul>
         <button className='selection' onClick={handleButtonNotInterested}> Not Interested</button>
         {reported ? (<button className='selection'> Reported</button>):(<button className='selection'onClick={handleButtonReport}> Report</button>)}
