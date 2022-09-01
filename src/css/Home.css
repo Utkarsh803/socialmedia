@@ -31,11 +31,10 @@
   }
 
   .Home .divider{
-    position: relative;
-    background-color: rgb(16, 15, 15);
+
     display: flex;
-    flex-direction: row;
-    margin-top: 9%;
+    flex-direction: column;
+ 
   }
 
   .Home .pagehaedspace{
@@ -48,10 +47,12 @@
     flex-direction: column;
     background-color: black;
     width:60%;
+    min-height: 80vh;
     height:fit-content;
     margin-Top: 2%;
     margin-left: 1.5%;
     border-radius: 5px;
+    margin-bottom: 2%;
 }
 
 .Home .posts{
@@ -60,20 +61,18 @@
   flex: 1;
   background-color: black;
   flex-wrap: wrap;
-  flex-direction: 'row';
-  width: 90%;
+  flex-direction: 'column';
+  width: 80%;
   height: fit-content;
-  margin-left: 5%;
+  margin-left: 10%;
   padding-top: 2%;
-  border-radius: 5px;
-  margin-bottom: 2%;
+  border-radius: 5px;  margin-bottom: 2%;
   
 }
 
 .Home .indPost{ 
   position: relative;
-  width: 85%;
-  padding-left: 7.5%;
+  width: 100%;
   background-color:black;
   margin-bottom: 0.5%;
   border: 1px solid black;

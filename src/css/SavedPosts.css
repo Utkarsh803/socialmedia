@@ -1,6 +1,8 @@
 .SavedPosts{
     color: aliceblue;
     background-color:rgba(0, 0, 0, 0.896);
+    display: flex;
+      flex-direction: column;
     }
     
     .SavedPosts button{
@@ -34,8 +36,7 @@
       position: relative;
       background-color: rgb(16, 15, 15);
       display: flex;
-      flex-direction: row;
-      margin-top: 9%;
+      flex-direction: column;
     }
   
     .SavedPosts .pagehaedspace{
@@ -53,7 +54,9 @@
       background-color: black;
       width:80%;
       height:fit-content;
-      margin-Top: 2%;
+      min-height: 80vh;
+      margin-bottom:3%;
+      margin-Top: 3%;
       margin-left: 10%;
       border-radius: 2%;
       border-top-left-radius: 2%;

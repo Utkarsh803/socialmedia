@@ -6,15 +6,18 @@ import {db, auth, storage} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc} from 'firebase/firestore';
 import PostTools from './PostTools';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
+import * as ReactBootstrap from 'react-bootstrap'
 
 function GridImg({postid, name, authorId, captions, comments, likes, timestamp, url}) {
 
   const[postUrl, SetPostUrl]=useState(null);
+  const[loading, SetLoading]= useState(true);
   
   const getPostPic= async()=>{
   getDownloadURL(ref(storage, `${authorId}/${url}`))
   .then((url) => {
     SetPostUrl(url);
+    SetLoading(false);
   })
   .catch((error) => {
     // A full list of error codes is available at
@@ -33,6 +36,7 @@ function GridImg({postid, name, authorId, captions, comments, likes, timestamp, 
         console.log("Unknown error occurred, inspect the server response");
         break;
     }
+    SetLoading(false);
   });
 
   }
@@ -47,8 +51,10 @@ function GridImg({postid, name, authorId, captions, comments, likes, timestamp, 
   }, [] );
 
 
-  return (<div >
-    <img src={postUrl} style={{width:'100%', backgroundColor:'black', marginBottom:"-1.7%"}}/>
+  return (<div style={{width:'100%', height:'100%'}} >
+      {!loading ?
+  (<img src={postUrl} style={{width:'100%', height:'100%', backgroundColor:'#666', marginBottom:"-1.7%"}}/>):
+  (<ReactBootstrap.Spinner animation="border" style={{marginTop:'45%', marginLeft:'48%'}}/>)}
   </div>);
 }
 

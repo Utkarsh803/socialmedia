@@ -64,7 +64,7 @@ const User=({user, selectUser, user1, chat})=> {
 
     console.log(data);
     return (
-    <div className={`SearchResult ${user === chat && `selected-user`}`} onClick={()=>{selectUser(user)}}>
+    <div className={`SearchResult ${user === chat && `selected-user`}`} onClick={()=>{selectUser(user)}} style={{minHeight:'15vh'}}>
    <div style={{display:'flex', flexDirection:'column', backgroundColor:'transparent', height:'fit-content'}}>
     <div style={{display:'flex', flexDirection:'row', marginRight:'45%', padding:'2%', backgroundColor:'transparent',height:'fit-content'}} >
     <Avatar

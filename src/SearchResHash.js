@@ -9,17 +9,18 @@ import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { Link, useNavigate } from 'react-router-dom';
 
-function SearchResultHash({hash}) {
+function SearchResultHash({hash,SetSearchResHash}) {
     
     const navigate = useNavigate();
 
     const goToHash=(hash)=>{
     const tag = hash.substring(1,hash.length);
     navigate(`/hashTag/${tag}`);
+    SetSearchResHash(false);
     }
     
 
-  return (<div className="SearchResult" onClick={()=>{goToHash(hash)}}>
+  return (<div className="SearchResult" style={{cursor:'pointer'}} onClick={()=>{goToHash(hash)}}>
     <h4 className='welcome'>{hash}</h4>  
     </div>)
 

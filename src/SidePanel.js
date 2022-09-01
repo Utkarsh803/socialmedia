@@ -35,7 +35,8 @@ navigate(`/hashTag/${tag}`);
         <div style={{padding:'0%'}}>
         { trends && (
           trends.map((res)=>
-            {return <div >
+            {if(res.val>0)
+              return <div >
             <div style={{padding:'1%',fontSize:'x-large', display:'flex', flexDirection:'column'}} >
                <div onClick={()=>goToHash(res.tag)} className='pointer'> {res.tag}{' '}<div><small style={{fontSize:'small', color:'grey', paddingLeft:'3%'}} >{res.val}{' '} posts</small></div></div>
               </div>

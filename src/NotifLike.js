@@ -4,18 +4,23 @@ import { AiOutlineHeart, AiOutlineNotification } from 'react-icons/ai';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where, Timestamp} from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { Link, useNavigate } from 'react-router-dom';
 import GridImg from './GridImg';
 import Moment from 'react-moment'
+import * as ReactBootstrap from 'react-bootstrap'
+import { runTransaction } from "firebase/firestore";
 
-function NotifLike({authorId,postid,content, timestamp, type}) {
+function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
     const NotRef = collection(db, `users/${authorId}/notifications`);
     const navigate = useNavigate();
 
     const[imageUrl, SetImageUrl]=useState(false);
+    const[followLoading, SetFollowLoading]=useState(false);
+    const[declineLoading, SetDeclineLoading]=useState(false); 
+
     const[postUrl, SetPostUrl]=useState(false);
     const[follow, SetFollow]=useState(null);
     const[myFollow, SetMyFollow]=useState(null);
@@ -231,6 +236,96 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
              }
     const like = "like";
 
+    const handleButtonDecline=async()=>{
+      SetDeclineLoading(true);
+      const NotRef = doc(db, `users/${auth.currentUser.uid}/notifications`, `${identifier}`);
+      await deleteDoc(NotRef);
+
+      const reqRef = doc(db, `users/${authorId}/profileRequests`, `${auth.currentUser.uid}`);
+      const docSnap = await getDoc(reqRef);
+      
+      if(docSnap.exists()){
+      await deleteDoc(reqRef);
+      }
+      SetDeclineLoading(false);
+    };
+
+
+    const handleButtonAccept = async()=>{
+      SetFollowLoading(true);
+      
+      try{
+        await runTransaction(db, async (transaction) => { 
+
+      const followRef = doc(db, `users/${authorId}/followingList`, `${auth.currentUser.uid}`)
+      const myfollow = await transaction.get(followRef)
+
+      const followingRef = doc(db, `users/${auth.currentUser.uid}/followerList`, `${authorId}`)
+
+      const followingdocRef = doc(db, `users`, `${authorId}`)
+      const docfollowingdocRef =await transaction.get(followingdocRef)
+
+      const followerdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
+      const docfollowerdocRef =await transaction.get(followerdocRef)
+
+      if(!myfollow.exists()){
+
+      transaction.set(followRef,{
+          timeStamp:serverTimestamp(),
+      });
+      console.log("You are now followed by"+authorId);
+
+   
+      transaction.set(followingRef,{
+          timeStamp:serverTimestamp()
+      });
+      console.log(auth.currentUser.uid+"has a new follower.");
+
+      
+      const newfield1 = {following:  docfollowingdocRef.data().following + 1};
+     
+      const newfield2 = {followers: docfollowerdocRef.data().followers + 1};
+
+      transaction.update(followingdocRef,newfield1);
+      transaction.update(followerdocRef,newfield2);
+      console.log("follow stats updated.");
+
+      const NotRef = collection(db, `users/${auth.currentUser.uid}/notifications`);
+       transaction.set(doc(NotRef),{
+        type:"follow",
+        content:"started following you.",
+        author:authorId,
+        timeStamp:Timestamp.fromDate(new Date()),
+      })
+
+      const NotRef2 = collection(db, `users/${authorId}/notifications`);
+      transaction.set(doc(NotRef2),{
+       type:"accept",
+       content:"accepted your follow request..",
+       author:auth.currentUser.uid,
+       timeStamp:Timestamp.fromDate(new Date()),
+     })
+
+      console.log("Posted a notification about a follow.")
+
+      const thisRef = doc(db, `users/${auth.currentUser.uid}/notifications`, `${identifier}`);
+      await deleteDoc(thisRef);
+
+      const reqRef = doc(db, `users/${authorId}/profileRequests`, `${auth.currentUser.uid}`);
+      const docSnap = await getDoc(reqRef);
+  
+    }
+    });
+    SetFollowLoading(false);
+  }
+      catch(error){
+          console.log(error);
+      }
+      SetFollowLoading(false);
+  }
+
+
+
   return (
     <div className="NotifLike">
     {type === "like" && (
@@ -242,7 +337,7 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
     sx={{ width: 40, height: 40, marginTop:'3%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> liked a post. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> liked a post.<small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
     
     <img src={postUrl} style={{height:'60%', backgroundColor:'black',height:'fit-content', maxHeight:'10vh', maxWidth:'10vh'}}></img>
     </div>
@@ -270,8 +365,46 @@ function NotifLike({authorId,postid,content, timestamp, type}) {
     sx={{ width: 40, height: 40, marginTop:'3%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> started follwing you. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> started following you. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
    
+    </div>
+   )}
+
+{type === "accept" && (
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
+    <Avatar
+    alt="preview image"
+    src={imageUrl}
+    sx={{ width: 40, height: 40, marginTop:'3%'}}
+    />
+    <h4 className='welcome'>{username}</h4>  
+    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> accepted your follow request. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+   
+    </div>
+   )}
+
+{type === "request" && (
+    <div style={{display:'flex', flexDirection:'column', backgroundColor:'black', marginRight:'45%'}} >
+     <div style={{display:'flex', flexDirection:'row', backgroundColor:'black'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
+    <Avatar
+    alt="preview image"
+    src={imageUrl}
+    sx={{ width: 40, height: 40, marginTop:'3%'}}
+    />
+    <h4 className='welcome'>{username}</h4>  
+    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> has requested to follow you. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+    </div>
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', justifyContent:'center'}} >
+    {!followLoading ?
+    (<button style={{width:'fit-content', marginRight:'2%'}} onClick={handleButtonAccept}>Accept</button>):(
+      <button style={{width:'fit-content', marginRight:'2%'}}>{<ReactBootstrap.Spinner animation="border" size="sm"/>}</button>
+    )}
+    {!declineLoading ?
+    (<button style={{width:'fit-content'}} onClick={handleButtonDecline}>Decline</button>):
+    (
+      <button style={{width:'fit-content'}}>{<ReactBootstrap.Spinner animation="border" size="sm"/>}</button>
+    )}
+    </div>
     </div>
    )}
    

@@ -8,8 +8,11 @@ import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, 
 import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { Link, useNavigate } from 'react-router-dom';
+import { runTransaction } from "firebase/firestore";
+import * as ReactBootstrap from 'react-bootstrap'
 
-function SearchResult({name, authorId, url}) {
+
+const SearchResult = ({name, authorId, url, SetSearchRes})=> {
     const NotRef = collection(db, `users/${authorId}/notifications`);
     const navigate = useNavigate();
 
@@ -17,6 +20,8 @@ function SearchResult({name, authorId, url}) {
     const[follow, SetFollow]=useState(null);
     const[myFollow, SetMyFollow]=useState(null);
     const[following, SetFollowing]=useState(null);
+    const[loading, SetLoading]=useState(false);
+
 
     const getFollow=async()=>{
     const docRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${authorId}`)
@@ -123,33 +128,57 @@ function SearchResult({name, authorId, url}) {
     }
  
      const handleButttonFollow = async()=>{
-        SetFollow(!follow);
+        SetLoading(true);
+        var i = 0;
         try{
+        await runTransaction(db, async (transaction) => { 
         const followRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${authorId}`)
+        const myfollow = await transaction.get(followRef);
+        const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
+        const docfollowingdocRef =await transaction.get(followingdocRef)
+        const followerdocRef = doc(db, `users`, `${authorId}`)
+        const docfollowerdocRef =await transaction.get(followerdocRef)
+        
+        const followingRef = doc(db, `users/${authorId}/followerList`, `${auth.currentUser.uid}`)
 
-        await setDoc(followRef,{
+if(!myfollow.exist){
+        transaction.set(followRef,{
             timeStamp:serverTimestamp(),
         });
         console.log("You are now folowing"+name);
 
-        const followingRef = doc(db, `users/${authorId}/followerList`, `${auth.currentUser.uid}`)
-
-        await setDoc(followingRef,{
+        
+        transaction.set(followingRef,{
             timeStamp:serverTimestamp(),
         });
         console.log(authorId+"has a new follower.");
-    }
-        catch(error){
-            console.log(error);
-        }
-        increaseFollower();
-        await addDoc(NotRef,{
+
+        const newfield1 = {following: docfollowingdocRef.data().following + 1};
+        const newfield2 = {followers: docfollowerdocRef.data().followers + 1};
+        transaction.update(followingdocRef,newfield1);
+        transaction.update(followerdocRef,newfield2);
+        console.log("follow stats updated.");
+
+        transaction.set(doc(NotRef),{
             type:"follow",
             content:"started following you.",
             author:auth.currentUser.uid,
             timeStamp:Timestamp.fromDate(new Date()),
           })
           console.log("Posted a notification about a follow.")
+          i=1;}
+        });
+
+        if(i===1){
+        SetMyFollow(myFollow+1);
+        SetFollowing(following+1);
+        SetFollow(!follow);
+    }
+    }
+        catch(error){
+            console.log(error);
+        }
+        SetLoading(false);
     }
 
     const deleteFeed = async()=>{
@@ -163,54 +192,97 @@ function SearchResult({name, authorId, url}) {
     }
 
     const handleButttonUnfollow = async()=>{
-        SetFollow(!follow);
+        SetLoading(true);
+        var i = 0;
         try{
-        const followRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${authorId}`)
+         await runTransaction(db, async (transaction) => { 
 
-        await deleteDoc(followRef);
+
+       
+        const followRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${authorId}`)
+        const myfollow = await transaction.get(followRef);
+        const followingRef = doc(db, `users/${authorId}/followerList`, `${auth.currentUser.uid}`)
+        const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
+        const docFollowingdocRef = await transaction.get(followingdocRef)
+        const followerdocRef = doc(db, `users`, `${authorId}`)
+        const docFollowerdocRef = await transaction.get(followerdocRef)
+        
+        if(myfollow.exists()){
+        transaction.delete(followRef);
         console.log("You are not following"+name+" anymore");
 
-        const followingRef = doc(db, `users/${authorId}/followerList`, `${auth.currentUser.uid}`)
-
-        await deleteDoc(followingRef);
+        transaction.delete(followingRef);
         console.log(authorId+"has one less follower.");
-    }
+
+
+        const newfield1 = {following: docFollowingdocRef.data().following - 1};
+       
+        const newfield2 = {followers: docFollowerdocRef.data().followers- 1};
+      
+        transaction.update(followingdocRef,newfield1);
+        transaction.update(followerdocRef,newfield2);
+        console.log("follow stats updated.")
+
+
+        const q = query(collection(db, `feed/${auth.currentUser.uid}/posts`), where("author", "==", `${authorId}`));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+        transaction.delete(doc(db, `feed/${auth.currentUser.uid}/posts/${doc.id}`))
+        console.log(doc.id);    
+        
+    });
+    i=1;
+        }
+    });
+    if(i===1){
+    SetMyFollow(myFollow-1);
+    SetFollowing(following-1);
+    SetFollow(!follow);}
+}
         catch(error){
             console.log(error);
         }
-        decreaseFollower();
-        deleteFeed();
+        SetLoading(false);
     }
 
     const handleButtonSendToProfile=()=>{
+        console.log("step1")
+       if (auth.currentUser.uid != authorId){
        navigate(`/profile/${authorId}`);
        console.log("sent to ", authorId);
+       console.log("step2")
+        }
+        else{
+            navigate(`/myprofile`);
+            console.log("step2")
+        }
+        SetSearchRes(false);
         }
 
-        const handleButtonSendToMyprofile=()=>{
-            navigate(`/myprofile`);
-             }
-    
 
   return (<div className="SearchResult">
-
-    <div style={{display:'flex', flexDirection:'row', backgroundColor:'transparent', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
+    
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'transparent', marginRight:'45%', cursor:'pointer'}}  onClick={handleButtonSendToProfile} >
     <Avatar
     alt="preview image"
     src={imageUrl}
-    sx={{ width: 40, height: 40, marginTop:'2%'}}
+    sx={{ width: 40, height: 40, marginTop:'2%', cursor:'pointer'}}
     />
     <h4 className='welcome'>{name}</h4>  
     </div>
 
-    { (authorId!=auth.currentUser.uid) && (
-    follow ? (<button className='icons' onClick={handleButttonUnfollow}>Unfollow</button>):(
-        <button className='icons' onClick={handleButttonFollow}>Follow</button>
+    { (authorId!=auth.currentUser.uid) && !loading && (
+    follow ? (<button className='icons' disabled={loading} onClick={handleButttonUnfollow}>Unfollow</button>):(
+        <button className='icons' disabled={loading} onClick={handleButttonFollow}>Follow</button>
     )
     )}
 
-    
-  
+{ (authorId!=auth.currentUser.uid) && loading && (
+    <button className='icons'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}</button>    
+    )}
+
+
+
   </div>);
 }
 

@@ -1,6 +1,6 @@
-.Profile{ 
+.Profile{
     color: #fff;  
-    background-color:rgba(0, 0, 0, 0.896);
+    background-color:rgb(31, 30, 30)
   }
 
 
@@ -44,58 +44,73 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.078);
-    width:93%;
-    height: 60vh;
-   margin-top: 0%;
-    padding-left: 7%;
-    margin-bottom: 5%;
+    background-color: rgb(31, 30, 30);
+    width:100%;
+    height: fit-content;
+    padding-top: 5%;
+    padding-left: 0%;
+    margin-bottom:0%;
 }
 
 .Profile .secondTray{
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.078);
+    margin-left: 0%;
+    margin-top: 1%;
+    background-color: rgb(31, 30, 30);
     width:100%;
     height:fit-content;
+    min-height: 40vh;
 
 }
-.Profile button:hover{
-    transform: translateY(-4px);
-  }
+
 .Profile .posts{
     position: relative;
     display: flex;
     flex: 1;
-    background-color:rgba(0, 0, 0, 0.078);
+    background-color:black;
     flex-wrap: wrap;
     flex-direction: 'row';
-    width: 71%;
+    width:80%;
     height: fit-content;
-    margin-left: 15%;
+    margin-left: 10%;
     padding-top: 1%;
-    border-radius: 2%;
     margin-bottom: 2%;
     
 }
 
+
 .Profile .indPost{ 
+    position: fixed;
+    width: 100%;
+    top:15.8%;
+    height: fit-content;
+    z-index: 2;
+    margin-left: 0%;
+    background-color:black;
+    margin-bottom: 0.5%;
+    border: 1px solid black;
+    overflow: scroll;
+
+}
+
+.Profile button:hover{
+    transform: translateY(-4px);
+  }
+
+.Profile .indGrid{ 
     position: relative;
-    width: 85%;
-    padding-left: 7.5%;
-    background-color:rgba(0, 0, 0, 0.078);
+    width: 32.8%;
+    background-color:#666;
+    margin-left: 0.25%;
+    margin-right: 0.25%;
     margin-bottom: 0.5%;
     border: 1px solid black;
 }
 
-.Profile .indGrid{ 
-    position: relative;
-    width: 32.5%;
-    background-color:rgba(0, 0, 0, 0.797);
-    margin-right: 0.5%;
-    margin-bottom: 0.5%;
-    border: 1px solid black;
+.Profile .indGrid:hover{
+    transform: translateY(-4px);
 }
 
 
@@ -103,11 +118,11 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color: rgba(0, 0, 0, 0.797);
-    width:70%;
+    background-color: black;
+    width:80%;
     height:fit-content;
     padding-top: 2%;
-    margin-left: 15%;
+    margin-left: 10%;
     color: aliceblue;
 }
 
@@ -116,7 +131,7 @@
 .Profile .catIcon{
     position: relative;
     color: aliceblue;
-    background-color: rgba(0, 0, 0, 0.797);
+    background-color: black;
     width: 100%;
     padding-bottom: 1vh;
     height: 5vh;
@@ -126,7 +141,7 @@
 .Profile .catIconFocused{
     position: relative;
     color: aliceblue;
-    background-color:rgba(0, 0, 0, 0.797);
+    background-color:black;
     width: 100%;
     height: 5vh;
     padding-bottom: 1vh;
@@ -137,12 +152,13 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color: rgba(0, 0, 0, 0.797);
+    background-color: black;
     color: aliceblue;
     width:fit-content;
     height:fit-content;
     padding-top: 5%;
-    margin-left: 15%;
+    width:80%;
+    margin-left: 10%;
 
 }
 
@@ -150,22 +166,22 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color:rgba(0, 0, 0, 0.797);
+    background-color:white;
     color: aliceblue;
-    width:100%;
+    width:70%;
     height:fit-content;
-    margin-left: 20%;
-    margin-top: 15%;
+    margin-left: 0%;
+    margin-top: 8%;
 }
 
 .Profile .rowEditButton{
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color:rgba(0, 0, 0, 0.797);
+    background-color:black;
     color: aliceblue;
-    width:78%;
-    padding-left:11%;
+    width:100%;
+    padding-left:10%;
     height:fit-content;
     }
 
@@ -173,12 +189,12 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.797);
+    background-color: black;
     color: aliceblue;
     height:fit-content;
-    width: fit-content;
+    width: 33.33333%;
     align-items: center;
-    margin-right: 55%;
+    
     
 }
 
@@ -186,7 +202,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.797);
+    background-color: black;
     color: aliceblue;
     height:fit-content;
     width: 80%;
@@ -196,39 +212,41 @@
 
 .Profile .name{
     position: relative;
-    background-color: rgba(0, 0, 0, 0.797);
+    background-color: black;
     font-size: x-large;
+    padding-bottom: 2%;
     padding-left: 11%;
 
 }
 
 .Profile .bio{
     position: relative;
-    background-color: rgba(0, 0, 0, 0.797);
+    background-color:black;
     font-size:small;
-    
+    padding-bottom: 1%;
     padding-left: 11.5%;
 
 }
 
 .Profile .profilePic{
     display: inline-block;
-    width: fit-content;
-    background-color: rgba(0, 0, 0, 0.797);
+    width: 20%;
+    background-color:black;
     height:fit-content;
     margin-left: 7%;
+    
 }
 
 .Profile .number{
     position: relative;
-    background-color: rgba(0, 0, 0, 0.797);
+    background-color: black;
     height:fit-content;
     font-size: xx-large;
 }
 
 .Profile .category{
     position: relative;
-    background-color: rgba(0, 0, 0, 0.797);
+    background-color: black;
     height:fit-content;
     
 }
@@ -240,14 +258,14 @@
     height: 2vh;
     width: 105%;
     right:2.5%;
-    background-color: rgb(18, 17, 17);;
+    background-color: black;
 }
 
 
 .Profile .editProfile{
-      min-height: 35px;
+      height: fit-content;
       appearance: button;
-      width: 85%;
+      width: 88%;
       backface-visibility: hidden;
       background-color: #405cf5;
       border-width: 0;
@@ -258,11 +276,20 @@
       font-family: -apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif;
       outline: none;
       overflow: hidden;
-      padding: 0 25px;
       text-transform: none;
       transform: translateZ(0);
       transition: all .2s,box-shadow .08s ease-in;
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
+}
+
+.Profile .option{
+    width:fit-content;
+    background-color:black;
+}
+
+.Profile .option:hover{
+    background-color:#666;
+    transform: translateY(-4px);
 }

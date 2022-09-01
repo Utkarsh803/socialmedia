@@ -17,6 +17,14 @@ import NotifLike from './NotifLike';
 import SearchResultHash from './SearchResHash';
 import React, {useRef} from 'react';
 import { runTransaction } from "firebase/firestore";
+import CropEasy from './crop/CropEasy';
+import { Button, DialogActions, DialogContent, Slider, Typography ,Box} from '@mui/material';
+import Cropper from 'react-easy-crop';
+import { MdCancel } from 'react-icons/md';
+import { FaCrop } from 'react-icons/fa';
+import getCroppedImg from './crop/utils/CropImage.js';
+import * as ReactBootstrap from 'react-bootstrap'
+
 
 
 
@@ -39,6 +47,12 @@ function Header({handleLogout, name}) {
   const[searchInput, SetSearchInput]=useState(null);
   const[followersList, SetFollowersList]=useState(null);
   const[numPosts, SetNumPosts]=useState(null);
+  const[openCrop,setOpenCrop]=useState(false);
+  const [crop,setCrop] = useState({x:0, y:0})
+  const [zoom,setZoom] = useState(1)
+  const [rotation,setRotation] = useState(0)
+  const[croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const[loading,setLoading]=useState(false);
 
   let navigate = useNavigate(); 
   let notifRef = useRef();
@@ -96,7 +110,6 @@ function Header({handleLogout, name}) {
 
 
     getPostsStats();
-    getNotif();
     return()=>{
       document.removeEventListener("mousedown", handler)
       document.removeEventListener("mousedown", handler2)
@@ -107,22 +120,6 @@ function Header({handleLogout, name}) {
       document.removeEventListener("mousedown", handler7)
     }
     }, [] );
-
-    const getNotif= async()=>{
-      try{
-      const notifRef = collection(db, `users/${auth.currentUser.uid}/notifications`);
-      const q = query(notifRef,orderBy('timeStamp', 'desc'))
-      onSnapshot(q, querySnapshot=>{
-        SetNotif(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
-      })
-    
-
-    }
-    catch(error)
-    {
-      console.log(error);
-    }
-    }
 
 
    const search = async(name) =>{
@@ -169,6 +166,10 @@ function Header({handleLogout, name}) {
 
 
     }
+
+    const zoomPercent = (value)=>{
+      return `${Math.round(value *100)}%`
+  }
 
     const increasePosts=async()=>{
       try{
@@ -222,6 +223,26 @@ catch(error){
 }
 }
 
+const getNotif= async()=>{
+  setLoading(true);
+  try{
+  const notifRef = collection(db, `users/${auth.currentUser.uid}/notifications`);
+  const q = query(notifRef,orderBy('timeStamp', 'desc'))
+  onSnapshot(q, querySnapshot=>{
+    if(querySnapshot.size>0){
+    SetNotif(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+  }
+  else{
+    SetNotif("null");
+  }
+  })
+setLoading(false);
+}
+catch(error)
+{
+  console.log(error);
+}
+}
   
 
   function goToMyProfile() {
@@ -237,8 +258,30 @@ catch(error){
     navigate("/settings");
   }
 
+  const cropComplete = (croppedArea, croppedAreaPixels)=>{
+    setCroppedAreaPixels(croppedAreaPixels)
+    }
 
-
+    const cropImage = async() => {
+      setLoading(true);
+      const { file, url } = await getCroppedImg(
+        image,
+        croppedAreaPixels,
+        rotation
+      );
+      if(file!==null){
+        var binaryData = [];
+        binaryData.push(url);
+        SetImage(URL.createObjectURL(new Blob(binaryData, {type: "application/text"})))
+        SetImageFile(file);
+        setTimeout(() => {
+          SetUpload(false);
+          SetNext(true);
+          setLoading(false);
+        }, 2000);
+        }
+    }
+    
 
 
   function handleButtonProfileMenu() {
@@ -263,10 +306,12 @@ catch(error){
     SetAddPost(false);
     SetUpload(false);
     SetNext(false);
+    SetPercent(0);
   }
 
   
   const handleButtonNext = async() => {
+    setLoading(true);
     console.log("Height", imageFile.height)
     console.log("Weight", imageFile.width )
     if(imageFile.width==imageFile.height){
@@ -274,14 +319,14 @@ catch(error){
   }else{
     console.log("File resolution not supported")
   }
-    SetUpload(false);
-    SetNext(false);
     SetImage(null);
     SetImageFile(null);
     SetPercent(0);
     SetUrl(null);
     SetCaption(null);
-    
+    setLoading(false);
+    SetUpload(false);
+    SetNext(false);
   }
 
   function handleButtonUpload() {
@@ -327,8 +372,11 @@ catch(error){
 
 
    const createPost = async() =>{
-    const hashtagArray = caption.match(/#[\p{L}]+/ugi);
+    var hashtagArray = caption.match(/#[\p{L}]+/ugi);
     console.log("This post has hashtags"+hashtagArray);
+    if(hashtagArray === null){
+      hashtagArray=0;
+    };
     const imageName = imageFile.name + v4();
     try
     {
@@ -338,17 +386,29 @@ catch(error){
       const data = await getDocs(followerRef);
       console.log("Step1")
 
+      const blockRef = collection(db, `users/${auth.currentUser.uid}/blockedUsers`)
+      const block = await getDocs(blockRef);
+
+      const restrictRef = collection(db, `users/${auth.currentUser.uid}/restrictedUsers`)
+      const restrict = await getDocs(restrictRef);
+
+      const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
+      const docSnap= await transaction.get(followingdocRef);
+      const postsNum= docSnap.data().posts;
+
       var arr=[];
+      if(hashtagArray !== 0 && hashtagArray.length!=0){
       for(const hash of hashtagArray){
         const hashRef= doc(db, "hashtags", `${hash}`);
         const hashVal = await transaction.get(hashRef);
         arr.push({hashVal:hashVal, hashRef:hashRef, hash:hash});
-      }
+      }}
+
       console.log("Step2")
 
        await addToStorage(imageName);
        console.log("Step2i")
-       const usersCollectionRef = doc(collection(db,  `/users/${auth.currentUser.uid}/posts`));
+       const usersCollectionRef = doc(collection(db, `/users/${auth.currentUser.uid}/posts`));
        console.log("Step2ii")
        const addedDoc =  transaction.set(usersCollectionRef, {
         authorID: auth.currentUser.uid,
@@ -358,6 +418,10 @@ catch(error){
         url:imageName,
         reported:0,
         saved:0,
+        allowComments:true,
+        archived:false,
+        deleted:false,
+        edited:false,
         tags:hashtagArray,
         timeStamp:Timestamp.fromDate(new Date()),
         });       
@@ -365,6 +429,7 @@ catch(error){
         console.log("Step3")
 
       var a=0;
+      if(hashtagArray !== 0 && hashtagArray.length!=0){
       for(const hashVal of arr ){
       console.log(arr[a].hashVal)
       
@@ -406,6 +471,7 @@ catch(error){
           console.log("added post to hastag array")
           a=a+1;
         }
+      }
         console.log("Step4")
         
          transaction.set(doc(db,  `/users/${auth.currentUser.uid}/album`, `${usersCollectionRef.id}`), {
@@ -424,6 +490,7 @@ catch(error){
 
         transaction.set(doc(db,  `/users/${auth.currentUser.uid}/comments`, `${usersCollectionRef.id}`), {
           totalComments:0,
+          validComments:0,
          });       
           console.log("A comment list was created for the post: "+ usersCollectionRef.id); 
       
@@ -440,7 +507,13 @@ catch(error){
           added:Timestamp.fromDate(new Date()),
           author:auth.currentUser.uid,
           postID:usersCollectionRef.id,
+          reported:false,
         })  
+
+        transaction.set(doc(db, `users/${auth.currentUser.uid}/feedRef/${usersCollectionRef.id}/nodes`, `${docc.id}`), {
+          createdAt:serverTimestamp()
+        })
+
        // SetFollowersList(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
        console.log("Added doc to"+ docc.id +"'s feed.");  
       });
@@ -448,13 +521,13 @@ catch(error){
       
         //increasePosts();
 
-        const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
-        const newfield1 = {posts: numPosts + 1};
+        
+        const newfield1 = {posts: postsNum + 1};
         transaction.update(followingdocRef,newfield1);
         console.log("Post stats updated.");
-        SetNumPosts(numPosts+1);
         console.log("Post ID : "+ usersCollectionRef.id);
         })
+        SetNumPosts(numPosts+1);
       }     
       catch(error)
         {
@@ -595,6 +668,7 @@ catch(error){
 
 
    const handleButtonNotif=()=>{
+    getNotif();
     SetViewNotif(!viewNotif);
    }
 
@@ -615,19 +689,22 @@ catch(error){
    <div style={{ display:'flex', flexDirection:'column', width:'57%', backgroundColor:'black', color:'white'}}>
     <input style={{width:'60%', marginTop:'5%', backgroundColor:'white', borderRadius:'5px', color:'black'}} placeholder='search...' onChange={(event)=>search(event.target.value)}></input>
     {searchRes && 
-    (
+    <div ref={searchRef}>
+    {
     searchRes.map((res)=>
-    {return <div  style={{width:'60%', marginLeft:'4%'}} ref={searchRef}>
-     <SearchResult name={res.username} authorId={res.id} url={res.profilePic}></SearchResult>
+    {return <div  style={{width:'60%', marginLeft:'4%'}} >
+     <SearchResult name={res.username} authorId={res.id} url={res.profilePic} SetSearchRes={SetSearchRes}></SearchResult>
       </div>;
     })
-    )}
+  }
+    </div>
+    }
 
 {searchResHash && 
     (
     searchResHash.map((res)=>
     {return <div  style={{width:'60%', marginLeft:'4%'}}  ref={searchRefHash}>
-     <SearchResultHash hash={res.tag}></SearchResultHash>
+     <SearchResultHash hash={res.tag}  SetSearchResHash={SetSearchResHash}></SearchResultHash>
       </div>;
     })
     )}
@@ -644,36 +721,111 @@ catch(error){
   )}
 
   {upload && (   
- <div class="uploadtray" ref={uploadRef}>
+ <div class={`uploadtray ${!image && `low`}`} ref={uploadRef}>
   <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton"></AiOutlineCloseCircle>
+
+ 
 <div className='chooseAndDisplay'>
   <input type="file" className='chooseImage' onChange={onImageChange} ></input>
 </div>
-{image &&(<img src={image} alt="preview image" className='preview' />)}
-  <button className="uploadImage" onClick={handleButtonUpload}>Next</button>
+{image &&(
+  <div>
+     <div 
+     style={{
+         position:"relative",
+         height:250,
+         width:"auto",
+         minWidth: {sn:500},
+         backgroundColor:"#333",
+         color:'white'
+       }}
+     >  
+     <Cropper
+     image={image}
+     width={100}
+     crop={crop}
+     zoom={zoom}
+     rotation={rotation}
+     onZoomChange={setZoom}
+     aspect={1}
+     onRotationChange={setRotation}
+     onCropChange={setCrop}
+     onCropComplete={cropComplete}
+     showGrid={false}
+     
+     />
+     </div>
+     <DialogActions sx={{flexDirection:'column', mx:3,my:2}}>
+         <Box sx={{width:"100%", mb:1}}>
+         <Box>
+             <Typography>Zoom: {zoomPercent(zoom)}</Typography>
+                 <Slider
+                 valueLabelDisplay='auto'
+                 valueLabelFormat={zoomPercent}
+                 min={1}
+                 max={3}
+                 step={0.1}
+                 value={zoom}
+                 onChange={(e,zoom)=>setZoom(zoom)}
+                 />
+         </Box>
+         <Box>
+         <Typography>Rotation: {rotation}</Typography>
+                 <Slider
+                 valueLabelDisplay='auto'
+                 min={0}
+                 max={360}
+                 value={rotation}
+                 onChange={(e,rotation)=>setRotation(rotation)}/>
+         </Box>
+         </Box>
+            {!loading ?(
+             <button
+             style={{width:'100%'}}
+             onClick={cropImage}
+             disabled={loading}
+             >
+                Next
+             </button>):(
+              <button
+              style={{width:'100%'}}
+              >
+{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Loading.....
+              </button>
+             )}
+       
+     </DialogActions>
+     </div>
+)}
+
 </div>
   )}
 
 {next&& (   
- <div class="uploadtray" ref={nextRef}>
+ <div class="uploadtrayP" ref={nextRef}>
   <AiOutlineCloseCircle onClick={handleButtonClose} className="closeButton"></AiOutlineCloseCircle>  
 <div className='flex-column'>
-{image &&(<img src={image} alt="preview image" className='previewSmall' />)}
-<textarea placeholder='Type yor caption...' className='captionInput' onChange={(event)=>{SetCaption(event.target.value)}}>
+<textarea placeholder='Type your caption...' className='captionInput' onChange={(event)=>{SetCaption(event.target.value)}}>
 </textarea>
   </div>
-  <button className="uploadImage" onClick={handleButtonNext}>Post</button><p style={{backgroundColor:'black', color:'white'}}>{percent}% done</p>
+  {!loading ?(
+  <button className="uploadImage" disabled={loading} onClick={handleButtonNext}>Post</button>
+  ):(
+  <button className="uploadImage">{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Posting.....</button>
+  )
+  }
+  <p style={{backgroundColor:'black', color:'white'}}>{percent}% done</p>
 </div>
   )}
 
     
     <AiOutlineHeart className='icons' onClick={handleButtonNotif}/>
         
-        {viewNotif && Notif && (
+        {!loading && viewNotif && Notif !=="null" && Notif !== null && (
         <div ref={notifRef} className='NotifTray'>
          {( Notif.map((res)=>
             {return <div>
-             <NotifLike authorId={res.author} content={res.content} postid={res.postid} timestamp={res.timeStamp} type={res.type}></NotifLike>
+             <NotifLike authorId={res.author} content={res.content} postid={res.postid} timestamp={res.timeStamp} type={res.type} identifier={res.id}></NotifLike>
               </div>;
             })
             )
@@ -683,15 +835,22 @@ catch(error){
     
     
             
-        {viewNotif && (Notif==null) && (
-        
+        {!loading && viewNotif && Notif ==="null" && Notif !== null &&
           (
-            <div class="NotifTray">
+            <div ref={notifRef} class="NotifTray">
            <div  style={{display:'relative', width:'100%', backgroundColor:'black', color:'white', padding:'5%'}}>
              <div style={{display:'relative', width:'100%', backgroundColor:'black', color:'white', textAlign:'center'}}>No Notifications.</div>
               </div>
               </div>
-            )
+         )}
+
+      {loading && viewNotif &&
+          (
+            <div ref={notifRef} class="NotifTray">
+           <div  style={{display:'relative', width:'100%', backgroundColor:'black', color:'white', padding:'5%'}}>
+             <div style={{display:'relative', width:'100%', backgroundColor:'black', color:'white', textAlign:'center'}}>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Getting Notifications.....</div>
+              </div>
+              </div>
          )}
         
      

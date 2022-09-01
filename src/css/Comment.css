@@ -6,3 +6,7 @@
 .Comment button{
     border-radius: 5px;
 }
+
+.Comment .CommentTray{
+    position: absolute;
+}

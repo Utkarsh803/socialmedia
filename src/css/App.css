@@ -1,11 +1,14 @@
-*{
-  background-color:rgba(0, 0, 0, 0.923);
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .App button{
   position: relative;
   display: block;
-  width:10%;
+  
   min-height: 35px;
     appearance: button;
     backface-visibility: hidden;

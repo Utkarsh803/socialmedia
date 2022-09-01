@@ -87,6 +87,7 @@ const Chats=()=>{
 
     console.log(msgs);
     const handleSubmit=async()=>{
+        if(img!==null && text!==null && text!==""){
         setVal(()=>"");
         const id = auth.currentUser.uid > chat ? `${auth.currentUser.uid + chat}` : `${chat + auth.currentUser.uid}`
 
@@ -121,6 +122,7 @@ const Chats=()=>{
             console.log("Chat posted.");
             SetText("");
     }
+    }
 
     const fetchData=async(user)=>{
             const userRef = doc(db, "users", `${user}`)
@@ -153,13 +155,9 @@ const Chats=()=>{
 
     return (
     <div className="Chats">
-    <nav>
-    <div className='divider'>
-    <div>
     <Header></Header>
-    </div>
-    <div style={{display:'flex', flexDirection:'row', width:'100%',  border:'1px solid grey',minHeight:'80vh'}}>
-    <div style={{width:'30%', border:'1px solid grey', height:'100%', overflow:'scroll'}}>
+    <div style={{display:'flex', flexDirection:'row', width:'100%',  border:'1px solid grey', paddingTop:'7.9%', height:'100vh'}}>
+    <div style={{width:'30%', border:'1px solid grey', overflow:'scroll'}}>
     <div className='chatDrawer'>
         {users.map(user => <User user={user} selectUser={selectUser} user1={auth.currentUser.uid} chat={chat}/>)}
     </div>
@@ -167,7 +165,7 @@ const Chats=()=>{
 
 {chat && (
     <div style={{height:'80vh', width:'70%'}}>
-    <div style={{height:'70vh'}}>
+    <div style={{height:'74vh'}}>
     <div style={{position:'relative',  display:'flex',flexDirection:'row',height:'fit-content', width:'100%',border:'1px solid grey'}}>
     <div style={{padding:'1%'}}>
     <Avatar  src={picUrl} sx={{ width: 40, height: 40, marginTop:'2%'}}></Avatar>
@@ -182,19 +180,19 @@ const Chats=()=>{
 
     </div>
     </div>
-    <div style={{position:'relative',width:'100%',backgroundColor:'transparent', height:'10%', paddingTop:'0.5%', display:'flex',flexDirection:'row', paddingBottom:'1%'}}>
-        <div style={{width:'fit-content', padding:'1%',backgroundColor:'transparent'}}>
+    <div style={{position:'relative',width:'100%',height:'fit-content',backgroundColor:'transparent', height:'fit-content', display:'flex',flexDirection:'row', marginBottom:'0px'}}>
+        <div style={{width:'fit-content', paddingLeft:'1%',paddingTop:'1%',paddingRight:'1%',backgroundColor:'transparent', marginBottom:'0px'}}>
         <input type="file" id="file" style={{display: "none",backgroundColor:'transparent'}}
          onChange={(e) => SetImg(e.target.files[0])}/>
          <label htmlFor="file" >
          <Attachment/>
          </label>
             </div>
-        <div style={{position:'relative',display:'flex', flexDirection:'row', width:'85%', paddingRight:'0%',backgroundColor:'transparent'}}>
+        <div style={{position:'relative',display:'flex', flexDirection:'row', width:'85%',backgroundColor:'transparent', marginBottom:'0px'}}>
         <input placeholder="Message...." value={val} style={{position:'relative',height:'100%', width:'100%', color:'white', paddingLeft:'2%', paddingRight:'2%', fontSize:'large', border:'1px solid #333', borderRadius:'5px', backgroundColor:'#333'}} onChange={(event)=>{SetText(event.target.value)}}></input>
         </div>
-        <div style={{position:'relative',width:'10%', height:'110%',bottom:'5%',paddingLeft:'1%',backgroundColor:'transparent' }}>
-        <button style={{position:'relative',height:'100%', width:'90%', border:'1px solid #405cf5', borderRadius:'5px'}} onClick={handleSubmit}>Post</button>
+        <div style={{position:'relative',width:'10%', height:'100%',paddingLeft:'1%',backgroundColor:'transparent',paddingTop:'7px' }}>
+        <button style={{position:'relative',height:'100%', width:'92%', border:'1px solid #405cf5', borderRadius:'5px'}} onClick={()=>{handleSubmit()}}>Post</button>
         </div>
     </div>
     </div>
@@ -202,8 +200,8 @@ const Chats=()=>{
 
     
     </div>
-    </div>
-    </nav>
+    
+   
     </div>
     )
 }

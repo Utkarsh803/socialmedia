@@ -16,6 +16,7 @@ import {MdKeyboardBackspace} from 'react-icons/md';
 
 import GridImg from './GridImg';
 import {BrowserRouter as Router, Link, Route, Routes} from 'react-router-dom';
+import * as ReactBootstrap from 'react-bootstrap'
 
 
 
@@ -46,6 +47,7 @@ function MyProfile() {
     const [postArray, SetPostArray]=useState();
     const [index, SetIndex]=useState([]);
     const[collectionSize, SetCollectionSize]=useState();
+    const[loading, SetLoading]= useState(true);
 
     const docRef = doc(db, "users", auth.currentUser.uid);
     let navigate = useNavigate(); 
@@ -117,14 +119,20 @@ function MyProfile() {
       const getUserPost =async()=>{
         const q = query(postsCollectionRef,orderBy('timeStamp', 'desc'))
         onSnapshot(q, querySnapshot=>{
+          if(querySnapshot.size>0){
           SetPosts(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
           let mymap = querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id}))
           let keys = [...mymap.values()]
           SetCollectionSize(keys.length);
           SetPostArray(keys);
           console.log("There are "+((keys.length)-1)+" posts");
+          SetLoading(false);
+        }
+          else{
+            SetPosts("null");
+            SetLoading(false);
+          }
         })
- 
       }
       getUsersData();
       getUserPost();
@@ -206,22 +214,22 @@ if(index < collectionSize-1){
  
   return (<div className="MyProfile">
     <nav>
-    <div className='divider'>
+  
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
 
     {posts && focusImages && !grid &&
       (<div className="indPost">
       <div style={{display:'flex', flexDirection:'row', width:'100%'}}>
-      <div style={{width:'10%', display:'flex', flexDirection:'column'}}>
+      <div style={{width:'10%',display:'flex', flexDirection:'column'}}>
 
-      <MdKeyboardBackspace style={{marginTop:'10%', width:'100%', height:'5%', cursor:'pointer'}} onClick={()=>{handleButtonClosePosts()}}>Back</MdKeyboardBackspace>
+      <MdKeyboardBackspace style={{marginTop:'15%', width:'100%', height:'5%', cursor:'pointer'}} onClick={()=>{handleButtonClosePosts()}}>Back</MdKeyboardBackspace>
       <FcPrevious style={{color:'white', marginTop:'150%', width:'100%', cursor:'pointer'}} disabled={index === 0} onClick={()=>{goToPreviousPost()}}>Previous</FcPrevious>
       
       </div>
       <div style={{width:'80%'}}>
-      <Post postid={postArray[index].id} name={name} authorId={postArray[index].authorID} captions={postArray[index].caption} url={postArray[index].url} profilePic={currentPicUrl} likes={postArray[index].likes} saves={postArray[index].saved} comments={postArray[index].comments} timeStamp={postArray[index].timeStamp}></Post>
+      <Post postid={postArray[index].id} name={name} authorId={postArray[index].authorID} captions={postArray[index].caption} url={postArray[index].url} profilePic={currentPicUrl} likes={postArray[index].likes} saves={postArray[index].saved} comments={postArray[index].comments} timeStamp={postArray[index].timeStamp} allowComments={postArray[index].allowComments}></Post>
       </div>
-      <div style={{width:'10%', color:'white'}}><FcNext style={{ marginLeft:'0%', color:'white', width:'100%', marginTop:'180%', cursor:'pointer'}} disabled={index === collectionSize - 1} onClick={()=>{goToNextPost()}} >Next</FcNext></div>
+      <div style={{width:'10%', color:'white'}}><FcNext style={{ color:'white', width:'100%', marginTop:'180%', cursor:'pointer'}} disabled={index === collectionSize - 1} onClick={()=>{goToNextPost()}} >Next</FcNext></div>
       </div>
       </div>
   )} 
@@ -259,7 +267,7 @@ if(index < collectionSize-1){
       </div>
     </div>
     </div>
-    <div className='space05'></div>
+   
     <div className='secondTray'>
       <div className='rowCategory'>
       {focusImages ?
@@ -277,21 +285,38 @@ if(index < collectionSize-1){
     
       </div>
       <div className='posts'>  
-      {posts && focusImages && 
+      {posts !== null && focusImages && grid && !loading && posts !== "null" &&
       (posts.map((post)=>
-    {return <div id={post.url} className="indGrid" onClick={()=>{handleButtonSetGrid(post.id)}}>
+    { if((!post.deleted))
+      return <div id={post.url} className="indGrid" onClick={()=>{handleButtonSetGrid(post.id)}}>
+       {!(post.deleted) && (
       <GridImg name={name} captions={post.caption} url={post.url} authorId={post.authorID}></GridImg>
+       )}
       </div>
-    })
+    }
+    )
   )}  
 
 
+{posts !== null && focusImages && grid && !loading && posts === "null" &&
+      (<div style={{width:'100%',marginTop:'7%', textAlign:'center', color:'#666'}}>
+       You haven't posted anything yet.
+      </div>
+  )} 
 
+{loading &&  (
+      <div style={{width:'100%',marginTop:'7%', textAlign:'center', color:'#666'}}>
+        
+{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Getting Posts.....
+      
+      </div>
+      
+      )}  
 
  
   </div>
     </div>
-    </div>
+  
     </nav>
   </div>);
 }

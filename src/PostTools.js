@@ -66,16 +66,6 @@ const getSave = async () => {
     console.log("You have not liked this post.");
   }
 };
-getCommentNum();
-getComments();
-getLike();
-getSave();
-
-return()=>{
-  document.removeEventListener("mousedown", handler)
-}
-
-}, [] );
 
 const getComments=async()=>{
   const comRef = collection(db, `users/${authorId}/comments/${postid}/ids`)
@@ -96,6 +86,22 @@ const getCommentNum=async()=>{
     SetTotalComments(null);
 }
 }
+
+
+getCommentNum();
+getComments();
+getLike();
+getSave();
+
+return()=>{
+  document.removeEventListener("mousedown", handler)
+}
+
+}, [postid, authorId, commentTree] );
+
+
+
+
 
 const incCommentNum=async()=>{
   try{
@@ -348,10 +354,9 @@ const subTotalPostLikes=async()=>{
 }
 
 const handleButtonLike=async()=> {
-   
+  setLike(!like);  
     try
     {
-      setLike(!like);  
       await runTransaction(db, async (transaction) => { 
 
         const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
@@ -382,17 +387,19 @@ const handleButtonLike=async()=> {
           console.log("Post ID: "+postid);
           console.log("updated a like on the post.");
         });
+        setLike(true);
          } 
    catch(error)
    {
        console.log(error.message);
        console.log("Like was not registered :("); 
+       setLike(!like);
    }
   }
 
 const handleButtonUnlike=async()=> {
+  setLike(!like);
     try{
-      setLike(!like);
       await runTransaction(db, async (transaction) => { 
 
       const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
@@ -411,10 +418,12 @@ const handleButtonUnlike=async()=> {
        console.log("updated a like on the post.");
 
       });
+      setLike(false);
     }
     catch(error){
       console.log(error.message);
       console.log("Like was not registered :("); 
+      setLike(!like);
     }
   }
   //like->create a notification->store the like notif ref in posst
@@ -425,14 +434,12 @@ const handleButtonUnlike=async()=> {
   }
 
   const handleButtonMark=async()=> {
+    setMark(true);
     try{
-      setMark(!mark);
     await runTransaction(db, async (transaction) => { 
     const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/savedPosts`,`${postid}`);
     const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
-    const docRef = transaction.get(userDoc)
-
-
+    const docRef = await transaction.get(userDoc)
     transaction.set(usersCollectionRef,{
       authorID: authorId,
       timeStamp:serverTimestamp()
@@ -441,46 +448,54 @@ const handleButtonUnlike=async()=> {
      console.log("Post ID: "+postid);
      console.log("Added to your saved list.");
 
-     
+     transaction.set(doc(db, `users/${authorId}/saveRef/${postid}/nodes`, `${auth.currentUser.uid}`), {
+      createdAt:serverTimestamp()
+    })
+
      const newFields = {saved: docRef.data().saved + 1};
-     await updateDoc(userDoc, newFields);   
+     transaction.update(userDoc, newFields);   
      console.log("Author ID: "+authorId);
      console.log("Post ID: "+postid);
      //SetSaveNum(saveNum+1);
   })
+
   }
   catch(e){
     console.log(e.message)
+    setMark(false);
   }
 }
 
   const handleButtonUnmark=async()=> {
+    setMark(false);
     try
     {  
-      setMark(!mark);
       await runTransaction(db, async (transaction) => { 
        const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/savedPosts`,`${postid}`);
        const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
        const docRef = await transaction.get(userDoc) 
 
-        await transaction.delete(usersCollectionRef);      
+        transaction.delete(usersCollectionRef);      
         console.log("Author ID: "+authorId);
         console.log("Post ID: "+postid);
         console.log("Removed from saved list.");
 
-       
+        transaction.delete(doc(db, `users/${authorId}/SaveRef/${postid}/nodes`, `${auth.currentUser.uid}`));
+
         const newFields = {saved: docRef.data().saved - 1};
-        await transaction.update(userDoc, newFields);   
+        transaction.update(userDoc, newFields);   
         console.log("Author ID: "+authorId);
         console.log("Post ID: "+postid);
 //        SetSaveNum(saveNum-1);
       });
+      setMark(false);
   
          } 
    catch(error)
    {
        console.log(error.message);
        console.log("Did not remove from saved list. :("); 
+       setMark(true);
    }
   }
 

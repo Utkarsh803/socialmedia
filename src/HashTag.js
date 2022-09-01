@@ -12,6 +12,9 @@ import Header from './Header';
 import { textAlign } from '@mui/system';
 import {FcNext, FcPrevious} from 'react-icons/fc';
 import {MdKeyboardBackspace} from 'react-icons/md';
+import * as ReactBootstrap from 'react-bootstrap'
+
+
 
 
 const  HashTag=()=> {
@@ -27,6 +30,7 @@ const  HashTag=()=> {
     const [postArray, SetPostArray]=useState();
     const [index, SetIndex]=useState([]);
     const[collectionSize, SetCollectionSize]=useState();
+    const[loading, SetLoading]=useState(true);
 
     useEffect(() => {
         const getHashVal=async()=>{
@@ -56,14 +60,17 @@ const  HashTag=()=> {
             let keys = [...mymap.values()]
             SetCollectionSize(keys.length);
             SetPostArray(keys);
+            SetLoading(false);
         }
         else{
-            setPosts(null);
+            setPosts("null");
+            SetLoading(false);
         }
         console.log("Got popular posts")
     }
 
     const getRecentPosts=async ()=>{
+        SetLoading(true);
         const tag = '#' + hash;
         const docRef = collection(db, `hashtags/${tag}/posts`)
         const q = query(docRef, orderBy("createdAt","desc"));
@@ -74,27 +81,33 @@ const  HashTag=()=> {
             let keys = [...mymap.values()]
             SetCollectionSize(keys.length);
             SetPostArray(keys);
+            SetLoading(false);
         }
         else{
-            setRecentPosts(null);
+            setRecentPosts("null");
+            SetLoading(false);
         }
     }
 
     const handleButtonPopular=()=>{
+    SetLoading(true);  
     if(popular === false){
         getPopularPosts();
         setPopular(true);
         setRecent(false);
     }
+    SetLoading(false); 
     
     }
 
     const handleButtonRecent=()=>{
+      SetLoading(true); 
         if(recent === false){
             getRecentPosts();
             setRecent(true);
             setPopular(false);
         }
+        SetLoading(false); 
     }
 
     const getIndex=(item)=>{
@@ -148,21 +161,20 @@ const  HashTag=()=> {
     console.log(posts);
 return(<div className='HashTag'>
     <nav>
-    <div className='divider'>
     <Header></Header>
-
+    <div className='divider'>
     {popularClicked && popular && posts &&(
     <div className="indPost" style={{zIndex:2}}>
      <div style={{display:'flex', flexDirection:'row', width:'100%'}}>
       <div style={{width:'10%', display:'flex', flexDirection:'column'}}> 
-      <MdKeyboardBackspace style={{marginTop:'10%', width:'100%', height:'5%', cursor:'pointer'}} onClick={()=>{handleButtonClosePopularPosts()}}>Back</MdKeyboardBackspace>
+      <MdKeyboardBackspace style={{marginTop:'15%', width:'100%', height:'5%', cursor:'pointer'}} onClick={()=>{handleButtonClosePopularPosts()}}>Back</MdKeyboardBackspace>
       <FcPrevious style={{color:'white', marginTop:'150%', width:'100%', cursor:'pointer'}} disabled={index === 0} onClick={()=>{goToPreviousPost()}}>Previous</FcPrevious>
       
       </div>
       <div style={{width:'80%'}}>
-          <HashFeedPost postid={postArray[index].postId} authorId={postArray[index].authorId}></HashFeedPost>
+          <HashFeedPost postid={postArray[index].postId} authorId={postArray[index].authorId} allowComments={postArray[index].allowComments}></HashFeedPost>
           </div>
-      <div style={{width:'10%', color:'white'}}><FcNext style={{ marginLeft:'0%', color:'white', width:'100%', marginTop:'180%', cursor:'pointer'}} disabled={index === collectionSize - 1} onClick={()=>{goToNextPost()}} >Next</FcNext></div>
+      <div style={{width:'10%', color:'white',backdropFilter:'blur(8px)'}}><FcNext style={{ marginLeft:'0%', color:'white', width:'100%', marginTop:'180%', cursor:'pointer'}} disabled={index === collectionSize - 1} onClick={()=>{goToNextPost()}} >Next</FcNext></div>
       </div>
       </div>
 )}
@@ -186,7 +198,7 @@ return(<div className='HashTag'>
         
 )}
 
-    <div style={{padding:'0'}} >
+    <div style={{padding:'0', backgroundColor:'black'}} >
     <div style={{float:'right', width:'100%', textAlign:'right', backgroundColor:'transparent'}}><BiDotsVerticalRounded style={{color:'white', height:'40px', width:'40px',backgroundColor:'transparent'}}/></div>
     <div  className='hash'>#{hash}</div>
     <div style={{fontSize:'large', color:'grey', paddingBottom:'2%', width:'100%', textAlign:'center'}} >{val}{' '} posts</div>
@@ -201,23 +213,53 @@ return(<div className='HashTag'>
       </div>
     <div className='posts'>
         
-{popular && posts &&(
+{popular && posts!=="null" && posts!==null && !loading &&(
        posts.map((post)=>
         {return <div className="indGrid"  onClick={()=>{handleButtonPopularClicked(post.postId)}}>
+           
           <Grid postid={post.postId} authorId={post.authorId}></Grid>
+           
           {console.log("post is not null")}
           </div>
         })
 )}
 
-{recent && recentPosts &&(
+{popular && posts==="null" && posts!==null && !loading &&(
+        <div  style={{width:'100%',marginTop:'7%', textAlign:'center', color:'#666'}}>
+          No posts for this hashtag yet.
+          </div>
+)}
+
+{loading && popular && (
+        <div  style={{width:'100%',marginTop:'7%', textAlign:'center', color:'#666'}}>
+
+{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Getting posts.....
+          </div>
+)}
+
+{recent && recentPosts!=="null" && recentPosts!==null && !loading &&(
        recentPosts.map((post)=>
         {return <div className="indGrid" onClick={()=>{handleButtonRecentClicked(post.postId)}} >
           <Grid postid={post.postId} authorId={post.authorId} ></Grid>
+          
           {console.log("post is not null")}
           </div>
         })
 )}
+
+{recent && recentPosts==="null" && recentPosts!==null && !loading &&(
+        <div  style={{width:'100%',marginTop:'7%', textAlign:'center', color:'#666'}}>
+          No posts for this hashtag yet.
+          </div>
+)}
+
+{loading && recent && (
+        <div  style={{width:'100%',marginTop:'7%', textAlign:'center', color:'#666'}} >
+ 
+{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Getting posts.....
+          </div>
+)}
+
 
     </div>
     </div>

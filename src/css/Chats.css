@@ -1,6 +1,8 @@
 .Chats{
-    color: aliceblue;
-    background-color:rgba(0, 0, 0, 0.896);
+  background-color:black;
+  color: aliceblue;
+
+
     }
     
     .Chats button{
@@ -28,14 +30,6 @@
         user-select: none;
         -webkit-user-select: none;
         touch-action: manipulation;
-    }
-  
-    .Chats .divider{
-      position: relative;
-      background-color: rgb(16, 15, 15);
-      display: flex;
-      flex-direction: row;
-      margin-top: 9%;
     }
   
     .Chats .pagehaedspace{

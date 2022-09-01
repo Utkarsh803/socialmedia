@@ -5,9 +5,20 @@ import writeUserData from './writeUserData';
 import {createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInWithEmailAndPassword} from "firebase/auth";
 import {auth} from './firebase-config';
 import {db} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp} from 'firebase/firestore';
 import { BrowserRouter as Router, Switch, 
     Route,Outlet, Link ,Redirect, useNavigate} from "react-router-dom";
+import LoginHeader from './LoginHeader';
+import  Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { createTheme , ThemeProvider, createM} from "@mui/material/styles";
+import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React from 'react';
+import * as ReactBootstrap from 'react-bootstrap'
+
+
+
 
 function Login() {
 
@@ -18,11 +29,13 @@ function Login() {
     const [userId, setUserId]=useState("");
     const [name, setUserName]=useState("");
     const [user, setUser] = useState({});
+    const [loading, setLoading] = useState(false);
 
 
 
     const register = async () =>
     {
+        setLoading(true);
         try
         {
             await createUserWithEmailAndPassword(auth, registerEmail, registerPassword ).then((result)=>{
@@ -31,7 +44,7 @@ function Login() {
             }).catch((error)=>{
                 console.log(error)});
             
-            
+        setLoading(false);
         } 
         catch(error)
         {
@@ -45,7 +58,7 @@ function Login() {
         {
             await setDoc(doc(db, "users", auth.currentUser.uid), {
                 bio:"",
-                created:0,
+                created:serverTimestamp(),
                 followers:0,
                 following:0,
                 gender:"",
@@ -85,7 +98,7 @@ function Login() {
    }
    }
 
-   
+
    const addToFollowingList = async(uid) =>{
     try
     {  
@@ -164,6 +177,7 @@ function Login() {
 
     const login = async () =>
     {
+        setLoading(true);
         try
         {
             const user = await signInWithEmailAndPassword(auth, loginEmail, loginPassword );
@@ -175,6 +189,7 @@ function Login() {
         {
             console.log(error.message);
         }
+        setLoading(false);
     }
 
     const logout = async () =>
@@ -184,23 +199,31 @@ function Login() {
     }
 
 
+
     return (<div className="Login">
     
-    <div>    
+    <div style={{backgroundColor:'black'}}>    
+    <LoginHeader></LoginHeader>
     <div className='divider'>
     <div className="half">
-    <div className='heading'>Register User</div>
+    <div className='heading'>Register</div>
     <input placeholder='Name...' className='input' onChange={(event)=>{setUserName(event.target.value);}}></input>
     <input placeholder='Email...' className='input' onChange={(event)=>{setRegisterEmail(event.target.value);}}></input>
     <input placeholder='Password...' type="password" className='input'  onChange={(event)=>{setRegisterPassword(event.target.value);}}></input>
-    <button className="buttons" onClick={register}>Create User</button>
+    {!loading ?(
+    <button style={{width:'100%'}} disabled={loading} onClick={register}>Sign Up</button>):(
+    <button style={{ width:'100%'}} >{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Registering ....</button>)}
+    
     </div>
 
     <div className="half" >
     <div className='heading'>Login</div>
     <input placeholder='Email...' className='input' onChange={(event)=>{setLoginEmail(event.target.value);}}></input>
     <input placeholder='Password...' type="password" className='input' onChange={(event)=>{setLoginPassword(event.target.value);}}></input>
-    <button className="buttons" onClick={login}>Login</button>
+  {!loading ?(
+    <button style={{width:'100%'}} disabled={loading} onClick={login}>Sign In</button>):(
+    <button style={{ width:'100%'}} >{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Signing In ....</button>)}
+
     <div className="forgotPass">
      Forgot password?{' '}
     Click here.

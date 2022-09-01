@@ -13,6 +13,7 @@ import Comment from './Comment';
 import Moment from 'react-moment';
 import createTree from './createTree';
 import { runTransaction } from "firebase/firestore";
+import * as ReactBootstrap from 'react-bootstrap'
 
 function FeedPost({postid,authorId}) {
 
@@ -29,7 +30,9 @@ function FeedPost({postid,authorId}) {
   const[totalComments, SetTotalComments]=useState(null);
   const[comCaption, SetComCaption]=useState(null);
   const[profilePicUrl, SetProfilePicUrl]=useState(null);
-
+  const[commentStatus,SetCommentStatus] = useState(false);
+  const[loading, SetLoading]= useState(true);
+  const[commentLoading, SetCommentLoading]= useState(false);
   //to get: name, captions, comments, likes, saves, url 
 
 
@@ -99,14 +102,23 @@ const getMyPic= async()=>{
 
   }
 
+const getCommentsStatus=async()=>{
+    const docRef = doc(db, `users/${authorId}/posts/`, `${postid}`);
+    const docSnap = await getDoc(docRef);
+    SetCommentStatus(docSnap.data().allowComments);  
+  }
 
 const getUserPost =async()=>{
   const postsCollectionRef = doc(db, `users/${authorId}/posts`, `${postid}`);
   const docSnap = await getDoc(postsCollectionRef);
+
+  const usersCollectionRef = doc(db, `/users/${authorId}/comments`,`${postid}`);
+  const commSnap = await getDoc(usersCollectionRef);
+  SetComments(commSnap.data().validComments);
+
   {
     SetUrl(docSnap.data().url);    
     SetCaptions(docSnap.data().caption);
-    SetComments(docSnap.data().comments);
     SetLikes(docSnap.data().likes);
     SetSaves(docSnap.data().saved);
     SetTimestamp(docSnap.data().timeStamp);
@@ -115,6 +127,7 @@ const getUserPost =async()=>{
     .then((url) => {
       SetPostUrl(url);
       console.log("Post image set!!!");
+      SetLoading(false);
     })
     .catch((error) => {
       // A full list of error codes is available at
@@ -133,6 +146,7 @@ const getUserPost =async()=>{
           console.log("Unknown error occurred, inspect the server response");
           break;
       }
+      SetLoading(false);
     });
     
 }
@@ -140,8 +154,9 @@ const getUserPost =async()=>{
 getMyPic();
 getUserPost();
 getUsersData();
+getCommentsStatus();
 getComments();
-}, [] );
+}, [commentStatus,comments,captions] );
 
 const getComments=async()=>{
   const comRef = collection(db, `users/${authorId}/comments/${postid}/ids`)
@@ -215,6 +230,7 @@ const addToPostComments=async()=>{
   }
 
 const addComment=async()=>{ 
+  SetCommentLoading(true);
   try{
     await runTransaction(db, async (transaction) => {   
   
@@ -229,7 +245,7 @@ const addComment=async()=>{
   const docRef1 = await transaction.get(userDoc) 
  
  
-  const newfield={totalComments:docRef.data().totalComments+1};
+  const newfield={totalComments:docRef.data().totalComments+1, validComments:docRef.data().validComments+1};
   transaction.update(comRef, newfield);
 
   const num=docRef.data().totalComments+1;
@@ -241,6 +257,7 @@ const addComment=async()=>{
     author:auth.currentUser.uid,
     postAuthor:authorId,
     likes:0,
+    child:0,
     postid:postid,
     timeStamp:Timestamp.fromDate(new Date()),
   });      
@@ -262,10 +279,12 @@ const addComment=async()=>{
       timeStamp:Timestamp.fromDate(new Date()),
     })}
     })
+    SetCommentLoading(false);
 }
 catch(e)
 {
   console.log(e.message)
+  SetCommentLoading(false);
 }
 }
 
@@ -273,30 +292,30 @@ catch(e)
 
   return (<div className="FeedPost">
     <nav>
-    <PostHeader name = {name} url={currentPicUrl} postid={postid} authorId={authorId} typ="vertical"></PostHeader>
-    <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />
+    <PostHeader name = {name} url={currentPicUrl} postid={postid} authorId={authorId} typ={"vertical"}></PostHeader>
+    {!loading ?
+  (<img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />):
+  (<ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>)}
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={currentPicUrl}></PostTools>
     <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
     <div className='caption'>
-    <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'1%', marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'1%', width:'90%', marginLeft:'0%'}}>
-{captions}
-    </span>
+   <span style={{height:'auto', width:'100%',flex:'1',wordBreak:'break-word'}}>{name+" "+captions}</span>
     </div>
 
     
-    {(comments >= 2) && (
+    {(comments >= 2) &&  commentStatus &&(
      <div>
      <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>{comments} comments</div>    </div>
     )
     }
 
-  {(comments == 1) && (
+  {(comments == 1) && commentStatus && (
      <div>
      <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>{comments} comment</div>    </div>
     )
     }
    
-   {comments < 3 && (
+   {comments < 3 && commentStatus &&(
     <div style={{color:'white',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}>
     {commentTree && 
     (commentTree.map((comment) => 
@@ -307,18 +326,27 @@ catch(e)
     )}
   </div>)}
 
-  <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', height:'9vh'}}>
+  {!commentStatus &&(
+    <div style={{backgroundColor:'black', color:'#666', paddingTop:'5%', textAlign:'center'}}>Comments are turned off.</div>
+  )}
+
+  {commentStatus && (
+  <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', height:'9vh', marginTop:'3%'}}>
 <Avatar
     alt="preview image"
     src={profilePicUrl}
-    sx={{ width: 25, height: 25, marginTop:'1%', marginLeft:'3%'}}
+    sx={{ width: 25, height: 25, marginTop:'1%', marginLeft:'2%'}}
     />
     <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'80%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }} onChange={(event)=>{SetComCaption(event.target.value)}}>
     </input>
-    <button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>
-    </div>
+    
+    
+    {!commentLoading ?
+    (<button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>):
+    (<button style={{backgroundColor:'black', width:'15%', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} ><ReactBootstrap.Spinner animation="border" size="sm" style={{color:'#666', alignContent:'center'}}/></button>)}
+    </div>)}
    
-    <small><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></small>
+    <small><Moment fromNow style={{backgroundColor:'transparent', color:'#888'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></small>
     <div className='footer'></div>
     </nav>
   </div>);

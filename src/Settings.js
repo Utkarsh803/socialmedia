@@ -17,6 +17,8 @@ import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
 
 import {v4} from 'uuid'
+import * as ReactBootstrap from 'react-bootstrap'
+
 
 
 
@@ -48,6 +50,7 @@ function Settings() {
     const [uploadProfilePic, SetUploadProfilePic]=useState(false);
     const [profilePicFile, SetProfilePicFile]=useState(false);
     const [preview, SetPreview]=useState(false);
+    const [loading, SetLoading]=useState(false);
     const [enteredText, setEnteredText] = useState('')
 
   const [val, setVal] = React.useState();
@@ -263,7 +266,7 @@ function Settings() {
 
   const addProfileInfo = async () =>
   {
-    setIsLoading(true);  
+    SetLoading(true);  
       try
        {  
           await updateDoc(doc(db, "users", auth.currentUser.uid), {
@@ -275,7 +278,7 @@ function Settings() {
               gender:gender,
               website:website,
               });
-              setIsLoading(false);
+              SetLoading(false);
               showAlert();
               console.log("Profile updated!");
             
@@ -283,27 +286,15 @@ function Settings() {
       catch(error)
       {
           console.log(error.message);
-          setIsLoading(false);
+          SetLoading(false);
       }
   }
 
-  const handleInputGetEmail= async()=>{
-    SetGetEmail(!getEmail);
-  }
-  const handleInputTwoFactor= async()=>{
-    SetTwoFactor(!twoFactor);
-  }
-  const handleInputPrivate= async()=>{
-    SetPrivateAccount(!privateAccount);
-  }
-  const handleInputGetSms= async()=>{
-    SetGetSms(!getSms);
-  }
   
 
   const submitGetEmail = async () =>
   { 
-    handleInputGetEmail();
+    SetGetEmail(!getEmail);
     console.log("Email is " + getEmail);
       try
        {  
@@ -319,17 +310,18 @@ function Settings() {
       catch(error)
       {
         window.alert("We had some error");
+        SetGetEmail(!getEmail);
       }
   }
 
-  const submitGetSms = async () =>
+  const submitGetSms = async (value) =>
   { 
-    handleInputGetSms();
+    SetGetSms(!getSms);
       try
        { 
-        const newFields = {getSms: getSms}; 
+        const newFields = {getSms: value}; 
         await updateDoc(docRef, newFields);
-              if(getSms){
+              if(value){
                 window.alert("You have successfully signed up to receive Sms");
               }
               else{
@@ -339,37 +331,34 @@ function Settings() {
       catch(error)
       {
         window.alert("We had some error");
+        SetGetSms(!getSms);
       }
   }
 
-  const submitPrivateAccount = async () =>
+  const submitPrivateAccount = async (value) =>
   { 
-    handleInputPrivate();
+    SetPrivateAccount(!privateAccount);
       try
        {  
-        const newFields = {private: privateAccount};
+        const newFields = {private: value};
         await updateDoc(docRef, newFields);
-              if(privateAccount){
-                window.alert("You have set account to private.");
-              }
-              else{
-                window.alert("You have set account to public.");
-              }
             } 
       catch(error)
       {
         window.alert("We had some error");
+        SetPrivateAccount(!privateAccount);
+
       }
   }
 
-  const submitTwoFactor = async () =>
+  const submitTwoFactor = async (value) =>
   { 
-    handleInputTwoFactor();
+    SetTwoFactor(!twoFactor);
       try
        {  
-        const newFields = {twoFactor: twoFactor};
+        const newFields = {twoFactor: value};
             await updateDoc(docRef, newFields);
-              if(twoFactor){
+              if(value){
                 window.alert("You have successfully signed up for two factor authentication.");
               }
               else{
@@ -379,6 +368,7 @@ function Settings() {
       catch(error)
       {
         window.alert("We had some error");
+        SetTwoFactor(!twoFactor);
       }
   }
 
@@ -391,6 +381,7 @@ function Settings() {
 
 
     const reAuth = async() =>{
+      SetLoading(true);
       const cred = EmailAuthProvider.credential(auth.currentUser.email, credential); 
       reauthenticateWithCredential(auth.currentUser,cred).then(() => {
       if(newPass==newPassConfirm){
@@ -400,13 +391,16 @@ function Settings() {
           window.alert("Could not set password.Please try again")
           console.log(error);
         });
+        SetLoading(false);
       }
       else{
         window.alert("New Passwords do not match.")
+        SetLoading(false);
       }
     }).catch((error) => {
       window.alert("Password Incorrect");
       console.log(error);
+      SetLoading(false);
     });
   }
 
@@ -517,6 +511,7 @@ function Settings() {
 
 
   const handleButtonUploadProfilePic = async()=>{
+      SetLoading(true);
       await addProfilePic();
       SetUploadProfilePic(false);
       SetPreview(false);
@@ -524,6 +519,7 @@ function Settings() {
       SetProfilePicFile(null);
       SetPercent(0);
       SetUrl(null);
+      SetLoading(false);
       window.location.reload();
   }
 
@@ -531,9 +527,8 @@ function Settings() {
 
   return (<div className="Settings">
     <nav>
-    <div className='divider'>
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
-    </div>
+<div style={{paddingTop:'8%', backgroundColor:'black'}}>
     {uploadProfilePic && (   
  <div class="uploadtray">
   <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton"></AiOutlineCloseCircle>
@@ -541,7 +536,10 @@ function Settings() {
   <input type="file" className='chooseImage' onChange={onImageChange} ></input>
 </div>
 {profilePic &&(<img src={profilePic} alt="preview image" className='preview' />)}
-  <button className="uploadImage" onClick={handleButtonPreview}>Preview</button>
+
+{profilePic ?(<button className="uploadImage" onClick={handleButtonPreview}>Preview</button>):
+(<button className="uploadImage" disabled={true}>Preview</button>)}
+
 </div>)}
 
 {preview && (   
@@ -559,7 +557,13 @@ function Settings() {
   
   )}
 
-   <button className="uploadImage" onClick={handleButtonUploadProfilePic}>Change</button><p>{percent}% done</p>
+{!loading ? (
+   <button className="uploadImage" disabled={loading} onClick={handleButtonUploadProfilePic}>Change</button>
+):(
+  <button className="uploadImage">{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Changing...</button>
+)}
+
+<p>{percent}% done</p>
  </div>
 
 
@@ -585,7 +589,9 @@ function Settings() {
         sx={{ width: 76, height: 76 }}/>
         <div className='editProfileColumn'>
         <div className='username'>{username}</div>
+
         <button className='changePicButton' onClick={handleButtonChangePic}>Change Profile Photo</button>
+        
         </div>
         </div>
         <div className='formInputsColumn'>
@@ -597,7 +603,10 @@ function Settings() {
         <div className='bgblack'>Number :<input  placeholder={phone} className='formInput' onChange={(event)=>{handleInputPhone(event.target.value)}}></input></div>
         <div className='bgblack'>Email :<input  placeholder={email} className='formInput' onChange={(event)=>{handleInputEmail(event.target.value)}}></input></div>
         <div className='bgblack'>Gender :<input  placeholder={gender} className='formInput' onChange={(event)=>{handleInputGender(event.target.value)}}></input></div>
-        <button className='submit' onClick={addProfileInfo} disabled={isLoading}>Submit </button>
+      {!loading ? (<button className='submit' onClick={addProfileInfo} disabled={loading}>Submit </button>):
+      (<button className='submit'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Submiting.... </button>)}  
+        
+      
       </div>
     </div>)}
     {passwordReset && (
@@ -610,7 +619,10 @@ function Settings() {
                 
         <input placeholder='Enter New Password *'  className='formInput' onChange={(event=>{SetnewPass(event.target.value)})}></input>
         <input placeholder='Confirm New Password *' className='formInput'  onChange={(event=>{SetNewPassConfirm(event.target.value)})}></input>
-        <button className='submitResetPassword'   onClick={reAuth}>Submit</button>
+      {!loading ?
+       ( <button className='submitResetPassword'  disabled={loading} onClick={reAuth}>Submit</button>):
+       (<button className='submitResetPassword'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Submiting...</button>)}
+      
       </div>
 
     </div>)}
@@ -619,14 +631,14 @@ function Settings() {
     
         <div className='formInputsColumnEmailAndSms'>
         <div className='row'>
-        <input type='checkbox' checked={getEmail} className="shiftup" onChange={submitGetEmail}></input>
+        <input type='checkbox' checked={getEmail} className="shiftup" onChange={(e)=>{submitGetEmail(e.value.checked)}}></input>
         <div className='column'>
         <div className='bgblackbig' >Email</div>
         <div className='bgblacksmall'> Receive important emails from our app</div>
         </div>
         </div>
         <div className='row'>
-        <input type='checkbox' checked={getSms} className="shiftup" onChange={submitGetSms}></input>
+        <input type='checkbox' checked={getSms} className="shiftup" onChange={(e)=>{submitGetSms(e.value.checked)}}></input>
         <div className='column'>
         <div className='bgblackbig'>SMS</div>
         <div className='bgblacksmall'> Receive important SMS from our app. </div>
@@ -640,7 +652,7 @@ function Settings() {
 
         <div className='formInputsColumnEmailAndSms'>
         <div className='row'>
-        <input type='checkbox' checked={privateAccount} className="shiftup" onChange={submitPrivateAccount}></input>
+        <input type='checkbox' checked={privateAccount} className="shiftup" onChange={(e)=>{submitPrivateAccount(e.target.checked)}}></input>
         <div className='column'>
         <div className='bgblackbig'>Private Account</div>
         <div className='bgblacksmall'> Only share posts with people who follow you.</div>
@@ -659,7 +671,7 @@ function Settings() {
 
         <div className='formInputsColumnEmailAndSms'>
         <div className='row'>
-        <input type='checkbox' className="shiftup" checked={twoFactor} onChange={submitTwoFactor}></input>
+        <input type='checkbox' className="shiftup" checked={twoFactor} onChange={(e)=>{submitTwoFactor(e.value.checked)}}></input>
         <div className='column'>
         <div className='bgblackbig'>Two Factor Authentication</div>
         <div className='bgblacksmall'>Receive OTP whenever you sign in.</div>
@@ -669,6 +681,7 @@ function Settings() {
     
     </div>)}
 
+    </div>
     </div>
     </nav>
   </div>);

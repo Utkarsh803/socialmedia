@@ -12,6 +12,7 @@ import Avatar from '@mui/material/Avatar';
 import Comment from './Comment';
 import Moment from 'react-moment';
 import createTree from './createTree';
+import * as ReactBootstrap from 'react-bootstrap'
 import { runTransaction } from "firebase/firestore";
 
 function HashFeedPost({postid,authorId}) {
@@ -30,6 +31,9 @@ function HashFeedPost({postid,authorId}) {
   const[comCaption, SetComCaption]=useState(null);
   const[profilePicUrl, SetProfilePicUrl]=useState(null);
   const[typ, SetTyp]=useState("horizontal");
+  const[commentStatus,SetCommentStatus]=useState(false);
+  const[loading, SetLoading]= useState(true);
+  const[commentLoading, SetCommentLoading]= useState(false);
 
   //to get: name, captions, comments, likes, saves, url 
 
@@ -71,6 +75,12 @@ useEffect(()=>{
     }
 };
 
+const getCommentsStatus=async()=>{
+  const docRef = doc(db, `users/${authorId}/posts/`, `${postid}`);
+  const docSnap = await getDoc(docRef);
+  SetCommentStatus(docSnap.data().allowComments);  
+}
+
 const getMyPic= async()=>{
   const docRef = doc(db, "users", `${auth.currentUser.uid}`);
   const docSnap = await getDoc(docRef);
@@ -104,10 +114,15 @@ const getMyPic= async()=>{
 const getUserPost =async()=>{
   const postsCollectionRef = doc(db, `users/${authorId}/posts`, `${postid}`);
   const docSnap = await getDoc(postsCollectionRef);
+ 
+  const usersCollectionRef = doc(db, `/users/${authorId}/comments`,`${postid}`);
+  const commSnap = await getDoc(usersCollectionRef);
+  SetComments(commSnap.data().validComments);
+  
+  try
   {
     SetUrl(docSnap.data().url);    
     SetCaptions(docSnap.data().caption);
-    SetComments(docSnap.data().comments);
     SetLikes(docSnap.data().likes);
     SetSaves(docSnap.data().saved);
     SetTimestamp(docSnap.data().timeStamp);
@@ -116,6 +131,7 @@ const getUserPost =async()=>{
     .then((url) => {
       SetPostUrl(url);
       console.log("Post image set!!!");
+      SetLoading(false);
     })
     .catch((error) => {
       // A full list of error codes is available at
@@ -134,29 +150,38 @@ const getUserPost =async()=>{
           console.log("Unknown error occurred, inspect the server response");
           break;
       }
+      SetLoading(false);
     });
     
+}
+catch(e){
+  console.log(e.message);
 }
 }
 SetPostUrl(null);
 SetProfilePicUrl(null);
 getMyPic();
 getUserPost();
+getCommentsStatus();
 getUsersData();
 getComments();
-}, [postid, authorId, comments] );
+}, [postid, authorId, comments, commentStatus] );
 
 const getComments=async()=>{
   const comRef = collection(db, `users/${authorId}/comments/${postid}/ids`)
   const q = query(comRef, orderBy("timeStamp", "desc"));
   const docSnap = await getDocs(q);
-
+/*
   if(docSnap.size>0){
     SetCommentTree(createTree(docSnap.docs.map((doc)=>({...doc.data()}))));
   }
   else{
     SetCommentTree(null);
-  }
+  }*/
+
+  onSnapshot(q, querySnapshot=>{
+    SetCommentTree(createTree(querySnapshot.docs.map((doc)=>({...doc.data()}))));
+  })
 
   /*
   await getDocs(comRef);
@@ -222,6 +247,7 @@ const addToPostComments=async()=>{
   }
 
   const addComment=async()=>{ 
+    SetCommentLoading(true);
     try{
       await runTransaction(db, async (transaction) => {   
     
@@ -236,7 +262,7 @@ const addToPostComments=async()=>{
     const docRef1 = await transaction.get(userDoc) 
    
    
-    const newfield={totalComments:docRef.data().totalComments+1};
+    const newfield={totalComments:docRef.data().totalComments+1, validComments:docRef.data().validComments+1};
     transaction.update(comRef, newfield);
   
     const num=docRef.data().totalComments+1;
@@ -248,6 +274,7 @@ const addToPostComments=async()=>{
       author:auth.currentUser.uid,
       postAuthor:authorId,
       likes:0,
+      child:0,
       postid:postid,
       timeStamp:Timestamp.fromDate(new Date()),
     });      
@@ -269,10 +296,12 @@ const addToPostComments=async()=>{
         timeStamp:Timestamp.fromDate(new Date()),
       })}
       })
+      SetCommentLoading(false);
   }
   catch(e)
   {
     console.log(e.message)
+    SetCommentLoading(false);
   }
   }
 
@@ -281,35 +310,35 @@ const addToPostComments=async()=>{
   return (<div className="HashFeedPost">
     <nav>
     <div style={{display:'flex', flexDirection:'row', height:'78vh'}}>
-    <div style={{width:'60%', height:'90%'}}>
+    <div style={{width:'50%', height:'90%'}}>
     <PostHeader name = {name} url={currentPicUrl} postid={postid} authorId={authorId} typ={typ}></PostHeader>
-    <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />
+    {!loading ?
+  (<img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />):
+  (<ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>)}
     </div>
-    <div style={{width:'40%', paddingLeft:'2%', height:'70vh'}}>
+    <div style={{width:'50%', paddingLeft:'2%', height:'70vh'}}>
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={currentPicUrl}></PostTools>
     <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
     <div className='caption'>
-    <span style={{fontWeight:'bold', backgroundColor:'black', paddingBottom:'2%', paddingTop:'2%',marginRight:'1%'}}>{name} {'  '} </span><span style={{fontWeight:'normal', backgroundColor:'black', paddingBottom:'2%', width:'90%',paddingTop:'2%', marginLeft:'0%'}}>
-{captions}
-    </span>
+    <span style={{height:'auto', width:'100%',flex:'1',wordWrap:'break-word'}}>{name+" "+captions}</span>
     </div>
 
-    <small><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></small>
+    <div style={{color:'#888',backgroundColor:'black',paddingLeft:'3%', fontSize:'small', paddingTop:'3%'}}><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></div>
 
     
-    {(comments >= 2) && (
+    {(comments >= 2) && commentStatus &&(
      <div>
      <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>{comments} comments</div>    </div>
     )
     }
 
-  {(comments == 1) && (
+  {(comments == 1) && commentStatus && (
      <div>
      <div style={{backgroundColor:'black', color:'grey', paddingLeft:'3%', paddingTop:'2%', paddingBottom:'1%'}}>{comments} comment</div>    </div>
     )
     }
    
-
+   {commentStatus && (
     <div style={{color:'white',backgroundColor:'black',paddingLeft:'3%', fontSize:'small', overflow:'scroll', height:'42vh'}}>
     {commentTree && 
     (commentTree.map((comment) => 
@@ -318,8 +347,11 @@ const addToPostComments=async()=>{
       }
     )
     )}
-  </div>
-
+  </div>)}
+  {!commentStatus&&(
+    <div style={{backgroundColor:'black', color:'#666', paddingTop:'20%', textAlign:'center'}}>Comments are turned off.</div>
+  )}
+  {commentStatus && (
   <div style={{position:'absolute', display:'flex', flexDirection:'row', backgroundColor:'black', height:'fit-content',bottom:'11px', width:'40%'}}>
 <Avatar
     alt="preview image"
@@ -328,8 +360,11 @@ const addToPostComments=async()=>{
     />
     <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'90%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }} onChange={(event)=>{SetComCaption(event.target.value)}}>
     </input>
-    <button style={{backgroundColor:'black', width:'fit-content', textAlign:'left', height:'6vh', marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>
+    {!commentLoading ?
+    (<button disable={commentLoading} style={{backgroundColor:'black', width:'fit-content', textAlign:'left', height:'6vh',marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>):
+    (<button style={{backgroundColor:'black', width:'fit-content', textAlign:'left', height:'6vh',marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}}><ReactBootstrap.Spinner animation="border" size="sm" style={{color:'#666', alignContent:'center'}}/></button>)}
     </div>
+    )}
     <div className='footer'></div>
     </div>
     </div>

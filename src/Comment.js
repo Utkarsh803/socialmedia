@@ -6,11 +6,14 @@ import {db, auth, storage} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, getDoc, deleteDoc, doc, setDoc, serverTimestamp,query, where, Timestamp, onSnapshot, QuerySnapshot} from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
-import { AiOutlineHeart,AiFillHeart} from 'react-icons/ai';
+import { AiOutlineHeart,AiFillHeart,AiFillDelete} from 'react-icons/ai';
+import {VscReport} from 'react-icons/vsc';
 import Moment from 'react-moment'
 import { async } from "@firebase/util";
 import './css/Comment.css'
 import { runTransaction } from "firebase/firestore";
+import * as ReactBootstrap from 'react-bootstrap'
+
 
 const Comment = ({ comment })=> {
 
@@ -18,7 +21,7 @@ const Comment = ({ comment })=> {
     return <Comment key={comment.id} comment={comment} type="child" />
   })
 
- 
+  const deleted = "[deleted]"
 
   const[imageUrl, SetImageUrl]=useState(null);
   const[name, SetName]=useState(null);
@@ -30,13 +33,16 @@ const Comment = ({ comment })=> {
   const[reply,SetReply]=useState(false);
   const[commentInput,SetCommentInput]=useState(null);
   const[commentLikes,SetCommentLikes]=useState(comment.likes?(comment.likes):(0));
+  const[menu, setMenu]=useState(false);
+  const[loading, setLoading]=useState(false);
+
 
   
 
 
   useEffect(()=>{
     const getPostPic=async()=>{
-
+     if (comment.author !== "[deleted]"){
         const docRef = doc(db, "users",`${comment.author}`)
         const docSnap = await getDoc(docRef);
         SetName(docSnap.data().username);
@@ -65,9 +71,14 @@ const Comment = ({ comment })=> {
               break;
           }
         });
+      }else{
+        SetName("[deleted]");
+      }
+        
         }
 
           const getCommentNum=async()=>{
+            if (comment.author !== "[deleted]"){
             const comRef = doc(db, `users/${comment.postAuthor}/comments/`, `${comment.postid}`)
             const data = await getDoc(comRef);
         
@@ -78,10 +89,11 @@ const Comment = ({ comment })=> {
             else{
               SetTotalComments(null);
           }
-          }
+          }}
 
 
        const getLiked =async()=>{
+
             const docRef = doc(db, `/users/${comment.postAuthor}/commentsLikes/${comment.postid}/ids/${comment.id}/ids`, `${auth.currentUser.uid}`);
             const docSnap = await getDoc(docRef);
             if(docSnap.exists()){
@@ -159,8 +171,11 @@ const Comment = ({ comment })=> {
   
           const userDoc = doc(db, `/users/${comment.postAuthor}/posts`, `${comment.postid}`);
           const docRef1 = await transaction.get(userDoc) 
+
+          const childRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${comment.id}`);
+          const docSnap = await transaction.get(childRef)
           
-          const newfield={totalComments: docRef.data().totalComments+1};
+          const newfield={totalComments: docRef.data().totalComments+1, validComments: docRef.data().validComments+1};
           transaction.update(comRef, newfield);
           console.log("total counts updated");
   
@@ -173,6 +188,8 @@ const Comment = ({ comment })=> {
          author:auth.currentUser.uid,
          postAuthor:comment.postAuthor,
          likes:0,
+         child:0,
+         reported:0,
          postid:comment.postid,
          timeStamp:Timestamp.fromDate(new Date()),
               });      
@@ -184,6 +201,8 @@ const Comment = ({ comment })=> {
       
       const newFields1 = {comments: docRef1.data().comments + 1};
       transaction.update(userDoc, newFields1);
+
+      transaction.update(childRef, {child:docSnap.data().child + 1});
 
       const NotRef = collection(db, `users/${comment.postAuthor}/notifications`);  
       if(comment.postAuthor != auth.currentUser.uid){
@@ -310,63 +329,183 @@ console.log(e.message)
     SetReply(!reply);
   }
 
+  const handleButtonOpenMenu=()=>{
+    setMenu(!menu);
+  }
+
+  const deleteNestedComment=async()=>{
+    console.log("Deleting nested commen.t")
+    try{
+      await runTransaction(db, async (transaction) => {   
+   
+        const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${comment.id}`);
+    transaction.update(usersCollectionRef,{
+      comment: "[deleted]",
+      author:"[deleted]",
+    });      
+
+     console.log("deleted a comment");
+      })
+    }catch(e)
+    {
+      console.log(e.message);
+    }
+  }
+
+  const deleteComment=async()=>{
+    try{
+      await runTransaction(db, async (transaction) => {
+            
+    console.log("Process began")   
+    const comRef = doc(db, `users/${comment.postAuthor}/comments`, `${comment.postid}`)
+    const docRef = await transaction.get(comRef) 
+  
+   
+    const newfield={validComments:docRef.data().validComments-1};
+    transaction.update(comRef, newfield);
+  
+   
+    const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${comment.id}`);
+    transaction.delete(usersCollectionRef);      
+
+    console.log("deleted a comment");
+      })
+    }catch(e)
+    {
+      console.log(e.message);
+    }
+  }
+
+  const handleButtonDelete=async()=>{
+    setLoading(true);
+    if(comment.child>0){
+      await deleteNestedComment();
+      setLoading(false);
+    }
+    else{
+      await deleteComment();
+      setLoading(false);
+    }
+  }
+
   return (
     <div style={{backgroundColor:'black'}} className='Comment'>
     {comment.parent===null ?
     (
     <div style={{ display:'flex',flexDirection:'column',marginLeft: '0px', marginTop: '0px' ,backgroundColor:'black', color:'white', paddingBottom:'3%'}}>
     <div style={{display:'flex',flexDirection:'row',backgroundColor:'black', color:'white'}}>
+    {comment.author!=="[deleted]" &&(
     <Avatar
     alt="preview image"
     src={imageUrl}
     sx={{ width: 26, height: 26, marginTop:'2%'}}
-    />
+    />)}
+      
+      {comment.author !== "[deleted]" ?
+      (
       <div
         style={{ color: '#555',fontSize: '10pt',backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%'}}
       >
         {name}
       </div>
+      ):(
+        <div
+        style={{ color: '#555',fontSize: '10pt',backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%'}}
+      >
+        {deleted}
+      </div>
+      )}
+      
+      {comment.author !== "[deleted]" && (
+      
+      <div style={{marginRight:'1%',marginLeft:'auto',}}>
+        {comment.author!==auth.currentUser.uid &&  
+          (<VscReport  style={{position:'relative',color:'white', top:'10px',ackgroundColor:'black', paddingRight:'2%',cursor:'pointer'}}/>)}
+         
+         {comment.author===auth.currentUser.uid && !loading &&
+          (<AiFillDelete   style={{position:'relative',color:'white', top:'10px',ackgroundColor:'black', paddingRight:'2%',cursor:'pointer'}} onClick={handleButtonDelete}/>)
+         }
+
+        {comment.author===auth.currentUser.uid && loading &&
+          (<ReactBootstrap.Spinner animation="border" size="sm"  style={{position:'relative',color:'white', top:'10px',ackgroundColor:'black', paddingRight:'2%',cursor:'pointer'}} />)
+         }
+        </div>
+      )}
       </div>
       <div style={{backgroundColor:'black', color:'white', fontSize: '10pt', marginLeft:'7%', marginTop:'1%'}}>{comment.comment}</div>
       <div style={{display:'flex', flexDirection:'row', backgroundColor:'black',marginLeft:'7%', paddingTop:'2%', paddingBottom:'2%'}}>
         <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey'}}>{ comment.timeStamp ? (comment.timeStamp.toDate()):null}</Moment></div>
         <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>{commentLikes} likes</div>
-        <div style={{color:'grey', backgroundColor:'black'}} onClick={handleButtonReply}>Reply </div>
+        {comment.author !== "[deleted]" &&
+        (<div style={{color:'grey', backgroundColor:'black'}} onClick={handleButtonReply}>Reply </div>)}
+      
+      {comment.author !== "[deleted]" &&(
       <div className='pointer' style={{marginRight:'1%' ,marginLeft:'auto'}}>  
         {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red', cursor:'pointer'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto', cursor:'pointer'}} onClick={handleButtonLike}/>)}
-      </div>
+      </div>)}
+     
       </div>
       {reply &&(
-        <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', color:'white', paddingLeft:'7%', height:'50px'}}>
-        <input placeholder="your reply..." style={{backgroundColor:'black', color:'white', border:'none', borderBottom:'1px solid white', height:'20px',paddingTop:'6%'}} onChange={(event)=>{SetCommentInput(event.target.value)}}></input>
-        <button  style={{backgroundColor:'black', color:'white', height:'fit-content', width:'fit-content'}} onClick={addComment}>Post</button>
+        <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', color:'white', paddingLeft:'7%', height:'40px'}}>
+        <input placeholder="your reply..." style={{backgroundColor:'black', color:'white', border:'none', borderBottom:'1px solid white', height:'20px', marginTop:'14px'}} onChange={(event)=>{SetCommentInput(event.target.value)}}></input>
+        <div style={{backgroundColor:'black', color:'white', height:'fit-content', width:'fit-content'}}>
+        <button  style={{backgroundColor:'black', color:'white', width:'fit-content'}} onClick={addComment}>Post</button>
+        </div>
         </div>
         )}
       {nestedComments}
     </div>
     ):
     (
-      <div style={{ display:'flex',flexDirection:'column', paddingTop: '5px' ,backgroundColor:'black', color:'white', marginLeft:'7%', borderLeft:'0.5px solid grey',  paddingBottom:'2%'}}>
+      <div style={{ display:'flex',flexDirection:'column', paddingTop: '10px' ,backgroundColor:'black', color:'white', marginLeft:'7%', borderLeft:'0.5px solid grey',  paddingBottom:'2%'}}>
       <div style={{display:'flex',flexDirection:'row',backgroundColor:'black', color:'white',marginLeft:'2%'}}>
-      <Avatar
+      {comment.author!=="[deleted]" &&
+      (<Avatar
       alt="preview image"
       src={imageUrl}
       sx={{ width: 26, height: 26, marginTop:'2%'}}
-      />
+      />)
+    }
+      {comment.author !== "[deleted]" ?
+      (
+      <div
+        style={{ color: '#555',fontSize: '10pt',backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%'}}
+      >
+        {name}
+      </div>
+      ):(
         <div
-          style={{ color: '#555',fontSize: '10pt',backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%'}}
-        >
-          {name}
-        </div>
+        style={{ color: '#555',fontSize: '10pt',backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%'}}
+      >
+        {deleted}
+      </div>
+      )}
+        {comment.author !== "[deleted]" &&(
+             <div style={{marginRight:'1%',marginLeft:'auto',}}>
+             {comment.author!==auth.currentUser.uid &&  
+               (<VscReport  style={{position:'relative',color:'white', top:'10px',ackgroundColor:'black', paddingRight:'2%',cursor:'pointer'}}/>)}
+              
+              {comment.author===auth.currentUser.uid && !loading &&
+               (<AiFillDelete   style={{position:'relative',color:'white', top:'10px',ackgroundColor:'black', paddingRight:'2%',cursor:'pointer'}} onClick={handleButtonDelete}/>)
+              }
+     
+             {comment.author===auth.currentUser.uid && loading &&
+               (<ReactBootstrap.Spinner animation="border"  size="sm" style={{position:'relative',color:'white', top:'10px',ackgroundColor:'black', paddingRight:'2%',cursor:'pointer'}} />)
+              }
+             </div>
+      )}
         </div>
         <div style={{backgroundColor:'black', color:'white', fontSize: '10pt', marginLeft:'7%', marginTop:'1%', paddingLeft:'2.5%'}}>{comment.comment}</div>
         <div style={{display:'flex', flexDirection:'row', backgroundColor:'black',marginLeft:'7%', paddingTop:'2%', paddingBottom:'2%', paddingLeft:'2.5%'}}>
           <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey'}}>{ comment.timeStamp ? (comment.timeStamp.toDate()):null}</Moment></div>
           <div style={{color:'grey', backgroundColor:'black', paddingRight:'2%'}}>{commentLikes} likes</div>
-          <div style={{color:'grey', backgroundColor:'black'}} onClick={handleButtonReply}>Reply</div>
+          {comment.author !== "[deleted]" &&
+          (<div style={{color:'grey', backgroundColor:'black'}} onClick={handleButtonReply}>Reply</div>)}
+        {comment.author !== "[deleted]" &&(
         <div  className='pointer' style={{marginRight:'1%' ,marginLeft:'auto'}}>  
           {like ? (<AiFillHeart style={{position:'relative', bottom:'20px',color:'red', backgroundColor:'black', paddingRight:'2%', outlineColor:'red', cursor:'pointer'}} onClick={handleButtonUnlike}/>):(<AiOutlineHeart style={{position:'relative', bottom:'20px',color:'white', backgroundColor:'black', paddingRight:'2%',outlineColor:'white',marginRight:'1%' ,marginLeft:'auto',cursor:'pointer'}} onClick={handleButtonLike}/>)}
-        </div>
+        </div>)}
+        
         </div>
         {reply &&(
         <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', color:'white', paddingLeft:'7%', height:'50px'}}>

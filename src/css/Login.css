@@ -1,7 +1,3 @@
-*{
-  background-color: rgba(0, 0, 0, 0.937);
-}
-
 .heading{
 text-align: center;
 color: white;
@@ -12,26 +8,36 @@ background-color:rgba(255, 255, 255, .0) ;
 }
 
 
+.Login{
+  background-color:black;
+}
 
 .Login button:hover{
-  transform: translateY(-4px);
+  transform: translateY(-2px);
 }
 
 .divider{
 display: flex;
 flex-direction: row;
-margin-top: 7%;
+padding-top: 8%;
 width: 100%;
+padding-bottom: 3.1%;
+background-color: black;
+
+}
+.MuiLoadingButton-root {
+  background-color: #405cf5;
+  color: #fff;
 
 }
 
 .half{
 background-attachment: fixed;
+background-color: black;
 position: relative;
 margin-top:4%;
 margin-left:9%;
 margin-right:9%;
-margin-bottom:9%;
 width: 100%;
 /*background-color:rgba(255, 255, 255, .05) ;
 box-shadow:  0 0 10px rgba(255, 255, 255, .5);*/
@@ -97,4 +103,4 @@ margin-bottom:9%;
       touch-action: manipulation;
 }
 
-
+@import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.css');

@@ -8,6 +8,8 @@ import {db, auth} from './firebase-config';
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
 import {signOut, onAuthStateChanged} from "firebase/auth";
 import { Link } from "react-router-dom";
+import * as ReactBootstrap from 'react-bootstrap'
+
 
 
 
@@ -16,7 +18,7 @@ function SavedPosts() {
 
     const [userId, setUserId]=useState("");
     const [name, setUserName]=useState("");
-    const [loaded, setLoaded]=useState(true);
+    const [loading, setLoading]=useState(true);
     const [loggedIn, setLoggedIn]=useState(true);
     const [user, setUser] = useState({});
     const [feed, setFeed] = useState(null);
@@ -29,13 +31,16 @@ function SavedPosts() {
           const data = await getDocs(feedRef);
           if(data.size>0){
           setFeed(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
+          setLoading(false);
           }
           else{
-            setFeed(null);
+            setFeed("null");
+            setLoading(false);
           }
         }
       catch(error){
         console.log(error);
+        setLoading(false);
       }
     }
 
@@ -58,16 +63,17 @@ function SavedPosts() {
  
   return (<div className="SavedPosts">
     <nav>
-    <div className='divider'>
+
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
-    
+    <div style={{paddingTop:'7%'}}>    
     
     <div className='secondTray'>
     <div className='posts'> 
 
-  {feed &&
+  {feed!==null && !loading && feed!=="null" &&
       (feed.map((post)=>
-    {return <div className="indPost">
+    {
+      return <div className="indPost">
       <FeedPost postid={post.id} authorId={post.authorID} ></FeedPost>
       {console.log("feed is not null")}
       </div>
@@ -75,9 +81,16 @@ function SavedPosts() {
     })
   )} 
 
-{(feed===null) &&
-      (<div className="indPost" style={{textAlign:'center'}}>
+{feed!==null && !loading && feed==="null" &&
+      (<div style={{width:'100%',marginTop:'20%', textAlign:'center', color:'#666'}}>
       No saved posts. 
+      </div>
+      )
+} 
+
+{loading && 
+      (<div style={{width:'100%',marginTop:'7%', textAlign:'center', color:'#666'}}>
+{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '} Getting posts....
       </div>
       )
 } 

@@ -1,11 +1,11 @@
 .SearchResult{
-    
      position:relative;
      display:flex;
      flex-direction: row;
      padding:1%;
      border-bottom: 1px grey;
      border-bottom-style:outset;
+     background-color: black;
     }
  
     .SearchResult:hover{
@@ -33,6 +33,7 @@
     margin-right: 40%;
     font-size: large;
     background-color: transparent;
+cursor: pointer;
     }
 
     .SearchResult .icons{
@@ -55,7 +56,7 @@
     top: 10%;
     right: 0%;
     width: 150px;
-    z-index: 1;
+  
     background-color: black;
     
   }
