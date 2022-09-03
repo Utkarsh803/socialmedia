@@ -1,5 +1,4 @@
 import './css/HashFeedPost.css';
-import logo from './mslogo.jpg';
 import PostHeader from './PostHeader';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';

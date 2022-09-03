@@ -1,5 +1,5 @@
 import './css/Post.css';
-import logo from './mslogo.jpg';
+
 import createTree from './createTree';
 import PostHeader from './PostHeader';
 import {useState, useEffect } from "react";

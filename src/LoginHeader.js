@@ -3,7 +3,7 @@ import {CgProfile} from 'react-icons/cg';
 import { AiOutlineHeart,AiOutlineHome, AiFillSetting, AiOutlineVideoCameraAdd,AiOutlineCloseCircle} from 'react-icons/ai';
 import {BiImageAdd, BiMessageRounded, BiHelpCircle} from 'react-icons/bi';
 import {FaRegBookmark , FaUserAltSlash}from 'react-icons/fa';
-import logo from'./mslogo.jpg';
+
 import {useState, useEffect} from "react";
 import {db, auth, storage} from './firebase-config';
 import {collection, getDocs, getDoc,addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp, Timestamp,onSnapshot} from 'firebase/firestore';
