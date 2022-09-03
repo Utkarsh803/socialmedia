@@ -97,7 +97,7 @@ return()=>{
   document.removeEventListener("mousedown", handler)
 }
 
-}, [postid, authorId, commentTree] );
+}, [postid, authorId] );
 
 
 

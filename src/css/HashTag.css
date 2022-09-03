@@ -1,6 +1,8 @@
 .HashTag{
     color: #fff;  
     background-color:rgba(0, 0, 0, 0.896);
+    height:fit-content;
+    min-height: 80vh;
 }
 
 .HashTag button{
@@ -36,7 +38,7 @@
     display: flex;
     background-color: rgb(16, 15, 15);
     flex-direction: column;
-    padding-top: 8%;    
+    padding-top: 100px;    
   }
 
 .HashTag .secondTray{

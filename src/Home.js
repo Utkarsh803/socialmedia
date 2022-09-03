@@ -22,6 +22,9 @@ function Home() {
     const [loggedIn, setLoggedIn]=useState(true);
     const [user, setUser] = useState({});
     const [feed, setFeed] = useState(null);
+    const[blocked, SetBlocked]= useState(null);
+    const[muted, SetMuted]= useState(null);
+    const[restricted, SetRestricted]= useState(null);
 
     useEffect(()=>{
 
@@ -44,7 +47,8 @@ function Home() {
           const q = query(feedRef,orderBy('added', 'desc'))
           onSnapshot(q, querySnapshot=>{
             if(querySnapshot.size>=1){
-            setFeed(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+            const newquery = querySnapshot.filter(x => !blocked.includes(x)|| !muted.includes(x))
+            setFeed(newquery.docs.map((doc)=>({...doc.data(), id: doc.id})));
             setLoading(false);
           }
             else{
@@ -58,6 +62,71 @@ function Home() {
       }
     }
 
+    
+    const getStatus=async()=>{
+      let keys=[];
+      let keys2=[];
+      let keys3=[];
+
+      var arrm =[];
+      const MuteRef = collection(db, `users/${auth.currentUser.uid}/mutedUsers`)
+      const muteSnap = await getDocs(MuteRef);
+      if(muteSnap.size>0){
+      let mymap = muteSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+      keys = [...mymap.values()]
+      keys.forEach((key)=>{
+        arrm.push(key.id);
+      })
+      if(arrm!==null){
+      SetMuted(arrm);}
+      else{
+        SetMuted([0]);
+      }
+      }else{
+        SetMuted([0]);
+      }
+
+  
+      var arrr =[];
+      const restrictRef = collection(db, `users/${auth.currentUser.uid}/restrictedUsers`)
+      const resSnap = await getDocs(restrictRef);
+      if(resSnap.size>0){
+      let mymap2 = resSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+      keys2 = [...mymap2.values()]
+      keys2.forEach((key)=>{
+        arrr.push(key.id);
+      })
+      if(arrr!==null){
+      SetRestricted(arrr);}
+      else{
+        SetRestricted([0]);
+      }
+    }else{
+      SetRestricted([0]);
+    }
+  
+      var arrb =[];
+      const blockRef = collection(db, `users/${auth.currentUser.uid}/blockedUsers`)
+      const blockSnap = await getDocs(blockRef);
+      if(blockSnap.size>0){
+      let mymap3 = blockSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+      keys3 = [...mymap3.values()]
+      keys3.forEach((key)=>{
+        arrb.push(key.id);
+      })
+      console.log("keys"+arrb)
+      if(arrb!==null){
+      SetBlocked(arrb);}
+      else{
+        SetBlocked([0]);
+      }
+    }
+    else{
+      SetBlocked([0]);
+    }
+    }
+
+      getStatus();
       getFeed();
       console.log("got feed");
     }, [] );
@@ -80,14 +149,14 @@ function Home() {
  
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
     
-    <div style={{display:'flex', flexDirection:'row', paddingTop:'9%'}}>
+    <div style={{display:'flex', flexDirection:'row', paddingTop:'100px'}}>
     <div className='secondTray'>
     <div className='posts'> 
 
    {!loading && feed !=="null" && feed!== null &&
    (
    (feed.map((post)=>
-    {
+    {if ((blocked!==null) && (!(blocked.includes(post.author))&&!(muted.includes(post.author))))
       return <div className="indPost">
       <FeedPost postid={post.postID} authorId={post.author} allowComments={post.allowComments}></FeedPost>
       {console.log("feed is not null")}

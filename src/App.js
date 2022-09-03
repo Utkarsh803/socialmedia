@@ -18,6 +18,8 @@ import './css/App.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { faCheckSquare, faCoffee } from '@fortawesome/free-solid-svg-icons'
+import HelpCenter from './HelpCenter';
+import PasswordReset from "./PasswordReset";
 
 library.add(fab, faCheckSquare, faCoffee)
 
@@ -29,7 +31,7 @@ function App() {
 
     useEffect(() => {
     onAuthStateChanged(auth, (currentUser)=>{
-            if(currentUser)
+            if(currentUser && currentUser.emailVerified)
             {
                 setUser(currentUser);
             }
@@ -48,13 +50,20 @@ function App() {
     <div className="App">
     <BrowserRouter>
     <Routes>
-        <Route path="/login" element={<Login />}> </Route>
-     
+  
+    <Route path="/login" element={<Login />}> </Route>
+        
        {!user ? (<Route path="/" exact element={<Login />}> </Route>):(
         <Route path="/" element={<Home />}></Route>
        )} ;
+
+
+{user &&(
+         <Route path="/help" element={<HelpCenter />}> </Route>)}
        
        <Route path='/modify' element={<Modify/>}></Route>
+
+       <Route path="/passwordReset" element={<PasswordReset />}> </Route>
               
        {user &&(
         <Route path="/myprofile" element={<MyProfile />}></Route>

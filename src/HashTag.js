@@ -2,7 +2,7 @@ import { getDoc, doc, getDocs, query, orderBy,collection } from 'firebase/firest
 import React, {useState, useEffect} from 'react'
 import {useParams} from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
-import {db} from './firebase-config';
+import {db, auth} from './firebase-config';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import GridImg from './GridImg';
 import HashFeedPost from './HashFeedPost';
@@ -31,6 +31,9 @@ const  HashTag=()=> {
     const [index, SetIndex]=useState([]);
     const[collectionSize, SetCollectionSize]=useState();
     const[loading, SetLoading]=useState(true);
+    const[blocked, SetBlocked]= useState(null);
+    const[muted, SetMuted]= useState(null);
+    const[restricted, SetRestricted]= useState(null);
 
     useEffect(() => {
         const getHashVal=async()=>{
@@ -45,6 +48,70 @@ const  HashTag=()=> {
         }
         }
 
+        const getStatus=async()=>{
+          let keys=[];
+          let keys2=[];
+          let keys3=[];
+
+          var arrm =[];
+          const MuteRef = collection(db, `users/${auth.currentUser.uid}/mutedUsers`)
+          const muteSnap = await getDocs(MuteRef);
+          if(muteSnap.size>0){
+          let mymap = muteSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+          keys = [...mymap.values()]
+          keys.forEach((key)=>{
+            arrm.push(key.id);
+          })
+          if(arrm!==null){
+          SetMuted(arrm);}
+          else{
+            SetMuted([0]);
+          }
+          }else{
+            SetMuted([0]);
+          }
+
+      
+          var arrr =[];
+          const restrictRef = collection(db, `users/${auth.currentUser.uid}/restrictedUsers`)
+          const resSnap = await getDocs(restrictRef);
+          if(resSnap.size>0){
+          let mymap2 = resSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+          keys2 = [...mymap2.values()]
+          keys2.forEach((key)=>{
+            arrr.push(key.id);
+          })
+          if(arrr!==null){
+          SetRestricted(arrr);}
+          else{
+            SetRestricted([0]);
+          }
+        }else{
+          SetRestricted([0]);
+        }
+      
+          var arrb =[];
+          const blockRef = collection(db, `users/${auth.currentUser.uid}/blockedUsers`)
+          const blockSnap = await getDocs(blockRef);
+          if(blockSnap.size>0){
+          let mymap3 = blockSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+          keys3 = [...mymap3.values()]
+          keys3.forEach((key)=>{
+            arrb.push(key.id);
+          })
+          console.log("keys"+arrb)
+          if(arrb!==null){
+          SetBlocked(arrb);}
+          else{
+            SetBlocked([0]);
+          }
+        }
+        else{
+          SetBlocked([0]);
+        }
+        }
+
+        getStatus();
         getPopularPosts();
         getHashVal();
     }, [])
@@ -215,10 +282,9 @@ return(<div className='HashTag'>
         
 {popular && posts!=="null" && posts!==null && !loading &&(
        posts.map((post)=>
-        {return <div className="indGrid"  onClick={()=>{handleButtonPopularClicked(post.postId)}}>
-           
+        {if ((blocked!==null) && (!(blocked.includes(post.authorId))&&!(muted.includes(post.authorId))))
+          return <div className="indGrid"  onClick={()=>{handleButtonPopularClicked(post.postId)}}>
           <Grid postid={post.postId} authorId={post.authorId}></Grid>
-           
           {console.log("post is not null")}
           </div>
         })
@@ -239,7 +305,8 @@ return(<div className='HashTag'>
 
 {recent && recentPosts!=="null" && recentPosts!==null && !loading &&(
        recentPosts.map((post)=>
-        {return <div className="indGrid" onClick={()=>{handleButtonRecentClicked(post.postId)}} >
+        {if ((blocked!==null) && (!(blocked.includes(post.authorId))&&!(muted.includes(post.authorId))))
+          return <div className="indGrid" onClick={()=>{handleButtonRecentClicked(post.postId)}} >
           <Grid postid={post.postId} authorId={post.authorId} ></Grid>
           
           {console.log("post is not null")}

@@ -22,6 +22,7 @@ import { runTransaction } from "firebase/firestore";
 import { FaTruckLoading } from 'react-icons/fa';
 import * as ReactBootstrap from 'react-bootstrap'
 import { getStackUtilityClass } from '@mui/system';
+import List from './List';
 
 
 
@@ -30,7 +31,7 @@ function Profile() {
    
     const {uid} =useParams();
     console.log("Welcome to", {uid});
-
+    const piid = {uid}
     const [name, setName]=useState("");    
     const [username, SetUserName]=useState("");
     const [website, SetWebsite]=useState("");
@@ -57,10 +58,17 @@ function Profile() {
     const[followLoading, SetFollowLoading]= useState(false);
     const[options, SetOptions]= useState(false);
 
-    const[blocked, SetBlocked]= useState(false);
+    const[showFollowers, SetShowFollowers]= useState(false);
+    const[showFollowing, SetShowFollowing]= useState(false);
+ 
+
+    const[blocked, SetBlocked]= useState(null);
+    const[blockedList, SetBlockedList]= useState(null);
+
     const[muted, SetMuted]= useState(false);
     const[restricted, SetRestricted]= useState(false);
-
+    const[followerList, SetFollowerList]=useState(null);
+    const[followingList, SetFollowingList]=useState(null);
 
     const[follow, SetFollow]=useState(false);
     const[request, SetRequest]=useState(false);
@@ -69,6 +77,7 @@ function Profile() {
     const [postArray, SetPostArray]=useState(null);
     const [index, SetIndex]=useState([]);
     const[collectionSize, SetCollectionSize]=useState();
+    const followString="follow"
     
     useEffect(()=>{
 
@@ -158,11 +167,17 @@ function Profile() {
       if(muteSnap.exists()){ 
       SetMuted(true);
     }
+    else{
+      SetMuted(false);
+    }
   
       const restrictRef = doc(db, `users/${auth.currentUser.uid}/restrictedUsers`, `${uid}`)
       const resSnap = await getDoc(restrictRef);
       if(resSnap.exists()){ 
       SetRestricted(true);
+    }
+    else{
+      SetRestricted(false);
     }
   
       const blockRef = doc(db, `users/${auth.currentUser.uid}/blockedUsers`, `${uid}`)
@@ -170,9 +185,23 @@ function Profile() {
       if(blockSnap.exists()){ 
       SetBlocked(true);
       }
+      else{
+        SetBlocked(false);
+      }
+    }
+
+    const getOwnProfile=()=>{
+      if(auth.currentUser.uid===uid){
+        navigate("/myProfile");
+        console.log("own profile")
+      }
+      console.log(uid);
+    console.log("Not own profile")
     }
 
 
+
+    getOwnProfile();
     getStatus();
     getFollowStats();
     getUsersData();
@@ -182,6 +211,44 @@ function Profile() {
       getRequested();
     }
   }, [uid, index] );
+
+  const getStatus=async()=>{
+    let keys3=[];
+    var arrb =[];
+    const blockRef = collection(db, `users/${auth.currentUser.uid}/blockedUsers`)
+    const blockSnap = await getDocs(blockRef);
+    if(blockSnap.size>0){
+    let mymap3 = blockSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+    keys3 = [...mymap3.values()]
+    keys3.forEach((key)=>{
+      arrb.push(key.id);
+    })
+    console.log("keys"+arrb)
+    if(arrb!==null){
+    SetBlockedList(arrb);}
+    else{
+      SetBlockedList([0]);
+    }
+  }
+  else{
+    SetBlockedList([0]);
+  }
+  }
+
+
+  const getFollowingList=async()=>{
+    try{
+    const docR = collection(db, `users/${uid}/followingList`)    
+    const docSnap =  await getDocs(docR);
+    
+    if (docSnap.size>0){
+    SetFollowingList(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
+    }
+  }
+        catch(error){
+          console.log(error);
+        }
+    }
 
 
 
@@ -515,13 +582,151 @@ function Profile() {
   }
 
   const handleButtonBlock=async()=>{
+    SetOptions(false);
+    try{
     SetBlocked(true);
     const blockRef = doc(db, `users/${auth.currentUser.uid}/blockedUsers`, `${uid}`)
-    await setDoc(blockRef, {
+
+    const myRef = doc(db, `users`, `${auth.currentUser.uid}`)
+    const myDoc = await getDoc(myRef)
+    const theirRef = doc(db, `users`, `${uid}`)
+    const theirDoc = await getDoc(theirRef)
+    console.log("step95")
+
+    const ownfollowerRef = doc(db, `users/${auth.currentUser.uid}/followerList`, `${uid}`)
+    const a =await getDoc(ownfollowerRef)
+
+    console.log("step96")
+    
+    const ownfollowingRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${uid}`)
+    const b =await getDoc(ownfollowingRef)
+
+    console.log("step97")    
+    const theirfollowerRef = doc(db, `users/${uid}/followerList`, `${auth.currentUser.uid}`)
+    const c =await getDoc(theirfollowerRef)
+
+    console.log("step98")
+    const theirfollowingRef = doc(db, `users/${uid}/followingList`, `${auth.currentUser.uid}`)
+    const d =await getDoc(theirfollowingRef)
+
+    console.log("step99")
+    const block2Ref = doc(db, `users/${uid}/blockedUsers`, `${auth.currentUser.uid}`)
+
+
+    //removes likes and comments...
+    var postids=[]
+    const postsRef = collection(db, `users/${auth.currentUser.uid}/posts`)
+    const postDocs = await getDocs(postsRef);
+    let mymap = postDocs.docs.map((doc)=>({...doc.data(), id: doc.id}))
+    postids = [...mymap.values()]
+    console.log("postids")
+    console.log(postids)
+
+    console.log("step100")
+
+
+    for(const docc of postids){
+      var commentids=[];
+
+      const postidRef = doc(db, `users/${auth.currentUser.uid}/posts`, `${docc.id}`)
+      const postidDocs = await getDoc(postidRef);
+
+      const commentsRef = collection(db, `users/${auth.currentUser.uid}/comments/${docc.id}/ids`)
+      const q =query(commentsRef, where("author", "==", `${uid}`));
+      const querySnapshot = await getDocs(q);
+      let mymap2 = querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id}))
+      commentids = [...mymap2.values()]
+      console.log("commentids")
+      console.log(commentids)
+
+      console.log("step1")
+      //remove post like
+      const likesRef = doc(db, `users/${auth.currentUser.uid}/likes/${docc.id}/ids`, `${uid}`) 
+      const likesDoc = await getDoc(likesRef);
+      if(likesDoc.exists()){
+        deleteDoc(likesRef);
+        updateDoc(postidRef,{likes:postidDocs.data().likes-1})
+      }
+      console.log("removed a like")
+
+      console.log("step2")
+
+            //remove all comments
+      for(const commentDoc of  commentids){
+      if(commentDoc.child===0){
+        console.log("step3")
+        console.log(commentDoc.id)
+            
+        console.log("Process began")   
+        const comRef = doc(db, `users/${auth.currentUser.uid}/comments`, `${docc.id}`)
+        const docRef = await getDoc(comRef) 
+        console.log("step4")
+      
+        const newfield={validComments:docRef.data().validComments-1};
+        updateDoc(comRef, newfield);
+       
+        console.log("step5")
+      
+       
+        const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/comments/${docc.id}/ids`, `${commentDoc.id}`);
+        
+        deleteDoc(usersCollectionRef);      
+        console.log("step6")
+        console.log("deleted a comment");
+      
+      }
+      else{
+        const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/comments/${docc}/ids`, `${commentDoc.id}`);
+        updateDoc(usersCollectionRef,{
+          comment: "[deleted]",
+          author:"[deleted]",
+        });      
+        console.log("step6")
+
+        console.log("deleted a comment");
+      }
+      };      console.log("step7")
+    
+    }
+
+    await setDoc(block2Ref, {
       createdAt:serverTimestamp(),
+      origin:auth.currentUser.uid,
     })
+
+    if(d.exists()){
+      updateDoc(theirRef , {following:theirDoc.data().following-1});
+    deleteDoc(theirfollowingRef)
+    }
+
+    if(c.exists()){
+      updateDoc(theirRef , {followers:theirDoc.data().followers-1});
+    deleteDoc(theirfollowerRef)
+    }
+
+    if(b.exists()){
+      updateDoc(myRef, {following:myDoc.data().following-1});
+      deleteDoc(ownfollowingRef)}
+
+    if(a.exists()){
+        updateDoc(myRef, {followers:myDoc.data().followers-1});
+        deleteDoc(ownfollowerRef);
+        }
+
+    
+      await setDoc(blockRef, {
+          createdAt:serverTimestamp(),
+          origin:auth.currentUser.uid,
+        })
+
     console.log("blockeded")
+    SetOptions(false);
   }
+  catch(e){
+    console.log(e.message);
+    SetOptions(false);
+  }
+}
 
   
   const handleButtonUnRestrict=async()=>{
@@ -551,6 +756,13 @@ function Profile() {
     if(docSnap.exists()){ 
     await deleteDoc(blockRef)
   }
+
+  const block2Ref = doc(db, `users/${uid}/blockedUsers`, `${auth.currentUser.uid}`)
+  const docSnap2 = await getDoc(block2Ref);
+  if(docSnap2.exists()){ 
+    await deleteDoc(block2Ref);
+  }
+  
   console.log("unblocked")
   }
 
@@ -563,6 +775,50 @@ function Profile() {
   const handleButtonEditProfile=()=>{
     navigate("/settings");
   }
+
+
+
+  const getFollowersList=async()=>{
+    try{
+    const docR = collection(db, `users/${uid}/followerList`)    
+    const docSnap =  await getDocs(docR);
+    console.log(docSnap)
+    
+    if (docSnap.size>0){
+    SetFollowerList(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
+    console.log("Got followers list")
+    }
+    
+  }catch(error){
+          console.log(error);
+        }
+    }
+
+  const handleButtonShowFollowers=async()=>{
+try{
+  if(showFollowing===false){
+    await getStatus();
+  await  getFollowersList();
+  SetShowFollowers(!showFollowers);}
+  else{
+    SetShowFollowers(!showFollowers);
+  }
+  }
+  catch(e){
+    console.log(e.message)
+  }
+  
+  }
+
+  const handleButtonShowFollowing=async()=>{
+    if(showFollowing===false){
+    await getStatus();
+    await getFollowingList();
+    SetShowFollowing(!showFollowing)}
+    else{
+      SetShowFollowing(!showFollowing)
+    }
+  }
  
   return (<div className="Profile">
     <nav>
@@ -573,19 +829,40 @@ function Profile() {
       (<div  style={{position:'absolute', top:'22.5%',left:'75%', width:'fit-content', zIndex:'3', backgroundColor:'black'}}>
         <ul style={{justifyContent:'center'}}>
           
-          {restricted ? (<button className='option' onClick={handleButtonUnRestrict}>UnRestrict</button>):(<button className='option' onClick={handleButtonRestrict}>Restrict</button>)}
+          {restricted ? (<button className='option' onClick={handleButtonUnRestrict}>UnRestrict</button>):(<button className='option' disabled={restricted} onClick={handleButtonRestrict}>Restrict</button>)}
 
           
-          {muted? (<button className='option' onClick={handleButtonUnMute}>UnMute</button>):(<button className='option' onClick={handleButtonMute}>Mute</button>)}
+          {muted? (<button className='option' onClick={handleButtonUnMute}>UnMute</button>):(<button className='option' disabled={muted} onClick={handleButtonMute}>Mute</button>)}
           
           
-          {blocked ? (<button className='option' onClick={handleButtonUnBlock}>UnBlock</button>):(<button className='option' onClick={handleButtonBlock}>Block</button>)}
+          {blocked ? (<button className='option' onClick={handleButtonUnBlock}>UnBlock</button>):(<button className='option' disabled={blocked} onClick={handleButtonBlock}>Block</button>)}
           
         </ul>
       </div>
   )} 
 
-    {posts && focusImages && !grid &&
+  {showFollowing && followingList !== null &&(
+    <div className='list'>
+  {followingList.map((res)=>
+    {if (!(blockedList.includes(res.id)))
+    return <div style={{width:'100%'}}>
+    <List authorId={res.id} typ={followString}></List>
+  </div>})}
+  </div>)}
+  
+  {showFollowers && followerList!==null && (
+      <div className='list'>
+        {followerList.map((res)=>
+    {if (!(blockedList.includes(res.id)))
+  return <div style={{width:'100%'}}>
+     <List authorId={res.id} typ={followString}></List>
+  </div>}
+  )}
+      </div>
+    )}
+
+
+    {posts && focusImages && !grid && blocked!==null && !blocked &&
       (<div className="indPost">
       <div style={{display:'flex', flexDirection:'row', width:'100%'}}>
       <div style={{width:'10%', display:'flex', flexDirection:'column'}}>
@@ -599,28 +876,28 @@ function Profile() {
       </div>
       <div style={{width:'10%', color:'white'}}><FcNext style={{color:'white', width:'100%', marginTop:'180%', cursor:'pointer'}} disabled={index === collectionSize - 1} onClick={()=>{goToNextPost()}}>Next</FcNext></div>
       </div>
-      </div>
-  )} 
+      </div>)}
 
-    <div className='firstTray'>
+{blocked!==null && !blocked &&
+    (<div className='firstTray'>
     <div className='rowPicnStat'>
     <div className='profilePic'>  
     <Avatar
     alt="preview image"
     src={currentPicUrl}
-    sx={{ width: 156, height: 156}}
+    sx={{ width: '100%', height: '100%'}}
     />
     </div>
     <div className='row'>
-    <div className='column'>
+    <div className='column' >
       <div className='number'>{numberOfPosts}</div>
       <div className='category'>Posts</div>
     </div>
-    <div className='column'>
+    <div className='column' onClick={()=>{handleButtonShowFollowers()}}>
       <div className='number'>{numberOFollowers}</div>
       <div className='category'>Followers</div>
     </div>
-    <div className='column'>
+    <div className='column' onClick={()=>{handleButtonShowFollowing()}}>
       <div className='number'>{numberOFollowing}</div>
       <div className='category'>Following</div>
     </div>
@@ -661,9 +938,9 @@ function Profile() {
    
     </div>
     </div>
+    )}
 
-
-
+{blocked!==null && !blocked &&(
     <div className='secondTray'>
       <div className='rowCategory'>
       {focusImages ?
@@ -747,7 +1024,16 @@ function Profile() {
  
  
  
-    </div>
+    </div>)}
+
+    {blocked!==null && blocked &&(
+      <div style={{alignContent:'center', color:'white'}}>
+     <div style={{display:'flex', flexDirection:'column',paddingTop:'200px',alignContent:'center', color:'white'}}>
+      <h1 style={{textAlign:'center', color:'white'}}>Sorry, this page isn't available..</h1>
+      <h5 style={{textAlign:'center'}}>The link you followed may be broken, or the page may have been removed.</h5>
+      </div>
+      </div>
+    )}
  
     </nav>
   </div>);

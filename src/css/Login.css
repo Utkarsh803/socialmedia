@@ -9,7 +9,9 @@ background-color:rgba(255, 255, 255, .0) ;
 
 
 .Login{
-  background-color:black;
+  background-color:rgb(31, 30, 30);
+  
+  min-height: 100vh;
 }
 
 .Login button:hover{
@@ -19,7 +21,8 @@ background-color:rgba(255, 255, 255, .0) ;
 .divider{
 display: flex;
 flex-direction: row;
-padding-top: 8%;
+padding-top: 100px;
+height: 100%;
 width: 100%;
 padding-bottom: 3.1%;
 background-color: black;
@@ -38,6 +41,7 @@ position: relative;
 margin-top:4%;
 margin-left:9%;
 margin-right:9%;
+height: 100%;
 width: 100%;
 /*background-color:rgba(255, 255, 255, .05) ;
 box-shadow:  0 0 10px rgba(255, 255, 255, .5);*/

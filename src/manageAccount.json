@@ -1,0 +1,10 @@
+[
+    {
+    "name":"Adjust Settings",
+    "text":"You can adjust your user setting by going to Setiings from the upper rightmost icon on the header."
+    },
+    {
+        "name":"Delete your account",
+        "text":"You can delete your account from delete account tab in the Settings. \n \nNote: Your account will not be able to be restored."
+    }
+    ]

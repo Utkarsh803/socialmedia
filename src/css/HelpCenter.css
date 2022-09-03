@@ -1,12 +1,12 @@
 
-  .Settings{
+  .HelpCenter{
     display: flex;
     flex-direction: column;
     background-color:rgb(31, 30, 30);
     height:fit-content;
     min-height: 80vh;
   }
-  .Settings button{
+  .HelpCenter button{
     position: relative;
     display: block;
     width:10%;
@@ -34,11 +34,11 @@
       touch-action: manipulation;
   }
 
-  .Settings .submit:active {
+  .HelpCenter .submit:active {
     vertical-align: top;
     padding: 8px 13px 6px;
 }
-.Settings .list{
+.HelpCenter .list{
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -56,11 +56,11 @@
 
 
 
-  .Settings .pagehaedspace{
+  .HelpCenter .pagehaedspace{
     margin-top: 0%;
   }
 
-  .Settings .pageDivide{
+  .HelpCenter .pageDivide{
     position: relative;
     display: flex;
     flex-direction: row;
@@ -68,7 +68,7 @@
     
 }
 
-  .Settings .options{
+  .HelpCenter .options{
     position: relative;
     display: flex;
     flex-direction: column;
@@ -80,7 +80,7 @@
   
       }
 
-      .Settings .sideButtons{
+      .HelpCenter .sideButtons{
         position: relative;
         color: aliceblue;
         background-color: black;
@@ -88,20 +88,21 @@
           }
 
           
-  .Settings .formContainer{
+  .HelpCenter .formContainer{
     position: relative;
-    padding-top: 5.7%;
+    padding-top: 2%;
     background-color:rgb(24, 23, 27);
     color: aliceblue;
-    padding-left:10% ;
+    padding-left:2% ;
     width: 70%;
-    height:83vh;
+    height: fit-content;
+    min-height:83vh;
    
   
     
       }
 
-      .Settings .formContainerEmailandSms{
+      .HelpCenter .formContainerEmailandSms{
         position: relative;
         background-color:rgb(24, 23, 27);
         color: aliceblue;
@@ -112,7 +113,7 @@
           }
 
                 
-  .Settings .formInputs{
+  .HelpCenter .formInputs{
     position: relative;
     background-color:rgb(24, 23, 27);
     z-index: 0;
@@ -122,7 +123,7 @@
     
       }
 
-      .Settings .formInputsColumn{
+      .HelpCenter .formInputsColumn{
         position: relative;
         background-color:rgb(24, 23, 27);
         display: flex;
@@ -134,7 +135,7 @@
         
           }
 
-          .Settings .formInputsColumnPasswordReset{
+          .HelpCenter .formInputsColumnPasswordReset{
             position: relative;
             background-color:rgb(24, 23, 27);
             display: flex;
@@ -147,7 +148,7 @@
             
               }
 
-          .Settings .formInputsColumnEmailAndSms{
+          .HelpCenter .formInputsColumnEmailAndSms{
             position: relative;
             background-color:rgb(24, 23, 27);
             display: flex;
@@ -162,7 +163,7 @@
            
               }
       
-      .Settings .username{
+      .HelpCenter .username{
         position: relative;
         background-color:rgb(24, 23, 27);
         margin-top:-4.5%;
@@ -171,7 +172,7 @@
         
           }
 
-          .Settings .submit{
+          .HelpCenter .submit{
             position: relative;
             width: 40%;
             margin-top: 2%;
@@ -179,7 +180,7 @@
             margin-left: 47%;
               }
 
-              .Settings .submitResetPassword{
+              .HelpCenter .submitResetPassword{
                 position: relative;
                 width: 40%;
                 text-align: center;
@@ -190,16 +191,16 @@
                
                   }
 
-                  .Settings button:hover{
+                  .HelpCenter button:hover{
                     transform: translateY(-4px);
                   }
 
-                  .Settings .submitResetPassword:active {
+                  .HelpCenter .submitResetPassword:active {
                     vertical-align: top;
                     padding: 8px 13px 6px;
                 }
 
-          .Settings .changePicButton{
+          .HelpCenter .changePicButton{
             position: relative;
             background-color:rgb(24, 23, 27);
             outline: none;
@@ -211,7 +212,7 @@
             
               }
           
-              .Settings .row{
+              .HelpCenter .row{
                 position: relative;
                 background-color:rgb(24, 23, 27);
                 display: flex;
@@ -224,7 +225,7 @@
                 
                   }
 
-                  .Settings .column{
+                  .HelpCenter .column{
                     position: relative;
                     background-color:rgb(24, 23, 27);
                     display: flex;
@@ -236,26 +237,26 @@
 
                       }
 
-                      .Settings .shiftup{
+                      .HelpCenter .shiftup{
                         position: relative;
                         margin-right: 5%;
                         margin-top: 0%;
                           }
 
-                          .Settings .bgblackbig{
+                          .HelpCenter .bgblackbig{
                            background-color:rgb(24, 23, 27);
                           font-size:x-large;
                           margin-bottom: 2%;
   
                               }
 
-                              .Settings .bgblacksmall{
+                              .HelpCenter .bgblacksmall{
                                 background-color:rgb(24, 23, 27);
                                font-size:small;
        
                                    }
 
-                                   .Settings .bgblack{
+                                   .HelpCenter .bgblack{
                                     background-color:rgb(24, 23, 27);
                                   display: inline-block;
                                   text-align: right;
@@ -263,7 +264,7 @@
            
                                        }
 
-                                   .Settings .full-wide-netral{
+                                   .HelpCenter .full-wide-netral{
                                     position: relative;
                                     background-color: rgb(24, 23, 27);
                                     width: 60%;
@@ -280,7 +281,7 @@
                                     
                                    }
 
-                                   .Settings .margin-top{
+                                   .HelpCenter .margin-top{
                                     position: relative;
                                     background-color: rgb(24, 23, 27);
                                     margin-top: 3%;
@@ -288,7 +289,7 @@
                                  
                                    }
 
-                                   .Settings .buttonIcon{
+                                   .HelpCenter .buttonIcon{
                                     position: relative;
                                     background-color: rgb(24, 23, 27);
                                     margin-right: 3%;
@@ -298,7 +299,7 @@
                                  
                                    }
 
-                                   .Settings .formInput{
+                                   .HelpCenter .formInput{
                                     position: relative;
                                     background-color: white;
                                   
@@ -312,7 +313,7 @@
                                  
                                    }
 
-                                   .Settings .formInputBio{
+                                   .HelpCenter .formInputBio{
                                     position: relative;
                                     background-color: white;
                                     margin: 1%;
@@ -326,7 +327,7 @@
                                  
                                    }
 
-                                   .Settings .uploadtray{
+                                   .HelpCenter .uploadtray{
                                     position: absolute;
                                     display: flex;
                                     flex-direction: column;
@@ -339,7 +340,7 @@
                                     border-radius: 2.5%;
                                   }
 
-                                  .Settings .closeButton{
+                                  .HelpCenter .closeButton{
                                     position: relative;
                                     width: 7%;
                                     height: auto;
@@ -349,7 +350,7 @@
                                     background-color: black;
                                   }
 
-                                  .Settings .chooseAndDisplay{
+                                  .HelpCenter .chooseAndDisplay{
                                     position: relative;
                                     background-color: black;
                                     margin-bottom: 2%;
@@ -360,7 +361,7 @@
                                     
                                   }
 
-                                  .Settings .chooseImage{
+                                  .HelpCenter .chooseImage{
                                     position: relative;
                                     width: 100%;
                                     height: 10%;
@@ -368,7 +369,7 @@
                                     color: aliceblue;
                                   }
 
-                                  .Settings .uploadImage{
+                                  .HelpCenter .uploadImage{
                                     position: relative;
                                     width: 90%;
                                     height: 20%;
@@ -376,7 +377,7 @@
                                   
                                   }
 
-                                  .Settings .back{
+                                  .HelpCenter .back{
                                     position: relative;
                                     width: 20%;
                                     height: 20%;
@@ -385,7 +386,7 @@
                                   
                                   }
 
-                                  .Settings .preview {
+                                  .HelpCenter .preview {
                                     position: relative;
                                     max-width: 95%;
                                     max-height: 60vh;
@@ -393,14 +394,14 @@
                                     
                                   }
 
-                                  .Settings .profilePic {
+                                  .HelpCenter .profilePic {
                                     position: relative;
                                     background-color: black;
                                     padding-left: 20%;
                                     
                                   }
 
-                                  .Settings  .editProfileRow {
+                                  .HelpCenter  .editProfileRow {
                                     position: relative;
                                     display: flex;
                                     flex-direction: row;
@@ -414,7 +415,7 @@
                                     
                                     
                                   }
-                                  .Settings  .editProfileColumn {
+                                  .HelpCenter  .editProfileColumn {
                                     position: relative;
                                     display: flex;
                                     flex-direction: column;

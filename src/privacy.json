@@ -1,0 +1,38 @@
+[
+    {
+    "name":"How do I set my account to private so that only users I allow can see my posts?",
+    "text":"You can set you account to private by ticking on the private checkbox in Settings->Privacy tab."
+    },
+    {
+        "name":"Can I turn off comments on my post?",
+        "text":"Yes, open the post options from upper right corner of the post and select 'Turn off Comments'"
+    },
+    {
+        "name":"Can I remove a follower?",
+        "text":"Go to Settings->Privacy and click on 'Remove Followers' to remove a follower. No notification is sent."
+    },
+    {
+        "name":"Will my post appear on tags page if my account is private?",
+        "text":"If your account was public during posting an image only then it will be shown on the tags page. If it was private, they are not added to tags. "
+    },
+    {
+        "name":"How do I block a user?",
+        "text":"Go to the usr's profile. Click on the three dots beside their profile statistics and choose 'Block'."
+    },
+    {
+        "name":"What happens when I block someone?",
+        "text":"When you block someone:\n\n1.They won't be able to see your posts.\n2.Any posts from you will be removed from their saved posts.\n3.They won't be able to search for you.\n4.They wont be able to see your profile\n5.They won't be able to send you messages.\n\n No notification is sent."
+    },
+    {
+        "name":"What does muting someone mean?",
+        "text":"When you mute someone ,you won't see any new posts from that user. No notification is sent."
+    },
+    {
+        "name":"What does restricting someone mean?",
+        "text":"When you restrict someone, they won't see any of your new posts on their feed."
+    },
+    {
+        "name":"How do I unblock, unmute or unrestrict someone?",
+        "text":"Go to Settings->Privacy and clickk on the specific button to see blocked, muted or restricted users. You can then  unblock, unmute or unrestrict them from the list. No notification is sent."
+    }
+    ]

@@ -4,13 +4,13 @@ import Post from'./Post.js';
 import SidePanel from './SidePanel';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc, serverTimestamp} from 'firebase/firestore';
+import {collection, getDocs, addDoc,query,where, updateDoc, deleteDoc, doc, getDoc, setDoc, serverTimestamp} from 'firebase/firestore';
 import {signOut, onAuthStateChanged, reauthenticateWithCredential,updatePassword, EmailAuthCredential , AuthCredential, EmailAuthProvider} from "firebase/auth";
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import {FaUserAltSlash, FaBellSlash} from 'react-icons/fa';
 import {AiOutlineCloseCircle} from 'react-icons/ai';
-import {MdOutlineBlock} from 'react-icons/md';
+import {MdOutlineBlock,MdRemoveCircle} from 'react-icons/md';
 import Spinner from './Spinner';
 import { useNavigate } from "react-router-dom";
 import Avatar from '@mui/material/Avatar';
@@ -20,7 +20,7 @@ import {v4} from 'uuid'
 import * as ReactBootstrap from 'react-bootstrap'
 
 
-
+import List from './List'
 
 
 
@@ -69,8 +69,18 @@ function Settings() {
   const [url, SetUrl]=useState(null);
   const [currentPic, SetCurrentPic]=useState(null);
   const [currentPicUrl, SetCurrentPicUrl]=useState(null);
-
-
+  const[showBlocked, SetShowBlocked]= useState(false);
+  const[showMuted, SetShowMuted]= useState(false)
+  const[showRestricted, SetShowRestricted]= useState(false);
+  const[showFollowers, SetShowFollowers]= useState(false);
+  const [blockedUsers, SetBlockedUsers]=useState(null);
+  const [mutedUsers, SetMutedUsers]=useState(null);
+  const [restrictedUsers, SetRestrictedUsers]=useState(null);
+  const [followers, SetFollowers]=useState(null);
+  const blockString ="block"
+  const restrictString ="restrict"
+  const muteString ="mute"
+  const removeString ="remove"
 
 
   const docRef = doc(db, "users", auth.currentUser.uid);
@@ -290,7 +300,21 @@ function Settings() {
       }
   }
 
-  
+  const getFollowers=async()=>{
+    try{
+      const docR = collection(db, `users/${auth.currentUser.uid}/followerList`)    
+      const querySnapshot =  await getDocs(docR);
+      
+      if (querySnapshot.size>0){
+      SetFollowers(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      console.log("Got followers list")
+      }
+      
+    }catch(error){
+            console.log(error);
+          }
+
+  }
 
   const submitGetEmail = async () =>
   { 
@@ -377,9 +401,115 @@ function Settings() {
     }
 
 
+    const getBlockedList=async()=>{
+      try{
+      const docR = collection(db, `users/${auth.currentUser.uid}/blockedUsers`)    
+      const q = query(docR, where("origin", "==", `${auth.currentUser.uid}`))
+      const querySnapshot =  await getDocs(q);
+      
+      if (querySnapshot.size>0){
+      SetBlockedUsers(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      console.log("Got followers list")
+      }
+      
+    }catch(error){
+            console.log(error);
+          }
+      }
 
+      
+    const getMutedList=async()=>{
+      try{
+      const docR = collection(db, `users/${auth.currentUser.uid}/mutedUsers`)    
+      const docSnap =  await getDocs(docR);
+      console.log(docSnap)
+      
+      if (docSnap.size>0){
+      SetMutedUsers(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      console.log("Got followers list")
+      }
+      
+    }catch(error){
+            console.log(error);
+          }
+      }
 
+      
+    const getRestrictedList=async()=>{
+      try{
+      const docR = collection(db, `users/${auth.currentUser.uid}/restrictedUsers`)    
+      const docSnap =  await getDocs(docR);
+      console.log(docSnap)
+      
+      if (docSnap.size>0){
+      SetRestrictedUsers(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      console.log("Got followers list")
+      }
+      
+    }catch(error){
+            console.log(error);
+          }
+      }
 
+      const handleButtonShowBlocked=async()=>{
+        try{
+          if(showBlocked===false){
+          await  getBlockedList();
+          SetShowBlocked(!showBlocked);}
+          else{
+            SetShowBlocked(!showBlocked);
+          }
+          }
+          catch(e){
+            console.log(e.message)
+          }
+          
+          }
+
+          const handleButtonShowMuted=async()=>{
+            try{
+              if(showMuted===false){
+              await  getMutedList();
+              SetShowMuted(!showMuted);}
+              else{
+                SetShowMuted(!showMuted);
+              }
+              }
+              catch(e){
+                console.log(e.message)
+              }
+              
+              }
+
+              const handleButtonShowRestricted=async()=>{
+                try{
+                  if(showRestricted===false){
+                  await  getRestrictedList();
+                  SetShowRestricted(!showRestricted);}
+                  else{
+                    SetShowRestricted(!showRestricted);
+                  }
+                  }
+                  catch(e){
+                    console.log(e.message)
+                  }
+                  
+                  }
+
+                  const handleButtonShowFollowers=async()=>{
+                    try{
+                      if(showFollowers===false){
+                      await  getFollowers();
+                      SetShowFollowers(!showFollowers);}
+                      else{
+                        SetShowFollowers(!showFollowers);
+                      }
+                      }
+                      catch(e){
+                        console.log(e.message)
+                      }
+                      
+                      }
     const reAuth = async() =>{
       SetLoading(true);
       const cred = EmailAuthProvider.credential(auth.currentUser.email, credential); 
@@ -528,7 +658,58 @@ function Settings() {
   return (<div className="Settings">
     <nav>
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
-<div style={{paddingTop:'8%', backgroundColor:'black'}}>
+<div style={{paddingTop:'100px', backgroundColor:'black'}}>
+   
+{showBlocked && blockedUsers !== null && (
+    <div className='list'>
+  {blockedUsers.map((res)=>
+     <List authorId={res.id} typ={blockString}></List>)}
+  </div>)}
+
+
+      {showMuted && mutedUsers !== null && (
+    <div className='list'>
+  {mutedUsers.map((res)=>
+     <List authorId={res.id} typ={muteString}></List>)}
+  </div>)}
+
+
+      {showRestricted && restrictedUsers !== null && (
+    <div className='list'>
+  {restrictedUsers.map((res)=>
+     <List authorId={res.id} typ={restrictString}></List>)}
+  </div>)}  
+
+  {showFollowers && followers !== null && (
+    <div className='list'>
+  {followers.map((res)=>
+     <List authorId={res.id} typ={removeString}></List>)}
+  </div>)}  
+   
+  {showBlocked && blockedUsers === null && (
+    <div className='list'>
+No Blocked Users.
+  </div>)}
+
+
+      {showMuted && mutedUsers === null && (
+    <div className='list'>
+No Muted Users.
+  </div>)}
+
+
+      {showRestricted && restrictedUsers === null && (
+    <div className='list'>
+No Restricted Users.
+  </div>)}   
+
+  
+  {showFollowers && followers === null && (
+    <div className='list'>
+No Followers.
+  </div>)}   
+   
+   
     {uploadProfilePic && (   
  <div class="uploadtray">
   <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton"></AiOutlineCloseCircle>
@@ -659,9 +840,10 @@ function Settings() {
         </div>
         </div>
         <div className='margin-top'>
-        <button className='full-wide-netral' ><FaUserAltSlash className='buttonIcon'></FaUserAltSlash>Restricted Accounts</button>
-        <button className='full-wide-netral'><MdOutlineBlock className='buttonIcon'></MdOutlineBlock>Blocked Accounts</button>
-        <button className='full-wide-netral'>< FaBellSlash className='buttonIcon'></FaBellSlash>Muted Accounts</button>
+        <button className='full-wide-netral' onClick={()=>{handleButtonShowFollowers()}}><MdRemoveCircle className='buttonIcon' ></MdRemoveCircle>Remove Followers</button>
+        <button className='full-wide-netral' onClick={()=>{handleButtonShowRestricted()}}><FaUserAltSlash className='buttonIcon' ></FaUserAltSlash>Restricted Accounts</button>
+        <button className='full-wide-netral' onClick={()=>{handleButtonShowBlocked()}}><MdOutlineBlock className='buttonIcon' ></MdOutlineBlock>Blocked Accounts</button>
+        <button className='full-wide-netral' onClick={()=>{handleButtonShowMuted()}}>< FaBellSlash className='buttonIcon' ></FaBellSlash>Muted Accounts</button>
         </div>
       </div>
     

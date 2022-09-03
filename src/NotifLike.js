@@ -312,7 +312,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
       await deleteDoc(thisRef);
 
       const reqRef = doc(db, `users/${authorId}/profileRequests`, `${auth.currentUser.uid}`);
-      const docSnap = await getDoc(reqRef);
+      deleteDoc(reqRef);
   
     }
     });

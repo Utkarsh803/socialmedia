@@ -1,0 +1,16 @@
+[
+    {
+    "name":"Community Guildlines",
+    "text":"->Follow the law.\nWe have zer tolerance policy for sexually explicit material, material related to terrorism, hate groups and organised crime.\nRegulated material, firearma, alcohol, tobacco, drugs should not be sold. We will remove any posts related to these. \n\n->Foster meaningful and genuine interactions.\n\n->Share only photos and videos that you’ve taken or have the right to share.\n\n->Do not share explicit images. Doing so will get you banned.\n\n->Do not bully, abuse or harass anyone online. Doing so will get you banned and we may report you to the concerned authorities.\n\n>Be respectful of others and their opinions.Do not make personal attacks in your comments.\n\n->Do not post content that is discriminatory, obscene, inflammatory, harassing, hateful, threatening, profane or personally abusive.\n\n->Do not post anything that could be libellous or defamatory: if an accusation is made against a named person, for example at a member of staff at a service, we will hide it.\n\n->Do not post content with explicit or technical detail of self-harm or suicide.\n\n->Do not post adverts for commercial products or services.\n\n->Do not post repeatedly about issues that are off-topic i.e. spam"
+    },
+    {
+        "name":"Privacy Policy",
+        "text":"Your data is saved in an encrypted database.\nWe do not provide any info to third parties except firebase database."
+    },
+    {
+        "name":"Terms and Conditions",
+        "text":"We reserve the right to remove users and any content that we feel harmful to the website." 
+    }
+
+
+    ]

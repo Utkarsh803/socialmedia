@@ -12,15 +12,23 @@ import { runTransaction } from "firebase/firestore";
 import * as ReactBootstrap from 'react-bootstrap'
 
 
-const SearchResult = ({name, authorId, url, SetSearchRes})=> {
+const List = ({authorId, typ})=> {
     const NotRef = collection(db, `users/${authorId}/notifications`);
     const navigate = useNavigate();
+
+    console.log(authorId)
 
     const[imageUrl, SetImageUrl]=useState(false);
     const[follow, SetFollow]=useState(null);
     const[myFollow, SetMyFollow]=useState(null);
     const[following, SetFollowing]=useState(null);
+    const[blocked, SetBlocked]=useState(null);
+    const[muted, SetMuted]=useState(null);
+    const[restricted, SetRestricted]=useState(null);
     const[loading, SetLoading]=useState(false);
+    const[name, SetName]=useState("");
+    const[remove,SetRemove]=useState(false);
+    const followString = "follow"
 
 
     const getFollow=async()=>{
@@ -29,11 +37,49 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
 
         if (docSnap.exists()) {
             SetFollow(true);
+            SetRemove(true);
         } else {
         // doc.data() will be undefined in this case
             SetFollow(false);
+            SetRemove(false);
         }
     }
+
+    const getBlock=async()=>{
+        const docRef = doc(db, `users/${auth.currentUser.uid}/blockedUsers`, `${authorId}`)
+        const docSnap = await getDoc(docRef);
+    
+            if (docSnap.exists()) {
+                SetBlocked(true);
+            } else {
+            // doc.data() will be undefined in this case
+                SetBlocked(false);
+            }
+        }
+
+        const getMute=async()=>{
+            const docRef = doc(db, `users/${auth.currentUser.uid}/mutedUsers`, `${authorId}`)
+            const docSnap = await getDoc(docRef);
+        
+                if (docSnap.exists()) {
+                    SetMuted(true);
+                } else {
+                // doc.data() will be undefined in this case
+                    SetMuted(false);
+                }
+            }
+
+            const getRestrict=async()=>{
+                const docRef = doc(db, `users/${auth.currentUser.uid}/restrictedUsers`, `${authorId}`)
+                const docSnap = await getDoc(docRef);
+            
+                    if (docSnap.exists()) {
+                        SetRestricted(true);
+                    } else {
+                    // doc.data() will be undefined in this case
+                        SetRestricted(false);
+                    }
+                }
 
     const getFollowStats=async()=>{
         const docRef = doc(db, `users`,`${auth.currentUser.uid}`)
@@ -62,9 +108,13 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
 
 
     useEffect(()=>{
-        function getPostPic(){
-            
-            getDownloadURL(ref(storage, `${authorId}/${url}`))
+        const getPostPic=async()=>{
+
+            const docRef= doc(db, `users`, `${authorId}`)
+            const docSnap = await getDoc(docRef);
+            SetName(docSnap.data().name);
+
+            getDownloadURL(ref(storage, `${authorId}/${docSnap.data().profilePic}`))
             .then((url) => {
               SetImageUrl(url);
             })
@@ -88,8 +138,16 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
             });
             }
             getPostPic();
+            if(typ==="follow" || typ==="remove"){
             getFollow();
             getFollowStats();
+        }
+            if(typ==="block"){
+            getBlock();}
+            if(typ==="mute"){
+            getMute();}
+            if(typ==="restrict"){
+            getRestrict();}
       }, [] );
 
 
@@ -109,6 +167,33 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
         catch(error){
             console.log(error);
         }
+    }
+
+    const handleButtonRemove=async()=>{
+        SetLoading(true);
+        try{
+            await runTransaction(db, async (transaction) => { 
+
+        const profileRef = doc(db, `users/${auth.currentUser.uid}`);
+        const profileDoc = await transaction.get(profileRef);
+
+        const profileRef2 = doc(db, `users/${authorId}`);
+        const profileDoc2 = await transaction.get(profileRef2);
+
+        transaction.update(profileRef, {followers:profileDoc.data().followers-1})
+        transaction.update(profileRef, {following:profileDoc2.data().following-1})
+
+        transaction.delete(doc(db, `users/${auth.currentUser.uid}/followerList`, `${authorId}`));
+        transaction.delete(doc(db, `users/${authorId}/followingList`, `${auth.currentUser.uid}`));
+            })
+            SetRemove(false);
+            SetLoading(false);
+        }
+        catch(e){
+            console.log(e.message);
+            SetLoading(false);
+        }
+
     }
 
     const decreaseFollower=async()=>{
@@ -192,6 +277,41 @@ if(!myfollow.exist){
             console.log("deleted "+ {authorId}+"'s posts from your feed.")
     }
 
+    const handleButtonUnBlock=async()=>{
+        SetBlocked(false);
+        const blockRef = doc(db, `users/${auth.currentUser.uid}/blockedUsers`, `${authorId}`)
+        const docSnap = await getDoc(blockRef);
+        if(docSnap.exists()){ 
+        await deleteDoc(blockRef)
+    }
+
+    const blockRef2 = doc(db, `users/${authorId}/blockedUsers`, `${auth.currentUser.uid}`)
+    const docSnap2 = await getDoc(blockRef2);
+    if(docSnap2.exists()){ 
+    await deleteDoc(blockRef2)
+}
+
+}
+
+const handleButtonUnMute=async()=>{
+    SetMuted(false);
+    const blockRef = doc(db, `users/${auth.currentUser.uid}/mutedUsers`, `${authorId}`)
+    const docSnap = await getDoc(blockRef);
+    if(docSnap.exists()){ 
+    await deleteDoc(blockRef)
+}
+} 
+
+
+const handleButtonUnRestrict=async()=>{
+    SetRestricted(false);
+    const blockRef = doc(db, `users/${auth.currentUser.uid}/restrictedUsers`, `${authorId}`)
+    const docSnap = await getDoc(blockRef);
+    if(docSnap.exists()){ 
+    await deleteDoc(blockRef)
+}
+}
+
     const handleButttonUnfollow = async()=>{
         SetLoading(true);
         var i = 0;
@@ -257,13 +377,12 @@ if(!myfollow.exist){
             navigate(`/myprofile`);
             console.log("step2")
         }
-        SetSearchRes(false);
         }
 
 
   return (<div className="SearchResult">
     
-    <div style={{width:'20%', display:'flex', flexDirection:'row', backgroundColor:'transparent', marginRight:'45%', cursor:'pointer'}}  onClick={handleButtonSendToProfile} >
+    <div style={{width:'20%',display:'flex', flexDirection:'row', backgroundColor:'transparent', marginRight:'45%', cursor:'pointer'}}  onClick={handleButtonSendToProfile} >
     <Avatar
     alt="preview image"
     src={imageUrl}
@@ -272,11 +391,24 @@ if(!myfollow.exist){
     <h4 className='welcome'>{name}</h4>  
     </div>
 
-    { (authorId!=auth.currentUser.uid) && !loading && (
+    { (authorId!=auth.currentUser.uid) && !loading && typ===followString && (
     follow ? (<button className='icons' disabled={loading} onClick={handleButttonUnfollow}>Unfollow</button>):(
         <button className='icons' disabled={loading} onClick={handleButttonFollow}>Follow</button>
     )
     )}
+
+
+{(authorId!=auth.currentUser.uid) && !loading && typ==="block" && blocked && (
+<button className='icons' disabled={loading} onClick={handleButtonUnBlock}>UnBlock</button>)}
+
+{(authorId!=auth.currentUser.uid) && !loading && typ==="mute" && muted && (
+<button className='icons' disabled={loading} onClick={handleButtonUnMute}>UnMute</button>)}
+
+{(authorId!=auth.currentUser.uid) && !loading && typ==="restrict" && restricted && (
+<button className='icons' disabled={loading} onClick={handleButtonUnRestrict}>UnRestrict</button>)}
+
+{(authorId!=auth.currentUser.uid) && !loading && typ==="remove" && remove &&(
+<button className='icons' disabled={loading} onClick={handleButtonRemove}>Remove</button>)}
 
 { (authorId!=auth.currentUser.uid) && loading && (
     <button className='icons'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}</button>    
@@ -287,4 +419,4 @@ if(!myfollow.exist){
   </div>);
 }
 
-export default SearchResult;
+export default List;

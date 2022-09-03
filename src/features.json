@@ -1,0 +1,46 @@
+[
+{
+"name":"What is Lyfy?",
+"text":"Lyfy is a photo sharing app designed to keep you connected with friends and family."
+},
+{
+    "name":"My profile",
+    "text":"My profile is where you can see your posts. Here, you can view what you've shared, see a list of the people you're following and who's following you. You can set a bio and a link to your website for anyone to see. You can edit your profile from the Settings option available on the top rightmost dropdown menu on the header. "
+},
+{
+    "name":"Sharing and Deleting Photos",
+    "text":"You can share posts with images from captions from the second icon in the top right icons area. You will need to select an image and add a caption to your posts. Currently we support only square images which the user can crop and rotate as they like.Your followers will be able to see your post in their feed. \n \nFor deleting a post, click on the upper right option icon on the post and select 'delete'. The post will be deleted from all users feeds, saved posts and also the tag pages. You cannot retrieve a post once it has been deleted."
+},
+{
+    "name":"Chat with other users",
+    "text":"Users can send messages and media to each other by clicking the chat icon on the header."
+},
+{
+    "name":"Changing Password",
+    "text":"You can visit the Reset Password tab in the Settings menu to reset your password."
+},
+{
+    "name":"Add Hashtags",
+    "text":"We #supportHashtags! You can add a hashtag to your post and users will be able to find your post under the appropriate tags pages. Most used tags by all users will be shown on the side panel in the home screen."
+},
+{
+    "name":"Accept and Decline follow requests",
+    "text":"If your account is private, users can request to follow you.You will see a notification for this.You can accept or decline the request."
+},
+{
+    "name":"Like, Comment and Save",
+    "text":"A user can like a post, comment on it, reply to a comment on it and save the post. Saved posts can be seen by clicking on 'Saved Posts' option from the rightmost menu on the header.A like can also be given to a comment you like."
+},
+{
+    "name":"Threaded Comments",
+    "text":"Single comments are boring. Therefore you can have a whole conversation with another user! Reply to a comment or reply to a reply of a comment.. It goes on!"
+},
+{
+    "name":"Delete Comments",
+    "text":"Regret a comment? Delete it! Your comments have a bin icon on their upper right corner. Click it to delete the comment. \n \n Note: Single comments will be vanish when deleted however if it has replies, your username and comment will be shown as '[deleted]' to preserve the conversation."
+},
+{
+    "name":"Search Users and Hashtags",
+    "text":"The search bar on the header allows users to search for other users and hashtags.\n \nNote: You will not be able to search for users that have blocked you or have been blocked by you."
+}
+]

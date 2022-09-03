@@ -13,6 +13,7 @@ import {AiFillTag, AiOutlineVideoCamera} from 'react-icons/ai';
 import {FcGallery} from 'react-icons/fc';
 import {FcNext, FcPrevious} from 'react-icons/fc';
 import {MdKeyboardBackspace} from 'react-icons/md';
+import List from './List';
 
 import GridImg from './GridImg';
 import {BrowserRouter as Router, Link, Route, Routes} from 'react-router-dom';
@@ -48,6 +49,10 @@ function MyProfile() {
     const [index, SetIndex]=useState([]);
     const[collectionSize, SetCollectionSize]=useState();
     const[loading, SetLoading]= useState(true);
+    const[showFollowers, SetShowFollowers]= useState(false);
+    const[showFollowing, SetShowFollowing]= useState(false);
+    const[followerList, SetFollowerList]=useState(null);
+    const[followingList, SetFollowingList]=useState(null);
 
     const docRef = doc(db, "users", auth.currentUser.uid);
     let navigate = useNavigate(); 
@@ -72,7 +77,7 @@ function MyProfile() {
 
     const postsCollectionRef = collection(db, `users/${auth.currentUser.uid}/posts`);
 
-
+    const typeString = "follow"
     useEffect(()=>{
 
         const getUsersData = async () => {
@@ -211,11 +216,85 @@ if(index < collectionSize-1){
   const handleButtonEditProfile=()=>{
     navigate("/settings");
   }
+
+  const getFollowersList=async()=>{
+    try{
+    const docR = collection(db, `users/${auth.currentUser.uid}/followerList`)    
+    const docSnap =  await getDocs(docR);
+    console.log(docSnap)
+    
+    if (docSnap.size>0){
+    SetFollowerList(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
+    console.log("Got followers list")
+    }
+    
+  }catch(error){
+          console.log(error);
+        }
+    }
+
+    const getFollowingList=async()=>{
+      try{
+      const docR = collection(db, `users/${auth.currentUser.uid}/followingList`)    
+      const docSnap =  await getDocs(docR);
+      
+      if (docSnap.size>0){
+      SetFollowingList(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
+      }
+    }
+          catch(error){
+            console.log(error);
+          }
+      }
+
+
+      const handleButtonShowFollowers=async()=>{
+        try{
+          if(showFollowing===false){
+          await  getFollowersList();
+          SetShowFollowers(!showFollowers);}
+          else{
+            SetShowFollowers(!showFollowers);
+          }
+          }
+          catch(e){
+            console.log(e.message)
+          }
+          
+          }
+        
+          const handleButtonShowFollowing=async()=>{
+            if(showFollowing===false){
+            await getFollowingList();
+            SetShowFollowing(!showFollowing)}
+            else{
+              SetShowFollowing(!showFollowing)
+            }
+          }
+  
+  
+
  
   return (<div className="MyProfile">
     <nav>
   
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
+
+    {showFollowing && followingList !== null && (
+    <div className='list'>
+  {followingList.map((res)=>
+     <List authorId={res.id} typ={typeString} ></List>)}
+  </div>)}
+  
+  {showFollowers && followerList!==null && (
+      <div className='list'>
+        {followerList.map((res)=>
+  <div style={{width:'100%'}}>
+     <List authorId={res.id} typ={typeString}></List>
+  </div>
+  )}
+      </div>
+    )}
 
     {posts && focusImages && !grid &&
       (<div className="indPost">
@@ -240,7 +319,7 @@ if(index < collectionSize-1){
     <Avatar
     alt="preview image"
     src={currentPicUrl}
-    sx={{ width: 156, height: 156}}
+    sx={{ width: '100%', height: '100%'}}
     />
     </div>
     <div className='row'>
@@ -249,11 +328,11 @@ if(index < collectionSize-1){
       <div className='category'>Posts</div>
     </div>
     <div className='column'>
-      <div className='number'>{numberOFollowers}</div>
+      <div className='number' onClick={()=>{handleButtonShowFollowers()}}>{numberOFollowers}</div>
       <div className='category'>Followers</div>
     </div>
     <div className='column'>
-      <div className='number'>{numberOFollowing}</div>
+      <div className='number'  onClick={()=>{handleButtonShowFollowing()}}>{numberOFollowing}</div>
       <div className='category'>Following</div>
     </div>
     </div>  

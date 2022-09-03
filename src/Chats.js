@@ -4,7 +4,7 @@ import {ChatEngine} from 'react-chat-engine'
 import Header from './Header.js'
 import './css/Chats.css'
 import { db, auth, storage } from './firebase-config.js'
-import { collection, query, where, onSnapshot, getDoc, snapshotEqual,addDoc,updateDoc, doc , serverTimestamp, Timestamp, orderBy, setDoc} from 'firebase/firestore'
+import { collection, query, where, onSnapshot, getDoc,getDocs, snapshotEqual,addDoc,updateDoc, doc , serverTimestamp, Timestamp, orderBy, setDoc, FieldPath} from 'firebase/firestore'
 import User from './User.js'
 import Avatar from '@mui/material/Avatar';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
@@ -15,6 +15,8 @@ import { async } from '@firebase/util'
 import Attachment from './Attachment.js'
 import Message from './Message.js'
 import { update } from 'firebase/database'
+import * as ReactBootstrap from 'react-bootstrap'
+import { minHeight } from '@mui/system'
 
 const Chats=()=>{
 
@@ -28,6 +30,10 @@ const Chats=()=>{
     const [img, SetImg] = useState("");
     const [msgs, SetMsgs] = useState([]);
     const [val, setVal] = useState();
+    const[blocked, SetBlocked]= useState(null);
+    const[muted, SetMuted]= useState(null);
+    const[restricted, SetRestricted]= useState(null);
+    const[loading, SetLoading]=useState(true);
 
 
     useEffect(()=>{
@@ -35,8 +41,6 @@ const Chats=()=>{
         const getUsers=async()=>{
         const myRef = doc(db, "users", `${auth.currentUser.uid}`);
         const data = await getDoc(myRef);
-
-
 
         const userRef = collection(db, "users");
         const q = query(userRef, where('username', 'not-in', [data.data().username]));
@@ -48,9 +52,75 @@ const Chats=()=>{
             })
             SetUsers(users);
         })
+        SetLoading(false);
         return () => unsub();
         }
 
+        
+        const getStatus=async()=>{
+            let keys=[];
+            let keys2=[];
+            let keys3=[];
+  
+            var arrm =[];
+            const MuteRef = collection(db, `users/${auth.currentUser.uid}/mutedUsers`)
+            const muteSnap = await getDocs(MuteRef);
+            if(muteSnap.size>0){
+            let mymap = muteSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+            keys = [...mymap.values()]
+            keys.forEach((key)=>{
+              arrm.push(key.id);
+            })
+            if(arrm!==null){
+            SetMuted(arrm);}
+            else{
+              SetMuted([0]);
+            }
+            }else{
+              SetMuted([0]);
+            }
+  
+        
+            var arrr =[];
+            const restrictRef = collection(db, `users/${auth.currentUser.uid}/restrictedUsers`)
+            const resSnap = await getDocs(restrictRef);
+            if(resSnap.size>0){
+            let mymap2 = resSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+            keys2 = [...mymap2.values()]
+            keys2.forEach((key)=>{
+              arrr.push(key.id);
+            })
+            if(arrr!==null){
+            SetRestricted(arrr);}
+            else{
+              SetRestricted([0]);
+            }
+          }else{
+            SetRestricted([0]);
+          }
+        
+            var arrb =[];
+            const blockRef = collection(db, `users/${auth.currentUser.uid}/blockedUsers`)
+            const blockSnap = await getDocs(blockRef);
+            if(blockSnap.size>0){
+            let mymap3 = blockSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+            keys3 = [...mymap3.values()]
+            keys3.forEach((key)=>{
+              arrb.push(key.id);
+            })
+            console.log("keys"+arrb)
+            if(arrb!==null){
+            SetBlocked(arrb);}
+            else{
+              SetBlocked([0]);
+            }
+          }
+          else{
+            SetBlocked([0]);
+          }
+          }
+
+        getStatus();
         getUsers();
     }, [])
 
@@ -156,14 +226,28 @@ const Chats=()=>{
     return (
     <div className="Chats">
     <Header></Header>
-    <div style={{display:'flex', flexDirection:'row', width:'100%',  border:'1px solid grey', paddingTop:'7.9%', height:'100vh'}}>
+    <div style={{display:'flex', flexDirection:'row', width:'100%',  border:'1px solid grey', paddingTop:'100px',minHeight:'100vh'}}>
     <div style={{width:'30%', border:'1px solid grey', overflow:'scroll'}}>
+    {!loading &&(
     <div className='chatDrawer'>
-        {users.map(user => <User user={user} selectUser={selectUser} user1={auth.currentUser.uid} chat={chat}/>)}
+        
+        {users.map((user) => 
+
+        {if(blocked!==null && !blocked.includes(user))
+        return <User user={user} selectUser={selectUser} user1={auth.currentUser.uid} chat={chat}/>
+        }
+        )}
+    
+    </div>)}
+    {loading && (
+    <div style={{paddingLeft:'30%',paddingTop:'48%', color:'#666'}}>
+    {<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Getting users.....
     </div>
+    )}
+    
     </div> 
 
-{chat && (
+{chat && !blocked.includes(chat) && (
     <div style={{height:'80vh', width:'70%'}}>
     <div style={{height:'74vh'}}>
     <div style={{position:'relative',  display:'flex',flexDirection:'row',height:'fit-content', width:'100%',border:'1px solid grey'}}>
@@ -189,7 +273,7 @@ const Chats=()=>{
          </label>
             </div>
         <div style={{position:'relative',display:'flex', flexDirection:'row', width:'85%',backgroundColor:'transparent', marginBottom:'0px'}}>
-        <input placeholder="Message...." value={val} style={{position:'relative',height:'100%', width:'100%', color:'white', paddingLeft:'2%', paddingRight:'2%', fontSize:'large', border:'1px solid #333', borderRadius:'5px', backgroundColor:'#333'}} onChange={(event)=>{SetText(event.target.value)}}></input>
+        <input placeholder="Message...."  style={{position:'relative',height:'100%', width:'100%', color:'white', paddingLeft:'2%', paddingRight:'2%', fontSize:'large', border:'1px solid #333', borderRadius:'5px', backgroundColor:'#333'}} onChange={(event)=>{SetText(event.target.value)}}></input>
         </div>
         <div style={{position:'relative',width:'10%', height:'100%',paddingLeft:'1%',backgroundColor:'transparent',paddingTop:'7px' }}>
         <button style={{position:'relative',height:'100%', width:'92%', border:'1px solid #405cf5', borderRadius:'5px'}} onClick={()=>{handleSubmit()}}>Post</button>

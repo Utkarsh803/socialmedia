@@ -10,6 +10,7 @@ import {collection, getDocs, getDoc,addDoc, updateDoc, deleteDoc, doc, setDoc, s
 import { useNavigate } from "react-router-dom";
 import Settings from './Settings';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL } from "firebase/storage"
+import {signOut, onAuthStateChanged} from "firebase/auth";
 import {v4} from 'uuid'
 import { query, where, orderBy, limit } from "firebase/firestore";  
 import SearchResult from './SearchResult';
@@ -28,7 +29,8 @@ import * as ReactBootstrap from 'react-bootstrap'
 
 
 
-function Header({handleLogout, name}) {
+
+function Header() {
 
   const[profileMenu, SetProfileMenu]=useState(false);
   const[addPost, SetAddPost]=useState(false);
@@ -53,6 +55,11 @@ function Header({handleLogout, name}) {
   const [rotation,setRotation] = useState(0)
   const[croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const[loading,setLoading]=useState(false);
+  const[blocked, SetBlocked]= useState([]);
+  const[muted, SetMuted]= useState([]);
+  const[restricted, SetRestricted]= useState([]);
+
+
 
   let navigate = useNavigate(); 
   let notifRef = useRef();
@@ -108,7 +115,47 @@ function Header({handleLogout, name}) {
     document.addEventListener("mousedown", handler6);
     document.addEventListener("mousedown", handler7);
 
+    const getStatus=async()=>{
+      let keys=[];
+      let keys2=[];
+      let keys3=[];
+  
+      var arrm =[];
+      const MuteRef = collection(db, `users/${auth.currentUser.uid}/mutedUsers`)
+      const muteSnap = await getDocs(MuteRef);
+      if(muteSnap.size>0){
+      let mymap = muteSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+      keys = [...mymap.values()]
+      keys.forEach((key)=>{
+        arrm.push(key.id);
+      })
+      SetMuted(arrm);}
+  
+      var arrr =[];
+      const restrictRef = collection(db, `users/${auth.currentUser.uid}/restrictedUsers`)
+      const resSnap = await getDocs(restrictRef);
+      if(resSnap.size>0){
+      let mymap2 = resSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+      keys2 = [...mymap2.values()]
+      keys2.forEach((key)=>{
+        arrr.push(key.id);
+      })
+      SetRestricted(arrr);}
+  
+      var arrb =[];
+      const blockRef = collection(db, `users/${auth.currentUser.uid}/blockedUsers`)
+      const blockSnap = await getDocs(blockRef);
+      if(blockSnap.size>0){
+      let mymap3 = blockSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+      keys3 = [...mymap3.values()]
+      keys3.forEach((key)=>{
+        arrb.push(key.id);
+      })
+      console.log("keys"+arrb)
+      SetBlocked(arrb);}
+    }
 
+    getStatus();
     getPostsStats();
     return()=>{
       document.removeEventListener("mousedown", handler)
@@ -121,9 +168,16 @@ function Header({handleLogout, name}) {
     }
     }, [] );
 
+    const logout = async () =>
+    {
+            await signOut(auth);
+            navigate('/');
+          
+    }
 
    const search = async(name) =>{
     SetSearchInput(name);
+    getStatus();
     const charact = name.substring(0,1);
     if(charact !== '#'){
     console.log(name);
@@ -133,6 +187,7 @@ function Header({handleLogout, name}) {
     const querySnapshot = await getDocs(q);
       SetSearchRes(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
       SetSearchResHash(null);
+      console.log("blocked"+blocked)
     }
     else{
       SetSearchRes(null);
@@ -154,7 +209,15 @@ function Header({handleLogout, name}) {
   
   
   }
+
+  const getPrivate=async()=>{
+    const docRef = doc(db, `users`,`${auth.currentUser.uid}`)
+    const docSnap = await getDoc(docRef);
+    return docSnap.data().private
+  }
   
+
+
   const getPostsStats=async()=>{
     const docRef = doc(db, `users`,`${auth.currentUser.uid}`)
 
@@ -309,9 +372,50 @@ catch(error)
     SetPercent(0);
   }
 
+  const getStatus=async()=>{
+    let keys=[];
+    let keys2=[];
+    let keys3=[];
+
+    var arrm =[];
+    const MuteRef = collection(db, `users/${auth.currentUser.uid}/mutedUsers`)
+    const muteSnap = await getDocs(MuteRef);
+    if(muteSnap.size>0){
+    let mymap = muteSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+    keys = [...mymap.values()]
+    keys.forEach((key)=>{
+      arrm.push(key.id);
+    })
+    SetMuted(arrm);}
+
+    var arrr =[];
+    const restrictRef = collection(db, `users/${auth.currentUser.uid}/restrictedUsers`)
+    const resSnap = await getDocs(restrictRef);
+    if(resSnap.size>0){
+    let mymap2 = resSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+    keys2 = [...mymap2.values()]
+    keys2.forEach((key)=>{
+      arrr.push(key.id);
+    })
+    SetRestricted(arrr);}
+
+    var arrb =[];
+    const blockRef = collection(db, `users/${auth.currentUser.uid}/blockedUsers`)
+    const blockSnap = await getDocs(blockRef);
+    if(blockSnap.size>0){
+    let mymap3 = blockSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+    keys3 = [...mymap3.values()]
+    keys3.forEach((key)=>{
+      arrb.push(key.id);
+    })
+    console.log("keys"+arrb)
+    SetBlocked(arrb);}
+  }
+
   
   const handleButtonNext = async() => {
     setLoading(true);
+    getStatus();
     console.log("Height", imageFile.height)
     console.log("Weight", imageFile.width )
     if(imageFile.width==imageFile.height){
@@ -374,6 +478,7 @@ catch(error)
    const createPost = async() =>{
     var hashtagArray = caption.match(/#[\p{L}]+/ugi);
     console.log("This post has hashtags"+hashtagArray);
+    var privat = await getPrivate();
     if(hashtagArray === null){
       hashtagArray=0;
     };
@@ -397,7 +502,7 @@ catch(error)
       const postsNum= docSnap.data().posts;
 
       var arr=[];
-      if(hashtagArray !== 0 && hashtagArray.length!=0){
+      if(hashtagArray !== 0 && hashtagArray.length!=0 && !privat){
       for(const hash of hashtagArray){
         const hashRef= doc(db, "hashtags", `${hash}`);
         const hashVal = await transaction.get(hashRef);
@@ -429,7 +534,7 @@ catch(error)
         console.log("Step3")
 
       var a=0;
-      if(hashtagArray !== 0 && hashtagArray.length!=0){
+      if(hashtagArray !== 0 && hashtagArray.length!=0 && !privat){
       for(const hashVal of arr ){
       console.log(arr[a].hashVal)
       
@@ -499,6 +604,7 @@ catch(error)
       //addToFeed(addedDoc.id);
       
       data.forEach((docc) => {
+        if(!blocked.includes(docc.id)&&!restricted.includes(docc.id)){
   
         console.log(docc.id, " => ", docc.data());
         const feedRef = doc(db, `feed/${docc.id}/posts`, `${usersCollectionRef.id}`);
@@ -515,7 +621,7 @@ catch(error)
         })
 
        // SetFollowersList(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
-       console.log("Added doc to"+ docc.id +"'s feed.");  
+       console.log("Added doc to"+ docc.id +"'s feed.");}
       });
       
       
@@ -677,6 +783,10 @@ catch(error)
     navigate("/saved-posts");
    }
 
+   const goToHelpCenter=()=>{
+    navigate("/help");
+   }
+
    const handleButtonChats=()=>{
     navigate("/chats");
    }
@@ -692,7 +802,8 @@ catch(error)
     <div ref={searchRef}>
     {
     searchRes.map((res)=>
-    {return <div  style={{width:'60%', marginLeft:'4%'}} >
+    {if(!blocked.includes(res.id))
+      return <div  style={{width:'60%', marginLeft:'4%'}} >
      <SearchResult name={res.username} authorId={res.id} url={res.profilePic} SetSearchRes={SetSearchRes}></SearchResult>
       </div>;
     })
@@ -716,7 +827,7 @@ catch(error)
     {addPost && (
     <div class="middletray" ref={addPostRef}>
         <button className='addMedia' onClick={handleButtonUploadImage}> <BiImageAdd className='selectionIcon' />  Add Image</button>
-        <button className='addMedia'><AiOutlineVideoCameraAdd className='selectionIcon' /> Add Video</button>
+        <button className='addMedia' disabled={true}><AiOutlineVideoCameraAdd className='selectionIcon' /> Add Video (Coming Soon)</button>
     </div>
   )}
 
@@ -863,8 +974,8 @@ catch(error)
         <button className='selection'  onClick={goToMyProfile}> <CgProfile className='selectionIcon'/>  My Profile</button>
         <button className='selection' onClick={goToSettings}><AiFillSetting className='selectionIcon' />  Settings</button>
         <button className='selection'  onClick={goToSavedPosts}><FaRegBookmark className='selectionIcon' /> Saved</button>
-        <button className='selection'><BiHelpCircle className='selectionIcon'/>  Help Center</button>
-        <button className='selection' onClick={handleLogout}>Logout</button>
+        <button className='selection'  onClick={goToHelpCenter}><BiHelpCircle className='selectionIcon'/>  Help Center</button>
+        <button className='selection' onClick={logout}>Logout</button>
       </ul>
     </div>
   )}

@@ -1,8 +1,8 @@
 .Chats{
-  background-color:black;
   color: aliceblue;
-
-
+  background-color:black;
+  height:fit-content;
+  min-height: 80vh;
     }
     
     .Chats button{

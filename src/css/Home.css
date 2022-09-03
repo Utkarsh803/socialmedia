@@ -1,6 +1,9 @@
 .Home{
   color: aliceblue;
   background-color:rgba(0, 0, 0, 0.896);
+  background-color:rgb(31, 30, 30);
+  height:fit-content;
+  min-height: 80vh;
   }
   
   .Home button{

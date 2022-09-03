@@ -2,12 +2,12 @@ import './css/Login.css';
 import Home from './Home.js';
 import {useState, useEffect} from 'react';
 import writeUserData from './writeUserData';
-import {createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInWithEmailAndPassword} from "firebase/auth";
+import {createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInWithEmailAndPassword, sendEmailVerification} from "firebase/auth";
 import {auth} from './firebase-config';
 import {db} from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp} from 'firebase/firestore';
+import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, where, serverTimestamp, query, getDoc} from 'firebase/firestore';
 import { BrowserRouter as Router, Switch, 
-    Route,Outlet, Link ,Redirect, useNavigate} from "react-router-dom";
+    Route,Outlet, Link ,Redirect, useNavigate, Navigate} from "react-router-dom";
 import LoginHeader from './LoginHeader';
 import  Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -30,26 +30,57 @@ function Login() {
     const [name, setUserName]=useState("");
     const [user, setUser] = useState({});
     const [loading, setLoading] = useState(false);
+    const [loadingR, setLoadingR] = useState(false);
+    const [linkSent, setLinkSent] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+    const [errorMsgName, setErrorMsgName] = useState("");
+    const [errorMsgLogin, setErrorMsgLogin] = useState("");
 
 
-
+const navigate = useNavigate();
     const register = async () =>
     {
-        setLoading(true);
-        try
-        {
-            await createUserWithEmailAndPassword(auth, registerEmail, registerPassword ).then((result)=>{
-
-            addToDatabase();
-            }).catch((error)=>{
-                console.log(error)});
-            
-        setLoading(false);
-        } 
-        catch(error)
-        {
-            console.log(error.message);
+        setLoadingR(true);
+        setLinkSent(false);
+            var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+            if(!format.test(name) && !hasWhiteSpace(name)){
+            const nameRef = collection(db, "users");
+            const q = query(nameRef, where("name", "==", `${name}`), )
+            const querySnapshot = await getDocs(q);
+            if(querySnapshot.size !== 0){
+            setErrorMsgName("Username is not available.")
+            return ;
+            }
+            else{
+                setUserName(name);
+                setErrorMsgName(null)
+            }
         }
+        else{
+            setErrorMsgName("Special characters and spaces are not allowed")
+            return ;
+        }
+        console.log("username valid");
+
+        const duplicate = await duplicateEmail(registerEmail);
+
+        if(duplicate){
+            return;
+        }
+            await createUserWithEmailAndPassword(auth, registerEmail, registerPassword ).then((result)=>{
+            addToDatabase();
+            console.log("created account");
+            sendEmailVerification(auth.currentUser);
+            setErrorMsg(null);
+            setLinkSent(true);
+            setLoadingR(false);
+            }).catch((error)=>{
+                console.log(error.message)
+                setErrorMsg(error.message)
+                setLoadingR(false);
+                return;
+            });
+
     }
 
     const addToDatabase = async () =>
@@ -178,16 +209,22 @@ function Login() {
     const login = async () =>
     {
         setLoading(true);
+        setErrorMsgLogin(null);
         try
         {
             const user = await signInWithEmailAndPassword(auth, loginEmail, loginPassword );
             setUserId(auth.currentUser.uid);
-        
-            console.log(user);
+          
+            if(!auth.currentUser.emailVerified){
+                setErrorMsgLogin("Please verify your email.")
+            }else{
+            navigate('/');
+            console.log(auth.currentUser.uid);}
         } 
         catch(error)
         {
             console.log(error.message);
+            setErrorMsgLogin(error.message);
         }
         setLoading(false);
     }
@@ -198,26 +235,108 @@ function Login() {
 
     }
 
+    function hasWhiteSpace(s) {
+        return s.indexOf(' ') >= 0;
+      }
+
+    const handleSetUsername=async(value)=>{
+
+        var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+        if(!format.test(value) && !hasWhiteSpace(value)){
+        const nameRef = collection(db, "users");
+        const q = query(nameRef, where("username", "==", `${value}`))
+        const querySnapshot = await getDocs(q);
+
+        if(querySnapshot.size !== 0){
+        setErrorMsgName("Username is not available.")
+        }
+        else{
+            setUserName(value);
+            setErrorMsgName(null)
+        
+        }
+    }
+    else{
+        setErrorMsgName("Special characters and spaces are not allowed")
+    }
+    }
 
 
-    return (<div className="Login">
+
+    const handleSetEmail=async(value)=>{
+        setLinkSent(null)
+        const nameRef = collection(db, "users");
+        const q = query(nameRef, where("email", "==", `${value}`))
+        const querySnapshot = await getDocs(q);
+        console.log(querySnapshot.size);
+        if(querySnapshot.size !== 0){
+        setErrorMsgName("Email already in use.")
+        }
+        else{
+            setRegisterEmail(value);
+            setErrorMsgName(null)
+            
+        }
+    }
     
-    <div style={{backgroundColor:'black'}}>    
+
+    const duplicateEmail=async(value)=>{
+        setLinkSent(null)
+        const nameRef = collection(db, "users");
+        const q = query(nameRef, where("email", "==", `${value}`))
+        const querySnapshot = await getDocs(q);
+        console.log(querySnapshot.size);
+        if(querySnapshot.size !== 0){
+        setErrorMsgName("Email already in use.")
+        return true;
+        }
+        else{
+            setErrorMsgName(null)
+            return false;
+        }
+    }
+
+
+
+    const goToPasswordReset=()=>{
+        navigate('/passwordReset');
+    }
+
+
+    return (<div className="Login"> 
     <LoginHeader></LoginHeader>
+    <div style={{backgroundColor:'black', height:'100%'}}>   
     <div className='divider'>
     <div className="half">
     <div className='heading'>Register</div>
-    <input placeholder='Name...' className='input' onChange={(event)=>{setUserName(event.target.value);}}></input>
-    <input placeholder='Email...' className='input' onChange={(event)=>{setRegisterEmail(event.target.value);}}></input>
-    <input placeholder='Password...' type="password" className='input'  onChange={(event)=>{setRegisterPassword(event.target.value);}}></input>
-    {!loading ?(
-    <button style={{width:'100%'}} disabled={loading} onClick={register}>Sign Up</button>):(
+    {linkSent &&
+    (<small style={{color:'green', textAlign:'center'}}>Email Verification Link Sent!!</small>)}
+    {errorMsg && errorMsgName &&(
+        <small style={{color:'red', textAlign:'center'}}>{errorMsgName}</small>
+    )}
+
+    {errorMsg && !errorMsgName &&(
+        <small style={{color:'red', textAlign:'center'}}>{errorMsg}</small>
+    )}
+
+{!errorMsg && errorMsgName &&(
+        <small style={{color:'red', textAlign:'center'}}>{errorMsgName}</small>
+    )}
+
+    <input placeholder='Name...' className='input' required={true}  onChange={(event)=>{handleSetUsername(event.target.value);}}></input>
+    <input placeholder='Email...' className='input'  required={true}  onChange={(event)=>{handleSetEmail(event.target.value);}}></input>
+    <input placeholder='Password...' type="password"  required={true}  className='input'  onChange={(event)=>{setRegisterPassword(event.target.value);}}></input>
+    {!loadingR ?(
+    <button style={{width:'100%'}} disabled={errorMsgName} onClick={register}>Sign Up</button>):(
     <button style={{ width:'100%'}} >{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Registering ....</button>)}
     
     </div>
 
     <div className="half" >
     <div className='heading'>Login</div>
+    {errorMsgLogin && (
+        <small style={{color:'red', textAlign:'center'}}>{errorMsgLogin}</small>
+    )}
     <input placeholder='Email...' className='input' onChange={(event)=>{setLoginEmail(event.target.value);}}></input>
     <input placeholder='Password...' type="password" className='input' onChange={(event)=>{setLoginPassword(event.target.value);}}></input>
   {!loading ?(
@@ -226,7 +345,7 @@ function Login() {
 
     <div className="forgotPass">
      Forgot password?{' '}
-    Click here.
+  <small style={{color:'lightblue', cursor:'pointer'}} onClick={goToPasswordReset}>Click here.</small> 
     </div>
     </div>
     </div>
