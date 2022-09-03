@@ -1,6 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react'
 import {useHistory} from 'react-router-dom'
-import {ChatEngine} from 'react-chat-engine'
 import Header from './Header.js'
 import './css/Chats.css'
 import { db, auth, storage } from './firebase-config.js'
