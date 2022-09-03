@@ -44,11 +44,11 @@ useEffect(()=>{
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       setLike(true);
-      console.log("You have not liked this post.");
+     
     } else {
       setLike(false);
       // doc.data() will be undefined in this case
-      console.log("You have not liked this post.");
+     
     }
 };
 
@@ -59,11 +59,11 @@ const getSave = async () => {
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
     setMark(true);
-    console.log("You have not liked this post.");
+    
   } else {
     setMark(false);
     // doc.data() will be undefined in this case
-    console.log("You have not liked this post.");
+   
   }
 };
 
@@ -71,7 +71,7 @@ const getComments=async()=>{
   const comRef = collection(db, `users/${authorId}/comments/${postid}/ids`)
   const data = await getDocs(comRef)
   SetCommentTree(createTree(data.docs.map((doc)=>({...doc.data()}))));
-  console.log("got comments");
+
 }
 
 const getCommentNum=async()=>{
@@ -80,7 +80,7 @@ const getCommentNum=async()=>{
 
   if(data.exists()){
     SetTotalComments(data.data().totalComments);
-    console.log("There are"+data.data().totalComments+"comments on this post");
+    
   }
   else{
     SetTotalComments(null);
@@ -109,7 +109,7 @@ const incCommentNum=async()=>{
   const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
   const newfield={totalComments:totalComments+1};
   const data = updateDoc(comRef, newfield);
-  console.log("total counts updated");
+  
     });
   }
   catch(e){
@@ -131,7 +131,7 @@ const addTotalPostComments=async()=>{
         
         const newfield={totalComments: docRef.data().totalComments+1};
         transaction.update(comRef, newfield);
-        console.log("total counts updated");
+      
 
     const num=docRef.data().totalComments+1;
      const usersCollectionRef = doc(db, `/users/${authorId}/comments/${postid}/ids`, `${num}`);
@@ -146,16 +146,11 @@ const addTotalPostComments=async()=>{
        timeStamp:Timestamp.fromDate(new Date()),
             });      
      // SetTotalComments(totalComments+1);
-      console.log("Author ID: "+authorId);
-      console.log("Post ID: "+postid);
-      console.log("Added a comment");
-
+  
     
     const newFields1 = {comments: docRef1.data().comments + 1};
     transaction.update(userDoc, newFields1);
 
-    console.log(authorId)
-    console.log( auth.currentUser.uid)
 
     if(authorId != auth.currentUser.uid){
     transaction.set((doc(NotRef)),{
@@ -189,8 +184,7 @@ const addToPostComments=async()=>{
   const addComment=async()=>{    
       addTotalPostComments();
       addToPostComments();
-      console.log(authorId)
-      console.log( auth.currentUser.uid)
+
       if(authorId != auth.currentUser.uid){
     await addDoc(NotRef,{
       type:"comment",
@@ -200,7 +194,7 @@ const addToPostComments=async()=>{
       timeStamp:Timestamp.fromDate(new Date()),
     
     })
-    console.log("Posted a notification about a comment.")
+    
   }
 }
 
@@ -212,9 +206,7 @@ try{
   const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
   const newFields = {likes: likes + 1};
   await updateDoc(userDoc, newFields);   
-  console.log("Author ID: "+authorId);
-  console.log("Post ID: "+postid);
-  console.log("updated a like on the post.");
+ 
 }
 catch(error){
   console.log(error);
@@ -226,9 +218,7 @@ const subToPostLikes=async()=>{
     const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
     const newFields = {likes: likes - 1};
     await updateDoc(userDoc, newFields);   
-    console.log("Author ID: "+authorId);
-    console.log("Post ID: "+postid);
-    console.log("updated a like on the post.");
+
   }
   catch(error){
     console.log(error);
@@ -240,8 +230,7 @@ const subToPostLikes=async()=>{
       const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
       const newFields = {saved: saveNum + 1};
       await updateDoc(userDoc, newFields);   
-      console.log("Author ID: "+authorId);
-      console.log("Post ID: "+postid);
+     
       SetSaveNum(saveNum+1);
     }
     catch(error){
@@ -254,8 +243,7 @@ const subToPostLikes=async()=>{
         const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
         const newFields = {saved: saveNum - 1};
         await updateDoc(userDoc, newFields);   
-        console.log("Author ID: "+authorId);
-        console.log("Post ID: "+postid);
+       
         SetSaveNum(saveNum-1);
 
       }
@@ -275,9 +263,7 @@ const addTotalPostLikes=async()=>{
        await setDoc(usersCollectionRef,{
          timeStamp:serverTimestamp()
        });      
-        console.log("Author ID: "+authorId);
-        console.log("Post ID: "+postid);
-        console.log("Added a like");
+        
         if(authorId != auth.currentUser.uid){
            await addDoc(NotRef,{
             type:"like",
@@ -286,7 +272,7 @@ const addTotalPostLikes=async()=>{
             postid:postid,
             timeStamp:Timestamp.fromDate(new Date()),
           })
-          console.log("Posted a notification about a like.")
+          
          }
          } 
    catch(error)
@@ -305,9 +291,7 @@ const addTotalPostSaves=async()=>{
        authorID: authorId,
        timeStamp:serverTimestamp()
      });      
-      console.log("Author ID: "+authorId);
-      console.log("Post ID: "+postid);
-      console.log("Added to your saved list.");
+
 
        } 
  catch(error)
@@ -323,9 +307,7 @@ const subTotalPostSaves=async()=>{
   {  
      const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/savedPosts`,`${postid}`);
       await deleteDoc(usersCollectionRef);      
-      console.log("Author ID: "+authorId);
-      console.log("Post ID: "+postid);
-      console.log("Removed from saved list.");
+     
 
        } 
  catch(error)
@@ -341,9 +323,7 @@ const subTotalPostLikes=async()=>{
   {  
      const usersCollectionRef = doc(db, `/users/${authorId}/likes/${postid}/ids`, `${auth.currentUser.uid}`);
      await deleteDoc(usersCollectionRef);      
-      console.log("Author ID: "+authorId);
-      console.log("Post ID: "+postid);
-      console.log("Removed your like");
+  
        } 
  catch(error)
  {
@@ -366,9 +346,7 @@ const handleButtonLike=async()=> {
        transaction.set(usersCollectionRef,{
          timeStamp:serverTimestamp()
        });      
-        console.log("Author ID: "+authorId);
-        console.log("Post ID: "+postid);
-        console.log("Added a like");
+        
         if(authorId != auth.currentUser.uid){
            transaction.set(doc(NotRef),{
             type:"like",
@@ -377,15 +355,13 @@ const handleButtonLike=async()=> {
             postid:postid,
             timeStamp:Timestamp.fromDate(new Date()),
           })
-          console.log("Posted a notification about a like.")
+         
          }
 
          
           const newFields = {likes: docslike.data().likes + 1};
           transaction.update(userDoc, newFields);   
-          console.log("Author ID: "+authorId);
-          console.log("Post ID: "+postid);
-          console.log("updated a like on the post.");
+          
         });
         setLike(true);
          } 
@@ -407,15 +383,12 @@ const handleButtonUnlike=async()=> {
 
       const usersCollectionRef = doc(db, `/users/${authorId}/likes/${postid}/ids`, `${auth.currentUser.uid}`);
       transaction.delete(usersCollectionRef);      
-       console.log("Author ID: "+authorId);
-       console.log("Post ID: "+postid);
-       console.log("Removed your like");
+    
+   
 
        const newFields = {likes: docslike.data().likes - 1};
        transaction.update(userDoc, newFields);   
-       console.log("Author ID: "+authorId);
-       console.log("Post ID: "+postid);
-       console.log("updated a like on the post.");
+    
 
       });
       setLike(false);
@@ -444,9 +417,7 @@ const handleButtonUnlike=async()=> {
       authorID: authorId,
       timeStamp:serverTimestamp()
     });      
-     console.log("Author ID: "+authorId);
-     console.log("Post ID: "+postid);
-     console.log("Added to your saved list.");
+     
 
      transaction.set(doc(db, `users/${authorId}/saveRef/${postid}/nodes`, `${auth.currentUser.uid}`), {
       createdAt:serverTimestamp()
@@ -454,8 +425,7 @@ const handleButtonUnlike=async()=> {
 
      const newFields = {saved: docRef.data().saved + 1};
      transaction.update(userDoc, newFields);   
-     console.log("Author ID: "+authorId);
-     console.log("Post ID: "+postid);
+    
      //SetSaveNum(saveNum+1);
   })
 
@@ -476,16 +446,13 @@ const handleButtonUnlike=async()=> {
        const docRef = await transaction.get(userDoc) 
 
         transaction.delete(usersCollectionRef);      
-        console.log("Author ID: "+authorId);
-        console.log("Post ID: "+postid);
-        console.log("Removed from saved list.");
+       
 
         transaction.delete(doc(db, `users/${authorId}/SaveRef/${postid}/nodes`, `${auth.currentUser.uid}`));
 
         const newFields = {saved: docRef.data().saved - 1};
         transaction.update(userDoc, newFields);   
-        console.log("Author ID: "+authorId);
-        console.log("Post ID: "+postid);
+        
 //        SetSaveNum(saveNum-1);
       });
       setMark(false);

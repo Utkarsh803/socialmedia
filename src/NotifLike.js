@@ -45,7 +45,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
 
         if(docSnap.exists()){
             SetMyFollow(docSnap.data().following);
-            console.log("this"+docSnap.data().following);
+           
         }
         else{
                 console.log("error");
@@ -56,7 +56,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
 
         if(docSnap2.exists()){
             SetFollowing(docSnap2.data().followers);
-            console.log("their"+docSnap2.data().followers);
+            
         }
         else{
                 console.log("error");
@@ -99,8 +99,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
 
             if(type!="follow"){
             const postRef = doc(db, `users/${auth.currentUser.uid}/posts`, `${postid}`)
-            console.log({authorId});
-            console.log({postid})
+          
             const postData = await getDoc(postRef);
 
             getDownloadURL(ref(storage, `/${auth.currentUser.uid}/${postData.data().url}`))
@@ -144,7 +143,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
         SetFollowing(following+1);
         await updateDoc(followingdocRef,newfield1);
         await updateDoc(followerdocRef,newfield2);
-        console.log("follow stats updated.");
+        
         }
         catch(error){
             console.log(error);
@@ -161,7 +160,6 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
         SetFollowing(following-1);
         await updateDoc(followingdocRef,newfield1);
         await updateDoc(followerdocRef,newfield2);
-        console.log("follow stats updated.")
         }
         catch(error){
             console.log(error);
@@ -182,7 +180,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
         await setDoc(followingRef,{
             timeStamp:serverTimestamp()
         });
-        console.log(authorId+"has a new follower.");
+       
     }
         catch(error){
             console.log(error);
@@ -194,7 +192,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
             author:authorId,
             timeStamp:serverTimestamp(),
           })
-          console.log("Posted a notification about a follow.")
+          
     }
 
     const deleteFeed = async()=>{
@@ -202,9 +200,9 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
         const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
             deleteDoc(doc(db, `feed/${auth.currentUser.uid}/posts/${doc.id}`))
-            console.log(doc.id);    
+            
         });
-            console.log("deleted "+ {authorId}+"'s posts from your feed.")
+            
     }
 
     const handleButttonUnfollow = async()=>{
@@ -218,7 +216,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
         const followingRef = doc(db, `users/${authorId}/followerList`, `${auth.currentUser.uid}`)
 
         await deleteDoc(followingRef);
-        console.log(authorId+"has one less follower.");
+      
     }
         catch(error){
             console.log(error);
@@ -273,13 +271,13 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
       transaction.set(followRef,{
           timeStamp:serverTimestamp(),
       });
-      console.log("You are now followed by"+authorId);
+      
 
    
       transaction.set(followingRef,{
           timeStamp:serverTimestamp()
       });
-      console.log(auth.currentUser.uid+"has a new follower.");
+      
 
       
       const newfield1 = {following:  docfollowingdocRef.data().following + 1};
@@ -288,7 +286,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
 
       transaction.update(followingdocRef,newfield1);
       transaction.update(followerdocRef,newfield2);
-      console.log("follow stats updated.");
+      
 
       const NotRef = collection(db, `users/${auth.currentUser.uid}/notifications`);
        transaction.set(doc(NotRef),{
@@ -306,7 +304,7 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
        timeStamp:Timestamp.fromDate(new Date()),
      })
 
-      console.log("Posted a notification about a follow.")
+      
 
       const thisRef = doc(db, `users/${auth.currentUser.uid}/notifications`, `${identifier}`);
       await deleteDoc(thisRef);

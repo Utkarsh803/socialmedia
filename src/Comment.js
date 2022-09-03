@@ -51,7 +51,6 @@ const Comment = ({ comment })=> {
         getDownloadURL(ref(storage, `${comment.author}/${docSnap.data().profilePic}`))
         .then((url) => {
           SetImageUrl(url);
-        console.log("got profile pic")
         })
         .catch((error) => {
           // A full list of error codes is available at
@@ -84,7 +83,7 @@ const Comment = ({ comment })=> {
         
             if(data.exists()){
               SetTotalComments(data.data().totalComments);
-              console.log("There are"+data.data().totalComments+"comments on this post");
+             
             }
             else{
               SetTotalComments(null);
@@ -128,13 +127,11 @@ const Comment = ({ comment })=> {
          timeStamp:Timestamp.fromDate(new Date()),
        });      
        SetTotalComments(totalComments+1);
-        console.log("Author ID: "+comment.postAuthor);
-        console.log("Post ID: "+comment.postid);
-        console.log("Added a comment");
+
          } 
    catch(error)
    {
-       console.log(error.message);
+       
        console.log("Comment was not registered :("); 
    }
   }
@@ -143,7 +140,7 @@ const Comment = ({ comment })=> {
     const comRef = doc(db, `users/${comment.postAuthor}/comments`, `${comment.postid}`)
     const newfield={totalComments:totalComments+1};
     const data = updateDoc(comRef, newfield);
-    console.log("total counts updated  incCommentNum");
+ 
   }
 
   const addToPostComments=async()=>{
@@ -151,7 +148,7 @@ const Comment = ({ comment })=> {
       const userDoc = doc(db, `/users/${comment.postAuthor}/posts`, `${comment.postid}`);
       const newFields = {comments: totalComments + 1};
       await updateDoc(userDoc, newFields);
-      console.log("total counts updated addPostComments");
+     
     }
     catch(error){
       console.log(error);
@@ -177,7 +174,7 @@ const Comment = ({ comment })=> {
           
           const newfield={totalComments: docRef.data().totalComments+1, validComments: docRef.data().validComments+1};
           transaction.update(comRef, newfield);
-          console.log("total counts updated");
+        
   
       const num=docRef.data().totalComments+1;
        const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${num}`);
@@ -194,11 +191,7 @@ const Comment = ({ comment })=> {
          timeStamp:Timestamp.fromDate(new Date()),
               });      
        // SetTotalComments(totalComments+1);
-        console.log("Author ID: "+comment.postAuthor);
-        console.log("Post ID: "+comment.postid);
-        console.log("Added a comment");
-  
-      
+ 
       const newFields1 = {comments: docRef1.data().comments + 1};
       transaction.update(userDoc, newFields1);
 
@@ -217,8 +210,7 @@ const Comment = ({ comment })=> {
          } 
    catch(error)
    {
-       console.log(error.message);
-       console.log("Comment was not registered :("); 
+      console.log("Comment was not registered :("); 
    }
 
 }
@@ -232,7 +224,7 @@ const docRef = updateDoc(usersCollectionRef,{
 })
 
 SetCommentLikes(commentLikes+1);
-console.log("added likes")
+
 }
 
 
@@ -243,7 +235,7 @@ await setDoc(docRef, {
   createdAt:Timestamp.fromDate(new Date()),
   author:auth.currentUser.uid,
 })
-console.log("added user to ike list")
+
 }
 
   const handleButtonLike=async()=>{
@@ -261,14 +253,14 @@ console.log("added user to ike list")
     })
 
    // SetCommentLikes(commentLikes+1);
-    console.log("added likes")
+   
 
    
     transaction.set(docRef1, {
       createdAt:Timestamp.fromDate(new Date()),
       author:auth.currentUser.uid,
     })
-    console.log("added user to ike list")
+    
   });
   }
   catch(e){
@@ -285,7 +277,7 @@ const  subCommentLikes=()=>{
   })
   
   SetCommentLikes(commentLikes-1);
-  console.log("subbed likes")
+
   }
   
   
@@ -293,7 +285,7 @@ const  subCommentLikes=()=>{
   const  subUserToLikeList=async()=>{
   const docRef = doc(db, `/users/${comment.postAuthor}/commentsLikes/${comment.postid}/ids/${comment.id}/ids`, `${auth.currentUser.uid}`);
   await deleteDoc(docRef)
-  console.log("deleted user to ike list")
+
   }
   
 
@@ -313,11 +305,11 @@ const  subCommentLikes=()=>{
         })
         
        // SetCommentLikes(commentLikes-1);
-        console.log("subbed likes")
+       
 
         
         transaction.delete(docRef1)
-        console.log("deleted user to ike list")
+        
 
       })
   }
@@ -334,7 +326,7 @@ console.log(e.message)
   }
 
   const deleteNestedComment=async()=>{
-    console.log("Deleting nested commen.t")
+  
     try{
       await runTransaction(db, async (transaction) => {   
    
@@ -344,7 +336,7 @@ console.log(e.message)
       author:"[deleted]",
     });      
 
-     console.log("deleted a comment");
+
       })
     }catch(e)
     {
@@ -355,8 +347,7 @@ console.log(e.message)
   const deleteComment=async()=>{
     try{
       await runTransaction(db, async (transaction) => {
-            
-    console.log("Process began")   
+  
     const comRef = doc(db, `users/${comment.postAuthor}/comments`, `${comment.postid}`)
     const docRef = await transaction.get(comRef) 
   
@@ -368,7 +359,7 @@ console.log(e.message)
     const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${comment.id}`);
     transaction.delete(usersCollectionRef);      
 
-    console.log("deleted a comment");
+
       })
     }catch(e)
     {

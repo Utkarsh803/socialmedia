@@ -47,7 +47,7 @@ const Chats=()=>{
             let users = []
             querySnapshot.forEach(doc=>{
                 users.push(doc.id)
-                console.log("pushed a user", doc.id);
+              
             })
             SetUsers(users);
         })
@@ -107,7 +107,7 @@ const Chats=()=>{
             keys3.forEach((key)=>{
               arrb.push(key.id);
             })
-            console.log("keys"+arrb)
+           
             if(arrb!==null){
             SetBlocked(arrb);}
             else{
@@ -123,14 +123,13 @@ const Chats=()=>{
         getUsers();
     }, [])
 
-    console.log(users);
+   
 
     const selectUser=async(user)=>{
         SetPicUrl(null);
         SetChat(user);
         fetchData(user);
-        console.log(user);
-
+      
         const id = auth.currentUser.uid > user ? `${auth.currentUser.uid +user}` : `${user + auth.currentUser.uid}`
 
         const msgsRef = collection(db, `messages/${id}/chat`)
@@ -154,7 +153,7 @@ const Chats=()=>{
 
     };
 
-    console.log(msgs);
+
     const handleSubmit=async()=>{
         if(img!==null && text!==null && text!==""){
         setVal(()=>"");
@@ -188,7 +187,7 @@ const Chats=()=>{
         });
 
 
-            console.log("Chat posted.");
+         
             SetText("");
     }
     }

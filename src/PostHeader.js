@@ -69,7 +69,7 @@ function PostHeader({name, url, postid, authorId, typ, tags}) {
           await runTransaction(db, async (transaction) => { 
         const feedRef = doc(db, `feed/${auth.currentUser.uid}/posts`, `${postid}`)
         transaction.delete(feedRef);
-        console.log("We will not show this post")
+        
           });}
           catch(e){
             console.log(e.message);
@@ -104,7 +104,7 @@ function PostHeader({name, url, postid, authorId, typ, tags}) {
        if(dRef.exists()){
         transaction.update(docRef, {reported : dRef.data().reported + 1})
        }
-       console.log("post has been reported")
+       
       })
       SetReported(true);
     }
@@ -121,7 +121,7 @@ const handleButtonNext=async()=>{
   
     const oldHashtagArray = tags;
     var hashtagArray = caption.match(/#[\p{L}]+/ugi);
-    console.log("New caption has hashtags"+hashtagArray);
+   
 
 
     const added =  hashtagArray.filter(x => !oldHashtagArray.includes(x))
@@ -131,7 +131,7 @@ const handleButtonNext=async()=>{
 
       
   });
-  console.log("Post edited.");
+ 
   SetEdit(false);
   SetCaption(null);
   }  
@@ -155,7 +155,7 @@ const editPost=()=>{
     const docRef = doc(db, `users/${authorId}/posts/`, `${postid}`)
     transaction.update(docRef, {allowComments:false});
   });
-  console.log("Comments turned off");
+  
   SetOption(false);
   SetCommentStatus(false);
   }  
@@ -171,7 +171,7 @@ const turnOnComments=async()=>{
     const docRef = doc(db, `users/${authorId}/posts/`, `${postid}`)
     transaction.update(docRef, {allowComments:true});
   });
-  console.log("Comments turned on");
+
   SetOption(false);
   SetCommentStatus(true);
   }  
@@ -208,7 +208,7 @@ const deletePost=async()=>{
       arr.push({hashVal:hashVal, hashRef:hashRef, hash:hash});
     }}
 
-    console.log("arr[] :", arr);
+  
 
       const pid = authorId + postid;
 
@@ -217,21 +217,20 @@ const deletePost=async()=>{
       for(const hashVal of arr ){
       transaction.update(arr[a].hashRef, {val:(arr[a].hashVal).data().val-1});
       transaction.delete(doc(db, `hashtags/${arr[a].hash}/posts`, `${pid}`))
-      console.log(`hashtags/${arr[a].hash}/posts`, `${pid}`);
+     
       a=a+1;
     }}
 
-    console.log("deleted posts from hashtags");
+  
    
     transaction.update(docRef, {deleted:true});
     const newfield1 = {posts: postsNum - 1};
     transaction.update(followingdocRef,newfield1);
-     console.log("Post stats updated.");
-
+     
   feedSnap.forEach((docc)=>{
   transaction.delete(doc(db, `feed/${docc.id}/posts`, `${postid}`));
   });
-  console.log("Step1");
+ 
 
   transaction.delete(doc(db, `users/${authorId}/feedRef`, `${postid}`));
 
@@ -241,14 +240,13 @@ const deletePost=async()=>{
     b = b+1;
     });
 
-    console.log("Step2");
 
   transaction.delete(doc(db, `users/${authorId}/saveRef`, `${postid}`));
 
   transaction.update(docRef, {saved:saveDocGet.data().saved-b});
-  console.log("Step3");
+ 
   });
-  console.log("deleted post");
+ 
   SetOption(false);
   }  
   catch(e){
@@ -262,7 +260,7 @@ const archivePost=async()=>{
     const docRef = doc(db, `users/${authorId}/posts/`, `${postid}`)
     transaction.update(docRef, {archived:true});
   });
-  console.log("deleted post");
+ 
   SetOption(false);
   }  
   catch(e){

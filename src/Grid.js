@@ -42,7 +42,7 @@ const getUserPost =async()=>{
     getDownloadURL(ref(storage, `${authorId}/${docSnap.data().url}`))
     .then((url) => {
       SetPostUrl(url);
-      console.log("Post image set!!!");
+   
       SetLoading(false);
     })
     .catch((error) => {

@@ -59,7 +59,7 @@ const navigate = useNavigate();
             setErrorMsgName("Special characters and spaces are not allowed")
             return ;
         }
-        console.log("username valid");
+        
 
         const duplicate = await duplicateEmail(registerEmail);
 
@@ -68,13 +68,13 @@ const navigate = useNavigate();
         }
             await createUserWithEmailAndPassword(auth, registerEmail, registerPassword ).then((result)=>{
             addToDatabase();
-            console.log("created account");
+         
             sendEmailVerification(auth.currentUser);
             setErrorMsg(null);
             setLinkSent(true);
             setLoadingR(false);
             }).catch((error)=>{
-                console.log(error.message)
+                
                 setErrorMsg(error.message)
                 setLoadingR(false);
                 return;
@@ -135,7 +135,7 @@ const navigate = useNavigate();
         await setDoc(doc(db,  `/users/${auth.currentUser.uid}/following`, `${uid}`), {
             totalFollowing:0,
            });        
-        console.log("A Following list was created for the post: ");   
+ 
          } 
    catch(error)
    {
@@ -151,7 +151,7 @@ const navigate = useNavigate();
         await setDoc(doc(db,  `/users/${auth.currentUser.uid}/saved`, `${uid}`), {
             totalSaves:0,
            });        
-        console.log("A Savedlist was created for the post: ");   
+          
          } 
    catch(error)
    {
@@ -165,7 +165,7 @@ const navigate = useNavigate();
       await setDoc(doc(db,  `/users/${auth.currentUser.uid}/blocked`, `${uid}`), {
         totalBlocked:0,
        });         
-        console.log("A Blocked list was created for the post: ");   
+          
          } 
    catch(error)
    {
@@ -180,7 +180,7 @@ const navigate = useNavigate();
       await setDoc(doc(db,  `/users/${auth.currentUser.uid}/restricted`, `${uid}`), {
         totalRestricted:0,
        });         
-        console.log("A Restricted list was created for the post: ");   
+       
          } 
    catch(error)
    {
@@ -196,7 +196,7 @@ const navigate = useNavigate();
       await setDoc(doc(db,  `/users/${auth.currentUser.uid}/muted`, `${uid}`), {
         totalMuted:0,
        });         
-        console.log("A Muted list was created for the post: ");   
+           
          } 
    catch(error)
    {
@@ -218,7 +218,7 @@ const navigate = useNavigate();
                 setErrorMsgLogin("Please verify your email.")
             }else{
             navigate('/');
-            console.log(auth.currentUser.uid);}
+           }
         } 
         catch(error)
         {
@@ -267,7 +267,7 @@ const navigate = useNavigate();
         const nameRef = collection(db, "users");
         const q = query(nameRef, where("email", "==", `${value}`))
         const querySnapshot = await getDocs(q);
-        console.log(querySnapshot.size);
+        
         if(querySnapshot.size !== 0){
         setErrorMsgName("Email already in use.")
         }
@@ -284,7 +284,7 @@ const navigate = useNavigate();
         const nameRef = collection(db, "users");
         const q = query(nameRef, where("email", "==", `${value}`))
         const querySnapshot = await getDocs(q);
-        console.log(querySnapshot.size);
+   
         if(querySnapshot.size !== 0){
         setErrorMsgName("Email already in use.")
         return true;

@@ -150,7 +150,7 @@ function Header() {
       keys3.forEach((key)=>{
         arrb.push(key.id);
       })
-      console.log("keys"+arrb)
+   
       SetBlocked(arrb);}
     }
 
@@ -179,21 +179,21 @@ function Header() {
     getStatus();
     const charact = name.substring(0,1);
     if(charact !== '#'){
-    console.log(name);
+    
     if(name != '' && name!=null){
     const citiesRef = collection(db, "users");
     const q = query(citiesRef, where("username", ">=", `${name}`), where("username", "<=", `${name + "~"}`), limit(3));
     const querySnapshot = await getDocs(q);
       SetSearchRes(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
       SetSearchResHash(null);
-      console.log("blocked"+blocked)
+     
     }
     else{
       SetSearchRes(null);
     }}
     else{
 
-      console.log(name);
+ 
     if(name != ''){
     const citiesRef = collection(db, "hashtags");
     const q = query(citiesRef, where("tag", ">=", `${name}`), where("tag", "<=", `${name + "~"}`), limit(3));
@@ -223,7 +223,7 @@ function Header() {
     const q = query(docRef);
     onSnapshot(q, querySnapshot=>{
       SetNumPosts(querySnapshot.data().posts);
-      console.log("NUm of posts",querySnapshot.data().posts);
+   
     })
 
 
@@ -238,7 +238,7 @@ function Header() {
       const followingdocRef = doc(db, `users`, `${auth.currentUser.uid}`)
       const newfield1 = {posts: numPosts + 1};
       await updateDoc(followingdocRef,newfield1);
-      console.log("Post stats updated.");
+     
       SetNumPosts(numPosts+1);
       }
       catch(error){
@@ -272,12 +272,11 @@ function Header() {
     () => {
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          console.log(url);
-          console.log(imgName);
+         
         });
     }
 ); 
-console.log('image upload successful!');
+
 }
 
 catch(error){
@@ -407,7 +406,7 @@ catch(error)
     keys3.forEach((key)=>{
       arrb.push(key.id);
     })
-    console.log("keys"+arrb)
+ 
     SetBlocked(arrb);}
   }
 
@@ -415,8 +414,7 @@ catch(error)
   const handleButtonNext = async() => {
     setLoading(true);
     getStatus();
-    console.log("Height", imageFile.height)
-    console.log("Weight", imageFile.width )
+
     if(imageFile.width==imageFile.height){
     await createPost();
   }else{
@@ -442,7 +440,7 @@ catch(error)
     if (event.target.files && event.target.files[0]) {
       SetImage(URL.createObjectURL(event.target.files[0]));
       SetImageFile(event.target.files[0]);
-      console.log("Height", (event.target.files[0]).size)
+     
 
     }
    }
@@ -454,7 +452,7 @@ catch(error)
     
     data.forEach((docc) => {
 
-      console.log(docc.id, " => ", docc.data());
+     
       const feedRef = doc(db, `feed/${docc.id}/posts`, `${postid}`);
 
       setDoc(feedRef, {
@@ -464,7 +462,7 @@ catch(error)
       });
 
      // SetFollowersList(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
-     console.log("Added doc to"+ docc.id +"'s feed.");  
+     
     });
   
   }
@@ -476,7 +474,7 @@ catch(error)
 
    const createPost = async() =>{
     var hashtagArray = caption.match(/#[\p{L}]+/ugi);
-    console.log("This post has hashtags"+hashtagArray);
+
     var privat = await getPrivate();
     if(hashtagArray === null){
       hashtagArray=0;
@@ -485,11 +483,10 @@ catch(error)
     try
     {
     await runTransaction(db, async (transaction) => { 
-      console.log("Step0")   
+     
       const followerRef = collection(db, `users/${auth.currentUser.uid}/followerList`);
       const data = await getDocs(followerRef);
-      console.log("Step1")
-
+      
       const blockRef = collection(db, `users/${auth.currentUser.uid}/blockedUsers`)
       const block = await getDocs(blockRef);
 
@@ -508,12 +505,12 @@ catch(error)
         arr.push({hashVal:hashVal, hashRef:hashRef, hash:hash});
       }}
 
-      console.log("Step2")
+   
 
        await addToStorage(imageName);
-       console.log("Step2i")
+     
        const usersCollectionRef = doc(collection(db, `/users/${auth.currentUser.uid}/posts`));
-       console.log("Step2ii")
+       
        const addedDoc =  transaction.set(usersCollectionRef, {
         authorID: auth.currentUser.uid,
         likes:0,
@@ -530,15 +527,15 @@ catch(error)
         timeStamp:Timestamp.fromDate(new Date()),
         });       
 
-        console.log("Step3")
+   
 
       var a=0;
       if(hashtagArray !== 0 && hashtagArray.length!=0 && !privat){
       for(const hashVal of arr ){
-      console.log(arr[a].hashVal)
+     
       
         if((arr[a].hashVal).exists()){
-          console.log("Hashtag exists "+ arr[a].hash);
+         
           transaction.update(arr[a].hashRef, {val:(arr[a].hashVal).data().val+1});
         
           const pid = auth.currentUser.uid + usersCollectionRef.id;
@@ -554,7 +551,7 @@ catch(error)
         
         }
         else{
-          console.log("Hashtag does not exists "+ arr[a].hash);
+        
           transaction.set(doc(db, `hashtags`, `${arr[a].hash}`), {
             tag:arr[a].hash,
             val:1,
@@ -572,23 +569,22 @@ catch(error)
             createdAt:Timestamp.fromDate(new Date()),
           });
 
-          console.log("added post to hastag array")
           a=a+1;
         }
       }
-        console.log("Step4")
+       
         
          transaction.set(doc(db,  `/users/${auth.currentUser.uid}/album`, `${usersCollectionRef.id}`), {
           img:imageName,
          });         
-          console.log("Image added to album with url : "+ imageName);   
+             
           
        // createLikeList(addedDoc.id);
         
          transaction.set(doc(db,  `/users/${auth.currentUser.uid}/likes`, `${usersCollectionRef.id}`), {
           totalLikes:0,
          });         
-          console.log("A like list was created for the post: "+usersCollectionRef.id);   
+          
 
       //  createCommentList(addedDoc.id);
 
@@ -596,7 +592,7 @@ catch(error)
           totalComments:0,
           validComments:0,
          });       
-          console.log("A comment list was created for the post: "+ usersCollectionRef.id); 
+         
       
       
       
@@ -605,7 +601,7 @@ catch(error)
       data.forEach((docc) => {
         if(!blocked.includes(docc.id)&&!restricted.includes(docc.id)){
   
-        console.log(docc.id, " => ", docc.data());
+      
         const feedRef = doc(db, `feed/${docc.id}/posts`, `${usersCollectionRef.id}`);
   
         transaction.set(feedRef, {
@@ -620,7 +616,7 @@ catch(error)
         })
 
        // SetFollowersList(data.docs.map((doc)=>({...doc.data(), id: doc.id})));
-       console.log("Added doc to"+ docc.id +"'s feed.");}
+      }
       });
       
       
@@ -629,8 +625,7 @@ catch(error)
         
         const newfield1 = {posts: postsNum + 1};
         transaction.update(followingdocRef,newfield1);
-        console.log("Post stats updated.");
-        console.log("Post ID : "+ usersCollectionRef.id);
+     
         })
         SetNumPosts(numPosts+1);
       }     
@@ -654,7 +649,7 @@ catch(error)
       await setDoc(doc(db,  `/users/${auth.currentUser.uid}/likes`, `${postId}`), {
         totalLikes:0,
        });         
-        console.log("A like list was created for the post: "+ postId);   
+         
          } 
    catch(error)
    {
@@ -670,7 +665,7 @@ catch(error)
        await setDoc(doc(db,  `/users/${auth.currentUser.uid}/comments`, `${postId}`), {
         totalComments:0,
        });       
-        console.log("A comment list was created for the post: "+ postId);   
+        
          } 
    catch(error)
    {
@@ -685,7 +680,7 @@ catch(error)
       await setDoc(doc(db,  `/users/${auth.currentUser.uid}/followers`, `${uid}`), {
         totalFollowers:0,
        });         
-        console.log("A Follower list was created for the post: ");   
+          
          } 
    catch(error)
    {
@@ -701,7 +696,7 @@ catch(error)
         await setDoc(doc(db,  `/users/${auth.currentUser.uid}/following`, `${uid}`), {
             totalFollowing:0,
            });        
-        console.log("A Following list was created for the post: ");   
+           
          } 
    catch(error)
    {
@@ -716,9 +711,7 @@ catch(error)
     {  
         await setDoc(doc(db,  `/users/${auth.currentUser.uid}/saved`, `${uid}`), {
             totalSaves:0,
-           });        
-        console.log("A Savedlist was created for the post: ");   
-         } 
+           });          } 
    catch(error)
    {
        console.log(error.message);
@@ -731,7 +724,7 @@ catch(error)
       await setDoc(doc(db,  `/users/${auth.currentUser.uid}/blocked`, `${uid}`), {
         totalBlocked:0,
        });         
-        console.log("A Blocked list was created for the post: ");   
+        
          } 
    catch(error)
    {
@@ -746,7 +739,7 @@ catch(error)
       await setDoc(doc(db,  `/users/${auth.currentUser.uid}/restricted`, `${uid}`), {
         totalRestricted:0,
        });         
-        console.log("A Restricted list was created for the post: ");   
+       
          } 
    catch(error)
    {
@@ -762,7 +755,7 @@ catch(error)
       await setDoc(doc(db,  `/users/${auth.currentUser.uid}/muted`, `${uid}`), {
         totalMuted:0,
        });         
-        console.log("A Muted list was created for the post: ");   
+     
          } 
    catch(error)
    {

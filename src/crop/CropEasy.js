@@ -23,7 +23,7 @@ const cropImage = async () => {
         rotation
       );
       if(file!==null){
-        console.log("got file")
+        
         var binaryData = [];
         binaryData.push(url);
       this.SetImage(URL.createObjectURL(new Blob(binaryData, {type: "application/text"})));

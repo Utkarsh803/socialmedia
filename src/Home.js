@@ -29,16 +29,6 @@ function Home() {
     useEffect(()=>{
 
 
-      fetch('https://the-dune-api.herokuapp.com/quotes/3')
-      .then((response)=>response.json())
-      .then((data)=>{
-        console.log("Array of Dune Quotes");
-        console.log(data);
-      })
-      .catch((err)=>{
-        console.log(err.message);
-      });
-
 
       const getFeed=async()=>{
         try {
@@ -114,7 +104,7 @@ function Home() {
       keys3.forEach((key)=>{
         arrb.push(key.id);
       })
-      console.log("keys"+arrb)
+      
       if(arrb!==null){
       SetBlocked(arrb);}
       else{
@@ -128,7 +118,7 @@ function Home() {
 
       getStatus();
       getFeed();
-      console.log("got feed");
+      
     }, [] );
 
 
@@ -159,7 +149,7 @@ function Home() {
     {if ((blocked!==null) && (!(blocked.includes(post.author))&&!(muted.includes(post.author))))
       return <div className="indPost">
       <FeedPost postid={post.postID} authorId={post.author} allowComments={post.allowComments}></FeedPost>
-      {console.log("feed is not null")}
+     
       </div>
       
     })))}

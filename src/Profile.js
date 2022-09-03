@@ -30,7 +30,6 @@ function Profile() {
 
    
     const {uid} =useParams();
-    console.log("Welcome to", {uid});
     const piid = {uid}
     const [name, setName]=useState("");    
     const [username, SetUserName]=useState("");
@@ -120,7 +119,7 @@ function Profile() {
         });}
 
     const getUserPost =async()=>{
-      console.log("loading1: ", loading);
+     
       const q = query(postsCollectionRef,orderBy('timeStamp', 'desc'))
       onSnapshot(q, querySnapshot=>{
         if(querySnapshot.size>0){
@@ -129,7 +128,7 @@ function Profile() {
         let keys = [...mymap.values()]
         SetCollectionSize(keys.length);
         SetPostArray(keys);
-        console.log("There are "+((keys.length)-1)+" posts");
+      
         SetLoading(false);
       }
         else{
@@ -193,10 +192,10 @@ function Profile() {
     const getOwnProfile=()=>{
       if(auth.currentUser.uid===uid){
         navigate("/myProfile");
-        console.log("own profile")
+        
       }
-      console.log(uid);
-    console.log("Not own profile")
+      
+    
     }
 
 
@@ -223,7 +222,7 @@ function Profile() {
     keys3.forEach((key)=>{
       arrb.push(key.id);
     })
-    console.log("keys"+arrb)
+    
     if(arrb!==null){
     SetBlockedList(arrb);}
     else{
@@ -264,7 +263,7 @@ function Profile() {
 
         if(docSnap2.exists()){
             SetFollowing(docSnap2.data().followers);
-            console.log("their"+docSnap2.data().followers);
+         
         }
         else{
                 console.log("error");
@@ -284,7 +283,7 @@ function Profile() {
           SetFollowing(following+1);
           await updateDoc(followingdocRef,newfield1);
           await updateDoc(followerdocRef,newfield2);
-          console.log("follow stats updated.");
+          
           }
           catch(error){
               console.log(error);
@@ -301,7 +300,7 @@ function Profile() {
           SetFollowing(following-1);
           await updateDoc(followingdocRef,newfield1);
           await updateDoc(followerdocRef,newfield2);
-          console.log("follow stats updated.")
+        
           }
           catch(error){
               console.log(error);
@@ -325,15 +324,13 @@ function Profile() {
           author:auth.currentUser.uid,
           timeStamp:Timestamp.fromDate(new Date()),
         })
-        console.log("Posted a notification about a request.")
-
+        
         const reqRef = doc(db, `users/${auth.currentUser.uid}/profileRequests`, `${uid}`);
         transaction.set(reqRef, {
           createdAt:serverTimestamp(),
           declined:false,
         })
 
-        console.log("sent request");
      
       })
       SetRequest(true);      
@@ -364,13 +361,13 @@ function Profile() {
         transaction.set(followRef,{
             timeStamp:serverTimestamp(),
         });
-        console.log("You are now folowing"+name);
+       
 
      
         transaction.set(followingRef,{
             timeStamp:serverTimestamp()
         });
-        console.log(uid+"has a new follower.");
+       
 
         
         const newfield1 = {following:  docfollowingdocRef.data().following + 1};
@@ -379,7 +376,7 @@ function Profile() {
 
         transaction.update(followingdocRef,newfield1);
         transaction.update(followerdocRef,newfield2);
-        console.log("follow stats updated.");
+       
 
         const NotRef = collection(db, `users/${uid}/notifications`);
          transaction.set(doc(NotRef),{
@@ -388,7 +385,7 @@ function Profile() {
           author:auth.currentUser.uid,
           timeStamp:Timestamp.fromDate(new Date()),
         })
-        console.log("Posted a notification about a follow.")
+       
       i=1;
       }
       });
@@ -411,10 +408,10 @@ function Profile() {
       const q = query(collection(db, `feed/${auth.currentUser.uid}/posts`), where("author", "==", `${uid}`));
       const querySnapshot = await getDocs(q);
           querySnapshot.forEach((docc) => {
-            console.log(docc.id);  
+          
             deleteDoc(doc(db, `feed/${auth.currentUser.uid}/posts/${docc.id}`))
           });
-          console.log("deleted posts from your feed.")
+         
   }
 
     const handleButtonUnfollow = async()=>{
@@ -432,11 +429,10 @@ function Profile() {
 
         if(myfollow.exists()){
         transaction.delete(followRef);
-        console.log("You are not following"+name+" anymore");
+        
 
         transaction.delete(followingRef);
-        console.log(uid+"has one less follower.");
-
+        
 
         const newfield1 = {following: docFollowingdocRef.data().following - 1};
         
@@ -444,15 +440,15 @@ function Profile() {
        
         transaction.update(followingdocRef,newfield1);
         transaction.update(followerdocRef,newfield2);
-        console.log("follow stats updated.")
+       
 
         const q = query(collection(db, `feed/${auth.currentUser.uid}/posts`), where("author", "==", `${uid}`));
         const querySnapshot = await getDocs(q);
             querySnapshot.forEach((docc) => {
-              console.log(docc.id);  
+            
               transaction.delete(doc(db, `feed/${auth.currentUser.uid}/posts/${docc.id}`))
             });
-            console.log("deleted posts from your feed.")
+            
           i=1;
           }
         
@@ -507,7 +503,7 @@ function Profile() {
   function getPostPic(imgName){
   getDownloadURL(ref(storage, `${uid}/${imgName}`))
   .then((url) => {
-    console.log("Profile Pic Downloaded");
+    
     return url;
   })
   .catch((error) => {
@@ -536,7 +532,7 @@ function Profile() {
     postArray.forEach((post)=>{
       if(post.id === item){
         SetIndex(index);
-        console.log("index",index);
+        
       }
       else{
         index=index+1;
@@ -553,7 +549,7 @@ function Profile() {
       const goToPreviousPost = () => {
         if(index >= 1 ){
           SetIndex((index) => index - 1);
-        console.log("going to previous post")
+       
       }
       };
 
@@ -569,7 +565,7 @@ function Profile() {
     await setDoc(restrictRef, {
       createdAt:serverTimestamp(),
     })
-    console.log("restricted")
+    
   }
 
   const handleButtonMute=async()=>{
@@ -578,7 +574,7 @@ function Profile() {
     await setDoc(MuteRef, {
       createdAt:serverTimestamp(),
     })
-    console.log("muted")
+    
   }
 
   const handleButtonBlock=async()=>{
@@ -591,25 +587,25 @@ function Profile() {
     const myDoc = await getDoc(myRef)
     const theirRef = doc(db, `users`, `${uid}`)
     const theirDoc = await getDoc(theirRef)
-    console.log("step95")
+   
 
     const ownfollowerRef = doc(db, `users/${auth.currentUser.uid}/followerList`, `${uid}`)
     const a =await getDoc(ownfollowerRef)
 
-    console.log("step96")
+    
     
     const ownfollowingRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${uid}`)
     const b =await getDoc(ownfollowingRef)
 
-    console.log("step97")    
+       
     const theirfollowerRef = doc(db, `users/${uid}/followerList`, `${auth.currentUser.uid}`)
     const c =await getDoc(theirfollowerRef)
 
-    console.log("step98")
+   
     const theirfollowingRef = doc(db, `users/${uid}/followingList`, `${auth.currentUser.uid}`)
     const d =await getDoc(theirfollowingRef)
 
-    console.log("step99")
+ 
     const block2Ref = doc(db, `users/${uid}/blockedUsers`, `${auth.currentUser.uid}`)
 
 
@@ -619,10 +615,7 @@ function Profile() {
     const postDocs = await getDocs(postsRef);
     let mymap = postDocs.docs.map((doc)=>({...doc.data(), id: doc.id}))
     postids = [...mymap.values()]
-    console.log("postids")
-    console.log(postids)
-
-    console.log("step100")
+  
 
 
     for(const docc of postids){
@@ -636,10 +629,7 @@ function Profile() {
       const querySnapshot = await getDocs(q);
       let mymap2 = querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id}))
       commentids = [...mymap2.values()]
-      console.log("commentids")
-      console.log(commentids)
-
-      console.log("step1")
+    
       //remove post like
       const likesRef = doc(db, `users/${auth.currentUser.uid}/likes/${docc.id}/ids`, `${uid}`) 
       const likesDoc = await getDoc(likesRef);
@@ -647,32 +637,26 @@ function Profile() {
         deleteDoc(likesRef);
         updateDoc(postidRef,{likes:postidDocs.data().likes-1})
       }
-      console.log("removed a like")
-
-      console.log("step2")
+   
 
             //remove all comments
       for(const commentDoc of  commentids){
       if(commentDoc.child===0){
-        console.log("step3")
-        console.log(commentDoc.id)
-            
-        console.log("Process began")   
+   
+  
         const comRef = doc(db, `users/${auth.currentUser.uid}/comments`, `${docc.id}`)
         const docRef = await getDoc(comRef) 
-        console.log("step4")
-      
+        
         const newfield={validComments:docRef.data().validComments-1};
         updateDoc(comRef, newfield);
        
-        console.log("step5")
+     
       
        
         const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/comments/${docc.id}/ids`, `${commentDoc.id}`);
         
         deleteDoc(usersCollectionRef);      
-        console.log("step6")
-        console.log("deleted a comment");
+       
       
       }
       else{
@@ -681,11 +665,9 @@ function Profile() {
           comment: "[deleted]",
           author:"[deleted]",
         });      
-        console.log("step6")
-
-        console.log("deleted a comment");
+      
       }
-      };      console.log("step7")
+      };      
     
     }
 
@@ -719,7 +701,7 @@ function Profile() {
           origin:auth.currentUser.uid,
         })
 
-    console.log("blockeded")
+   
     SetOptions(false);
   }
   catch(e){
@@ -736,7 +718,7 @@ function Profile() {
     if(docSnap.exists()){ 
     await deleteDoc(restrictRef)
   }
-  console.log("UnRestricted")
+
   }
 
   const handleButtonUnMute=async()=>{
@@ -746,7 +728,7 @@ function Profile() {
     if(docSnap.exists()){ 
     await deleteDoc(MuteRef)
   }
-  console.log("Unmuted")
+ 
   }
 
   const handleButtonUnBlock=async()=>{
@@ -763,12 +745,12 @@ function Profile() {
     await deleteDoc(block2Ref);
   }
   
-  console.log("unblocked")
+  
   }
 
 
   const handleButtonOptions=()=>{
-    console.log("open");
+  
     SetOptions(!options);
   }
 
@@ -782,11 +764,11 @@ function Profile() {
     try{
     const docR = collection(db, `users/${uid}/followerList`)    
     const docSnap =  await getDocs(docR);
-    console.log(docSnap)
+    
     
     if (docSnap.size>0){
     SetFollowerList(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
-    console.log("Got followers list")
+   
     }
     
   }catch(error){

@@ -41,7 +41,7 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
 
         if(docSnap.exists()){
             SetMyFollow(docSnap.data().following);
-            console.log("this"+docSnap.data().following);
+            
         }
         else{
                 console.log("error");
@@ -52,7 +52,7 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
 
         if(docSnap2.exists()){
             SetFollowing(docSnap2.data().followers);
-            console.log("their"+docSnap2.data().followers);
+          
         }
         else{
                 console.log("error");
@@ -104,7 +104,7 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
         SetFollowing(following+1);
         await updateDoc(followingdocRef,newfield1);
         await updateDoc(followerdocRef,newfield2);
-        console.log("follow stats updated.");
+        
         }
         catch(error){
             console.log(error);
@@ -121,7 +121,7 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
         SetFollowing(following-1);
         await updateDoc(followingdocRef,newfield1);
         await updateDoc(followerdocRef,newfield2);
-        console.log("follow stats updated.")
+     
         }
         catch(error){
             console.log(error);
@@ -146,19 +146,19 @@ if(!myfollow.exist){
         transaction.set(followRef,{
             timeStamp:serverTimestamp(),
         });
-        console.log("You are now folowing"+name);
+ 
 
         
         transaction.set(followingRef,{
             timeStamp:serverTimestamp(),
         });
-        console.log(authorId+"has a new follower.");
+        
 
         const newfield1 = {following: docfollowingdocRef.data().following + 1};
         const newfield2 = {followers: docfollowerdocRef.data().followers + 1};
         transaction.update(followingdocRef,newfield1);
         transaction.update(followerdocRef,newfield2);
-        console.log("follow stats updated.");
+    
 
         transaction.set(doc(NotRef),{
             type:"follow",
@@ -166,7 +166,7 @@ if(!myfollow.exist){
             author:auth.currentUser.uid,
             timeStamp:Timestamp.fromDate(new Date()),
           })
-          console.log("Posted a notification about a follow.")
+       
           i=1;}
         });
 
@@ -187,9 +187,9 @@ if(!myfollow.exist){
         const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
             deleteDoc(doc(db, `feed/${auth.currentUser.uid}/posts/${doc.id}`))
-            console.log(doc.id);    
+               
         });
-            console.log("deleted "+ {authorId}+"'s posts from your feed.")
+            
     }
 
     const handleButttonUnfollow = async()=>{
@@ -210,10 +210,10 @@ if(!myfollow.exist){
         
         if(myfollow.exists()){
         transaction.delete(followRef);
-        console.log("You are not following"+name+" anymore");
+       
 
         transaction.delete(followingRef);
-        console.log(authorId+"has one less follower.");
+       
 
 
         const newfield1 = {following: docFollowingdocRef.data().following - 1};
@@ -222,14 +222,14 @@ if(!myfollow.exist){
       
         transaction.update(followingdocRef,newfield1);
         transaction.update(followerdocRef,newfield2);
-        console.log("follow stats updated.")
+      
 
 
         const q = query(collection(db, `feed/${auth.currentUser.uid}/posts`), where("author", "==", `${authorId}`));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
         transaction.delete(doc(db, `feed/${auth.currentUser.uid}/posts/${doc.id}`))
-        console.log(doc.id);    
+       
         
     });
     i=1;
@@ -247,15 +247,14 @@ if(!myfollow.exist){
     }
 
     const handleButtonSendToProfile=()=>{
-        console.log("step1")
+       
        if (auth.currentUser.uid != authorId){
        navigate(`/profile/${authorId}`);
-       console.log("sent to ", authorId);
-       console.log("step2")
+      
         }
         else{
             navigate(`/myprofile`);
-            console.log("step2")
+         
         }
         SetSearchRes(false);
         }

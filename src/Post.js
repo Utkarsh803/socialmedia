@@ -34,7 +34,7 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
     const newfield={totalComments:totalComments+1};
     const data = updateDoc(comRef, newfield);
 
-    console.log("total counts updated");
+  
   }
 
   useEffect(()=>{
@@ -44,7 +44,7 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
     
         if(data.exists()){
           SetTotalComments(data.data().validComments);
-          console.log("There are"+data.data().validComments+"comments on this post");
+        
         }
         else{
           SetTotalComments(null);
@@ -145,9 +145,7 @@ const addTotalPostComments=async()=>{
        timeStamp:Timestamp.fromDate(new Date()),
      });      
       SetTotalComments(totalComments+1);
-      console.log("Author ID: "+authorId);
-      console.log("Post ID: "+postid);
-      console.log("Added a comment");
+ 
        } 
  catch(error)
  {
@@ -175,23 +173,22 @@ const addToPostComments=async()=>{
       await runTransaction(db, async (transaction) => {   
     
     
-      console.log("Process began")
+      
     const NotRef = collection(db, `users/${authorId}/notifications`);   
    
-    console.log("Step1")
+  
     const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
-    console.log("Step2")
+
     const docRef = await transaction.get(comRef) 
-    console.log("Step3")
-    console.log(docRef.data())
+
   
     const userDoc = doc(db, `/users/${authorId}/posts`, `${postid}`);
-    console.log("Step4")
+
     const docRef1 = await transaction.get(userDoc) 
-    console.log("Step5")
+
    
     const num = docRef.data().totalComments+1;
-    console.log("Step6")
+
     const newfield={totalComments:num, validComments:docRef.data().validComments+1};
     transaction.update(comRef, newfield);
   
@@ -208,9 +205,7 @@ const addToPostComments=async()=>{
       timeStamp:Timestamp.fromDate(new Date()),
     });      
     
-     console.log("Author ID: "+authorId);
-     console.log("Post ID: "+postid);
-     console.log("Added a comment");
+     
      
     const newFields1 = {comments: docRef1.data().comments + 1};
     transaction.update(userDoc, newFields1);

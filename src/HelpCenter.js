@@ -164,38 +164,38 @@ function HelpCenter() {
   const handleInputName=(e)=>{
 
     setName(e);
-    console.log(name);
+   
   }
   
   const handleInputUsername=(e)=>{
 
     SetUserName(e);
-    console.log(username);
+   
   }
   const handleInputBio=(e)=>{
   
     SetBio(e);
-    console.log(bio);
+  
   }
   const handleInputPhone=(e)=>{
     
     SetPhone(e);
-    console.log(phone);
+    
   }
   const handleInputEmail=(e)=>{
     
     SetEmail(e);
-    console.log(email);
+    
   }
   const handleInputGender=(e)=>{
    
     SetGender(e);
-    console.log(gender);
+
   }
   const handleInputWebsite=(e)=>{
 
     SetWebsite(e);
-    console.log(gender);
+  
   }
 
 
@@ -214,7 +214,7 @@ if(userMessage.length>1 && userMessage!==null && userMessage!=""){
   }else{
     window.alert("Please type in a message. ")
   }
-    console.log("sent")
+   
   }
 
 

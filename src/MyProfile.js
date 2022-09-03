@@ -130,7 +130,7 @@ function MyProfile() {
           let keys = [...mymap.values()]
           SetCollectionSize(keys.length);
           SetPostArray(keys);
-          console.log("There are "+((keys.length)-1)+" posts");
+          
           SetLoading(false);
         }
           else{
@@ -155,7 +155,7 @@ function MyProfile() {
     postArray.forEach((post)=>{
       if(post.id === item){
         SetIndex(index);
-        console.log("index",index);
+       
       }
       else{
         index=index+1;
@@ -172,7 +172,7 @@ if(index < collectionSize-1){
   const goToPreviousPost = () => {
     if(index >= 1 ){
       SetIndex((index) => index - 1);
-    console.log("going to previous post")
+   
   }
   };
 
@@ -221,11 +221,11 @@ if(index < collectionSize-1){
     try{
     const docR = collection(db, `users/${auth.currentUser.uid}/followerList`)    
     const docSnap =  await getDocs(docR);
-    console.log(docSnap)
+    
     
     if (docSnap.size>0){
     SetFollowerList(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
-    console.log("Got followers list")
+    
     }
     
   }catch(error){

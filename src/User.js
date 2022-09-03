@@ -17,7 +17,7 @@ const User=({user, selectUser, user1, chat})=> {
     useEffect(()=>{
 
         const getPic=async()=>{
-            console.log("id", user);
+            
 
             const userRef = doc(db, "users", `${user}`)
             const data = await getDoc(userRef);
@@ -26,7 +26,7 @@ const User=({user, selectUser, user1, chat})=> {
             getDownloadURL(ref(storage, `${user}/${data.data().profilePic}`))
             .then((url) => {
               SetPicUrl(url);
-              console.log("yesssss");
+            
             })
             .catch((error) => {
               // A full list of error codes is available at
@@ -61,7 +61,7 @@ const User=({user, selectUser, user1, chat})=> {
 
     }, [])
 
-    console.log(data);
+ 
     return (
     <div className={`SearchResult ${user === chat && `selected-user`}`} onClick={()=>{selectUser(user)}} style={{minHeight:'15vh'}}>
    <div style={{display:'flex', flexDirection:'column', backgroundColor:'transparent', height:'fit-content'}}>

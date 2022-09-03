@@ -44,7 +44,7 @@ function PasswordReset() {
             const nameRef = collection(db, "users");
             const q = query(nameRef, where("email", "==", `${registerEmail}`))
             const querySnapshot = await getDocs(q);
-            console.log(querySnapshot.size);
+         
             if(querySnapshot.size === 0){
             setErrorMsgName("No account for this email.")
             setLoading(false);

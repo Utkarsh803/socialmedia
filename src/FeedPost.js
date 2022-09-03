@@ -126,7 +126,7 @@ const getUserPost =async()=>{
     getDownloadURL(ref(storage, `${authorId}/${docSnap.data().url}`))
     .then((url) => {
       SetPostUrl(url);
-      console.log("Post image set!!!");
+     
       SetLoading(false);
     })
     .catch((error) => {
@@ -186,7 +186,7 @@ const incCommentNum=async()=>{
   const newfield={totalComments:comments+1};
   const data = updateDoc(comRef, newfield);
 
-  console.log("total counts updated");
+
 }
 
 const addTotalPostComments=async()=>{
@@ -206,14 +206,11 @@ const addTotalPostComments=async()=>{
        timeStamp:Timestamp.fromDate(new Date()),
      });      
       SetTotalComments(comments+1);
-      console.log("Author ID: "+authorId);
-      console.log("Post ID: "+postid);
-      console.log("Added a comment");
+
        } 
  catch(error)
  {
      console.log(error.message);
-     console.log("Comment was not registered :("); 
  }
 }
 
@@ -235,7 +232,7 @@ const addComment=async()=>{
     await runTransaction(db, async (transaction) => {   
   
   
-    console.log("Process began")
+   
   const NotRef = collection(db, `users/${authorId}/notifications`);   
  
   const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
@@ -261,11 +258,7 @@ const addComment=async()=>{
     postid:postid,
     timeStamp:Timestamp.fromDate(new Date()),
   });      
-  
-   console.log("Author ID: "+authorId);
-   console.log("Post ID: "+postid);
-   console.log("Added a comment");
-   
+
   const newFields1 = {comments: docRef1.data().comments + 1};
   transaction.update(userDoc, newFields1);
   

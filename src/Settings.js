@@ -94,7 +94,7 @@ function Settings() {
   getDownloadURL(ref(storage, `${auth.currentUser.uid}/${docSnap.data().profilePic}`))
   .then((url) => {
     SetCurrentPicUrl(url);
-    console.log("Profile Pic Downloaded");
+  
   })
   .catch((error) => {
     // A full list of error codes is available at
@@ -230,38 +230,38 @@ function Settings() {
   const handleInputName=(e)=>{
 
     setName(e);
-    console.log(name);
+   
   }
   
   const handleInputUsername=(e)=>{
 
     SetUserName(e);
-    console.log(username);
+
   }
   const handleInputBio=(e)=>{
   
     SetBio(e);
-    console.log(bio);
+   
   }
   const handleInputPhone=(e)=>{
     
     SetPhone(e);
-    console.log(phone);
+ 
   }
   const handleInputEmail=(e)=>{
     
     SetEmail(e);
-    console.log(email);
+  
   }
   const handleInputGender=(e)=>{
    
     SetGender(e);
-    console.log(gender);
+   
   }
   const handleInputWebsite=(e)=>{
 
     SetWebsite(e);
-    console.log(gender);
+    
   }
 
 
@@ -290,7 +290,7 @@ function Settings() {
               });
               SetLoading(false);
               showAlert();
-              console.log("Profile updated!");
+             
             
             } 
       catch(error)
@@ -307,7 +307,7 @@ function Settings() {
       
       if (querySnapshot.size>0){
       SetFollowers(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
-      console.log("Got followers list")
+
       }
       
     }catch(error){
@@ -319,7 +319,7 @@ function Settings() {
   const submitGetEmail = async () =>
   { 
     SetGetEmail(!getEmail);
-    console.log("Email is " + getEmail);
+   
       try
        {  
         const newFields = {getEmail: getEmail};
@@ -409,7 +409,7 @@ function Settings() {
       
       if (querySnapshot.size>0){
       SetBlockedUsers(querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id})));
-      console.log("Got followers list")
+     
       }
       
     }catch(error){
@@ -422,11 +422,11 @@ function Settings() {
       try{
       const docR = collection(db, `users/${auth.currentUser.uid}/mutedUsers`)    
       const docSnap =  await getDocs(docR);
-      console.log(docSnap)
+     
       
       if (docSnap.size>0){
       SetMutedUsers(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
-      console.log("Got followers list")
+   
       }
       
     }catch(error){
@@ -439,11 +439,11 @@ function Settings() {
       try{
       const docR = collection(db, `users/${auth.currentUser.uid}/restrictedUsers`)    
       const docSnap =  await getDocs(docR);
-      console.log(docSnap)
+  
       
       if (docSnap.size>0){
       SetRestrictedUsers(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
-      console.log("Got followers list")
+    
       }
       
     }catch(error){
@@ -589,12 +589,11 @@ function Settings() {
       () => {
           // download url
           getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            console.log(url);
-            console.log(imgName);
+           
           });
       }
   ); 
-  console.log('image upload successful!');
+
   }
   
   catch(error){
@@ -610,7 +609,7 @@ function Settings() {
         url: url,
         created:serverTimestamp(),
         });      
-        console.log("Image added to album with url : "+ url +"and id: "+addedDoc.id);   
+        
          } 
    catch(error)
    {

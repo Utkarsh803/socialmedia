@@ -99,7 +99,7 @@ function SavedPosts() {
       keys3.forEach((key)=>{
         arrb.push(key.id);
       })
-      console.log("keys"+arrb)
+    
       if(arrb!==null){
       SetBlocked(arrb);}
       else{
@@ -113,7 +113,7 @@ function SavedPosts() {
 
       getStatus();
       getFeed();
-      console.log("got feed");
+     
     }, [] );
 
 
@@ -143,7 +143,7 @@ function SavedPosts() {
     {if ((blocked!==null) && (!(blocked.includes(post.authorID))&&!(muted.includes(post.authorID))))
       return <div className="indPost">
       <FeedPost postid={post.id} authorId={post.authorID} ></FeedPost>
-      {console.log("feed is not null")}
+     
       </div>
       
     })

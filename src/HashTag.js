@@ -99,7 +99,7 @@ const  HashTag=()=> {
           keys3.forEach((key)=>{
             arrb.push(key.id);
           })
-          console.log("keys"+arrb)
+        
           if(arrb!==null){
           SetBlocked(arrb);}
           else{
@@ -133,7 +133,7 @@ const  HashTag=()=> {
             setPosts("null");
             SetLoading(false);
         }
-        console.log("Got popular posts")
+       
     }
 
     const getRecentPosts=async ()=>{
@@ -182,7 +182,7 @@ const  HashTag=()=> {
         postArray.forEach((post)=>{
           if(post.postId === item){
             SetIndex(index);
-            console.log("index",index);
+            
           }
           else{
             index=index+1;
@@ -201,14 +201,14 @@ const  HashTag=()=> {
       const goToNextPost = () => {
         if(index < collectionSize-1){
             SetIndex((index) => index + 1);
-            console.log("going to next post")
+           
         }
           };
         
           const goToPreviousPost = () => {
             if(index >= 1 ){
               SetIndex((index) => index - 1);
-            console.log("going to previous post")
+           
           }
           };
         
@@ -217,7 +217,7 @@ const  HashTag=()=> {
    const  handleButtonPopularClicked=(item)=>{
     getIndex(item);
     setPopularClicked(true)
-    console.log("set popular clicked true")
+
     }
 
     const  handleButtonRecentClicked=(item)=>{
@@ -225,7 +225,7 @@ const  HashTag=()=> {
         setRecentClicked(true)
     }
  
-    console.log(posts);
+ 
 return(<div className='HashTag'>
     <nav>
     <Header></Header>
@@ -285,7 +285,7 @@ return(<div className='HashTag'>
         {if ((blocked!==null) && (!(blocked.includes(post.authorId))&&!(muted.includes(post.authorId))))
           return <div className="indGrid"  onClick={()=>{handleButtonPopularClicked(post.postId)}}>
           <Grid postid={post.postId} authorId={post.authorId}></Grid>
-          {console.log("post is not null")}
+          
           </div>
         })
 )}
@@ -309,7 +309,7 @@ return(<div className='HashTag'>
           return <div className="indGrid" onClick={()=>{handleButtonRecentClicked(post.postId)}} >
           <Grid postid={post.postId} authorId={post.authorId} ></Grid>
           
-          {console.log("post is not null")}
+         
           </div>
         })
 )}
