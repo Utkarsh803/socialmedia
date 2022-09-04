@@ -15,7 +15,7 @@ import Moment from 'react-moment';
 import { runTransaction } from "firebase/firestore";
 import * as ReactBootstrap from 'react-bootstrap'
 
-
+//    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
 function Post({postid, name, authorId, captions, comments, likes, saves, timeStamp, url, profilePic, allowComments}) {
   const NotRef = collection(db, `users/${authorId}/notifications`);
   const[commentTree, SetCommentTree]=useState(null);
@@ -241,7 +241,7 @@ const addToPostComments=async()=>{
     </div>
     <div style={{width:'50%', paddingLeft:'2%', height:'auto', maxWidth:'40%', overflow:'scroll'}}>
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={profilePic}></PostTools>
-    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
+
     <div className='caption'>
     <span style={{height:'auto', width:'100%',flex:'1',wordWrap:'break-word'}}>{name+" "+captions}</span>
     </div>

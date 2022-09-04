@@ -31,7 +31,7 @@ const List = ({authorId, typ})=> {
 
 
     const getFollow=async()=>{
-    const docRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${authorId}`)
+    const docRef = doc(db, `users/${auth.currentUser.uid}/followerList`, `${authorId}`)
     const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -180,7 +180,7 @@ const List = ({authorId, typ})=> {
         const profileDoc2 = await transaction.get(profileRef2);
 
         transaction.update(profileRef, {followers:profileDoc.data().followers-1})
-        transaction.update(profileRef, {following:profileDoc2.data().following-1})
+        transaction.update(profileRef2, {following:profileDoc2.data().following-1})
 
         transaction.delete(doc(db, `users/${auth.currentUser.uid}/followerList`, `${authorId}`));
         transaction.delete(doc(db, `users/${authorId}/followingList`, `${auth.currentUser.uid}`));

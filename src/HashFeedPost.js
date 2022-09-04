@@ -13,7 +13,7 @@ import Moment from 'react-moment';
 import createTree from './createTree';
 import * as ReactBootstrap from 'react-bootstrap'
 import { runTransaction } from "firebase/firestore";
-
+//  <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
 function HashFeedPost({postid,authorId}) {
 
   const[commentTree, SetCommentTree]=useState(null);
@@ -311,7 +311,6 @@ const addToPostComments=async()=>{
     </div>
     <div style={{width:'50%', paddingLeft:'2%', height:'70vh'}}>
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={currentPicUrl}></PostTools>
-    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
     <div className='caption'>
     <span style={{height:'auto', width:'100%',flex:'1',wordWrap:'break-word'}}>{name+" "+captions}</span>
     </div>

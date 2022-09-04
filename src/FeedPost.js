@@ -14,7 +14,7 @@ import Moment from 'react-moment';
 import createTree from './createTree';
 import { runTransaction } from "firebase/firestore";
 import * as ReactBootstrap from 'react-bootstrap'
-
+//    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
 function FeedPost({postid,authorId}) {
 
   const[commentTree, SetCommentTree]=useState(null);
@@ -290,7 +290,7 @@ catch(e)
   (<img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />):
   (<ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>)}
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={currentPicUrl}></PostTools>
-    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
+
     <div className='caption'>
    <span style={{height:'auto', width:'100%',flex:'1',wordBreak:'break-word'}}>{name+" "+captions}</span>
     </div>
