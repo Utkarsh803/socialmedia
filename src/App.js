@@ -33,9 +33,10 @@ function App() {
 
   return (
     <div className="App">
+  
     <BrowserRouter>
     <Routes>
-  
+
     <Route exact path="/login" element={<Login setlogged={SetLogged}/>}> </Route>
 
     <Route

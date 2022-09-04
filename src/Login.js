@@ -34,7 +34,14 @@ function Login(setlogged) {
     const [errorMsg, setErrorMsg] = useState("");
     const [errorMsgName, setErrorMsgName] = useState("");
     const [errorMsgLogin, setErrorMsgLogin] = useState("");
+    const [showMobileWarning, setShowMobileWarning] = useState(false);
 
+
+useEffect(()=>{
+    if(window.innerWidth <= 800){
+        setShowMobileWarning(true);
+    }
+}, [])
 
 const navigate = useNavigate();
     const register = async () =>
@@ -318,7 +325,9 @@ const navigate = useNavigate();
 
     return (<div className="Login"> 
     <LoginHeader></LoginHeader>
-    <div style={{backgroundColor:'black', height:'100%'}}>   
+    {!showMobileWarning ?
+
+    (<div style={{backgroundColor:'black', height:'100%'}}>   
     <div className='divider'>
     <div className="half">
     <div className='heading'>Register</div>
@@ -362,9 +371,12 @@ const navigate = useNavigate();
     </div>
     </div>
     </div>
-    </div>
-    
-
+    </div>):(
+        <div style={{backgroundColor:'black', height:'100vh', width:'100%', paddingTop:'200px',color:'white', textAlign:'center'}}>
+        <h1>Made for Desktop</h1>
+        <h5>This website was made for desktop view. Switch to a desktop to sign up or sign in.</h5>
+        </div>
+    )}
     </div>);
 }
 

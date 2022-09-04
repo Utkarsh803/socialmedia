@@ -30,4 +30,5 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
+    border-radius: 5px;
 }
