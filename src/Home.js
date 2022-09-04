@@ -37,9 +37,17 @@ function Home() {
           const q = query(feedRef,orderBy('added', 'desc'))
           onSnapshot(q, querySnapshot=>{
             if(querySnapshot.size>=1){
-            const newquery = querySnapshot.filter(x => !blocked.includes(x)|| !muted.includes(x))
-            setFeed(newquery.docs.map((doc)=>({...doc.data(), id: doc.id})));
+              let keys=[];
+            var arrm =[];
+            let arr =querySnapshot.docs.map((doc)=>({...doc.data(), id: doc.id}))
+            keys = [...arr.values()]
+          if(blocked!==null && muted!==null){
+            setFeed(keys.filter(x => !blocked.includes(x.authorID)|| !muted.includes(x.authorID)));
+            setLoading(false); 
+          }else{
+            setFeed(arr);
             setLoading(false);
+          }
           }
             else{
               setFeed("null");

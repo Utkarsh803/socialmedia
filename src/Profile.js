@@ -867,7 +867,7 @@ try{
     <Avatar
     alt="preview image"
     src={currentPicUrl}
-    sx={{ width: '100%', height: '100%'}}
+    sx={{ width: '100%', height: '100%', maxHeight:200}}
     />
     </div>
     <div className='row'>

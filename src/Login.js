@@ -236,7 +236,7 @@ const navigate = useNavigate();
             setUserId(auth.currentUser.uid);
           
             if(!auth.currentUser.emailVerified){
-                setErrorMsgLogin("Please verify your email.")
+              setErrorMsgLogin("Please verify your email.")
             }else{
             updateDoc(doc(db, `users`, `${auth.currentUser.uid}`), {
                 lastLogin:serverTimestamp(),

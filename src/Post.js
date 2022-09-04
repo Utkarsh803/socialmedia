@@ -286,7 +286,7 @@ const addToPostComments=async()=>{
     (<button style={{backgroundColor:'black', width:'fit-content', textAlign:'left', height:'6vh', color:'deepskyblue',fontSize:'large'}}><ReactBootstrap.Spinner animation="border" size="sm" style={{color:'#666', alignContent:'center'}}/></button>)}
     </div>)}
   
-    <div className='footer'></div>
+   
     </div>
     </div>
     </nav>

@@ -35,6 +35,18 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
         }
     }
 
+
+    /*
+        { (authorId!=auth.currentUser.uid) && !loading && (
+    follow ? (<button className='icons' disabled={loading} onClick={handleButttonUnfollow}>Unfollow</button>):(
+        <button className='icons' disabled={loading} onClick={handleButttonFollow}>Follow</button>
+    )
+    )}
+
+{ (authorId!=auth.currentUser.uid) && loading && (
+    <button className='icons'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}</button>    
+    )}
+    */
     const getFollowStats=async()=>{
         const docRef = doc(db, `users`,`${auth.currentUser.uid}`)
         const docSnap = await getDoc(docRef);
@@ -270,18 +282,6 @@ if(!myfollow.exist){
     />
     <h4 className='welcome'>{name}</h4>  
     </div>
-
-    { (authorId!=auth.currentUser.uid) && !loading && (
-    follow ? (<button className='icons' disabled={loading} onClick={handleButttonUnfollow}>Unfollow</button>):(
-        <button className='icons' disabled={loading} onClick={handleButttonFollow}>Follow</button>
-    )
-    )}
-
-{ (authorId!=auth.currentUser.uid) && loading && (
-    <button className='icons'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}</button>    
-    )}
-
-
 
   </div>);
 }

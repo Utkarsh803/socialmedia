@@ -31,6 +31,22 @@ function App() {
     const [img, setImg] = useState(null);
     const [logged, SetLogged]=useState(false);
 
+    useEffect(() => {
+      onAuthStateChanged(auth, (currentUser)=>{
+              if(currentUser && currentUser.emailVerified)
+              {
+                  setUser(currentUser);
+                  
+              }
+              else
+              {
+                  setUser("");
+                
+              }
+      });
+  
+    },[]);
+
 
   return (
     <div className="App">

@@ -384,6 +384,7 @@ catch(error)
     SetAddPost(false);
     SetUpload(!upload);
     SetNext(false);
+    setLoading(false);
   }
 
   function handleButtonClose() {

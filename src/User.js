@@ -64,16 +64,16 @@ const User=({user, selectUser, user1, chat})=> {
  
     return (
     <div className={`SearchResult ${user === chat && `selected-user`}`} onClick={()=>{selectUser(user)}} style={{minHeight:'15vh'}}>
-   <div style={{display:'flex', flexDirection:'column', backgroundColor:'transparent', height:'fit-content'}}>
-    <div style={{display:'flex', flexDirection:'row', marginRight:'45%', padding:'2%', backgroundColor:'transparent',height:'fit-content'}} >
+   <div style={{display:'flex', flexDirection:'column', backgroundColor:'transparent', height:'fit-content', width:'100%'}}>
+    <div style={{display:'flex', flexDirection:'row', padding:'2%', backgroundColor:'transparent',height:'fit-content', width:'100%'}} >
     <Avatar
     alt="preview image"
     src={picUrl}
     sx={{ width: 40, height: 40, marginTop:'2%'}}
     />
-    <h4 className='welcome' style={{backgroundColor:'transparent', paddingTop:'10%', paddingLeft:'5%',height:'fit-content'}}>{name}</h4>  
+    <h4 className='welcome' style={{backgroundColor:'transparent',height:'fit-content', marginTop:'4%', marginLeft:'2%'}}>{name}</h4>  
     </div>  
-    <div style={{position:'relative',paddingLeft:'25%', backgroundColor:'transparent', height:'fit-content', width:'90%'}}>
+    <div style={{position:'relative',marginLeft:'15%', backgroundColor:'transparent', height:'fit-content', width:'90%'}}>
      {data && (data.from !== user1 && data.unread === true) ? (
   <p 
   style={{
