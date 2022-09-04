@@ -19,7 +19,7 @@ import * as ReactBootstrap from 'react-bootstrap'
 
 
 
-function Login() {
+function Login(setlogged) {
 
     const [registerEmail, setRegisterEmail]=useState("");
     const [registerPassword, setRegisterPassword]=useState("");
@@ -67,18 +67,24 @@ const navigate = useNavigate();
             return;
         }
             await createUserWithEmailAndPassword(auth, registerEmail, registerPassword ).then((result)=>{
-            addToDatabase();
-         
-            sendEmailVerification(auth.currentUser);
-            setErrorMsg(null);
-            setLinkSent(true);
-            setLoadingR(false);
+
             }).catch((error)=>{
-                
                 setErrorMsg(error.message)
                 setLoadingR(false);
                 return;
             });
+
+            await addToDatabase();
+            console.log("Added to database");
+            try{
+            sendEmailVerification(auth.currentUser);
+            }catch(e){
+            console.log(e);
+            }
+            await signOut(auth);
+            setErrorMsg(null);
+            setLinkSent(true);
+            setLoadingR(false);  
 
     }
 
@@ -95,7 +101,7 @@ const navigate = useNavigate();
                 getEmail:true,
                 getSms:true,
                 name: name,
-                phone:0,
+                phone:"",
                 posts:0,
                 private:false,
                 twoFactor:false,
@@ -103,6 +109,11 @@ const navigate = useNavigate();
                 website:"",
                 email: registerEmail,
                 profilePic:"",
+                lastLogin:serverTimestamp(),
+                notificationStamp:serverTimestamp(),
+                banned:false,
+                hold:false,
+                verified:false,
                 });
 
         } 
@@ -217,6 +228,9 @@ const navigate = useNavigate();
             if(!auth.currentUser.emailVerified){
                 setErrorMsgLogin("Please verify your email.")
             }else{
+            updateDoc(doc(db, `users`, `${auth.currentUser.uid}`), {
+                lastLogin:serverTimestamp(),
+            })
             navigate('/');
            }
         } 

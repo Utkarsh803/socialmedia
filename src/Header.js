@@ -1,6 +1,6 @@
 import './css/Header.css';
 import {CgProfile} from 'react-icons/cg';
-import { AiOutlineHeart,AiOutlineHome, AiFillSetting, AiOutlineVideoCameraAdd,AiOutlineCloseCircle} from 'react-icons/ai';
+import { AiOutlineHeart,AiOutlineHome, AiFillSetting, AiOutlineVideoCameraAdd,AiOutlineCloseCircle,AiFillHeart} from 'react-icons/ai';
 import {BiImageAdd, BiMessageRounded, BiHelpCircle} from 'react-icons/bi';
 import {FaRegBookmark , FaUserAltSlash}from 'react-icons/fa';
 import {useState, useEffect} from "react";
@@ -57,6 +57,7 @@ function Header() {
   const[blocked, SetBlocked]= useState([]);
   const[muted, SetMuted]= useState([]);
   const[restricted, SetRestricted]= useState([]);
+  const[newNotifs, SetNewNotifs]= useState(false);
 
 
 
@@ -154,6 +155,30 @@ function Header() {
       SetBlocked(arrb);}
     }
 
+
+    const getNewNotifs=async()=>{
+      const docRef=doc(db, "users", `${auth.currentUser.uid}`)
+      const docSnap = await getDoc(docRef);
+      
+      const notifRef = collection(db, `users/${auth.currentUser.uid}/notifications`);
+      const q = query(notifRef,orderBy('timeStamp', 'desc'), limit(1))
+      const notifDoc = await getDocs(q);
+
+   if(notifDoc.size>0){
+    notifDoc.forEach((doc)=>{
+      if(docSnap.data().notificationStamp < doc.data().timeStamp){
+        SetNewNotifs(true);
+      }
+      else{
+        SetNewNotifs(false);
+      }
+    })}
+    else{
+      SetNewNotifs(false);
+    }
+    }
+
+    getNewNotifs();
     getStatus();
     getPostsStats();
     return()=>{
@@ -765,7 +790,17 @@ catch(error)
    }
 
 
-   const handleButtonNotif=()=>{
+
+   const updateNotifStamp=async()=>{
+    const docRef=doc(db, "users", `${auth.currentUser.uid}`)
+    updateDoc(docRef, {
+      notificationStamp:serverTimestamp(),
+    })
+   }
+
+   const handleButtonNotif=async()=>{
+    SetNewNotifs(false);
+    updateNotifStamp();
     getNotif();
     SetViewNotif(!viewNotif);
    }
@@ -921,8 +956,9 @@ catch(error)
 </div>
   )}
 
-    
-    <AiOutlineHeart className='icons' onClick={handleButtonNotif}/>
+    {!newNotifs ?
+   (<AiOutlineHeart className='icons' onClick={handleButtonNotif}/>):
+   (<AiFillHeart className='icons' style={{color:'red'}} onClick={handleButtonNotif}/>)}
         
         {!loading && viewNotif && Notif !=="null" && Notif !== null && (
         <div ref={notifRef} className='NotifTray'>

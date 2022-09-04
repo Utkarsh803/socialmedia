@@ -4,7 +4,7 @@ import Login from './Login';
 import Home from './Home';
 import Modify from "./Modify";
 import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp} from 'firebase/firestore';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ReactDOM from 'react-dom/client';
 import {signOut, onAuthStateChanged} from "firebase/auth";
 import MyProfile from "./MyProfile";
@@ -20,6 +20,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 import { faCheckSquare, faCoffee } from '@fortawesome/free-solid-svg-icons'
 import HelpCenter from './HelpCenter';
 import PasswordReset from "./PasswordReset";
+import PrivateRoute from './PrivateRoute'
 
 library.add(fab, faCheckSquare, faCoffee)
 
@@ -27,23 +28,7 @@ function App() {
 
     const [user, setUser] = useState(null);
     const [img, setImg] = useState(null);
-
-
-    useEffect(() => {
-    onAuthStateChanged(auth, (currentUser)=>{
-            if(currentUser && currentUser.emailVerified)
-            {
-                setUser(currentUser);
-            }
-            else
-            {
-                setUser("");
-            }
-         //   window.location='App.js';
-    });
-
-  },[]);
-
+    const [logged, SetLogged]=useState(false);
 
 
   return (
@@ -51,45 +36,79 @@ function App() {
     <BrowserRouter>
     <Routes>
   
-    <Route path="/login" element={<Login />}> </Route>
-        
-       {!user ? (<Route path="/" exact element={<Login />}> </Route>):(
-        <Route path="/" element={<Home />}></Route>
-       )} ;
+    <Route exact path="/login" element={<Login setlogged={SetLogged}/>}> </Route>
+
+    <Route
+    path="/"
+    element={
+    <PrivateRoute >
+    <Home />
+    </PrivateRoute>}/>
 
 
-{user &&(
-         <Route path="/help" element={<HelpCenter />}> </Route>)}
-       
-       <Route path='/modify' element={<Modify/>}></Route>
+    <Route
+    path="/help"
+    element={
+    <PrivateRoute>
+    <HelpCenter />
+    </PrivateRoute>}/>
 
-       <Route path="/passwordReset" element={<PasswordReset />}> </Route>
+
+    <Route
+    path="/passwordReset"
+    element={
+    <PrivateRoute>
+    <PasswordReset/>
+    </PrivateRoute>}/>
+
+
+    <Route
+    path="/myprofile"
+    element={
+    <PrivateRoute>
+    <MyProfile />
+    </PrivateRoute>}/>
               
-       {user &&(
-        <Route path="/myprofile" element={<MyProfile />}></Route>
-       )} ;
-        {user &&(
-        <Route path="/settings" element={<Settings />}></Route>
-       )} ;
-               {user &&(
-        <Route path="/saved-posts" element={<SavedPosts />}></Route>
-       )} ;
 
-          {user &&(
-        <Route path="/chats" element={<Chats />}></Route>
-       )} ;
+    <Route
+    path="/settings"
+    element={              
+    <PrivateRoute>
+    <Settings />
+    </PrivateRoute>}/>
+     
 
-       
-      {user &&(
-       <Route path='/hashTag/:hash' element={<HashTag />}></Route>
-       )} ;
+    <Route
+    path="/saved-posts"
+    element={
+    <PrivateRoute>
+    <SavedPosts />
+    </PrivateRoute>}/>
 
-{user &&(
-       <Route path='/profile/:uid' element={<Profile />}></Route>
-       )} ;
 
-       
+    <Route
+    path="/chats"
+    element={
+    <PrivateRoute>
+    <Chats />
+    </PrivateRoute>}/>
 
+
+    <Route
+    path="/hashTag/:hash"
+    element={
+    <PrivateRoute>
+    <HashTag />
+    </PrivateRoute>}/>
+
+
+    <Route
+    path="/profile/:uid"
+    element={
+    <PrivateRoute>
+    <Profile />
+    </PrivateRoute>}/>
+   
                  
     </Routes>
   </BrowserRouter>
