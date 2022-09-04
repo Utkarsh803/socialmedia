@@ -5,6 +5,7 @@
     background-color: black;
     width: 35%;
     height: fit-content;
+    max-height: 65vh;
     border-radius: 6%;
     margin-left: 63%;
     margin-top: 2%;

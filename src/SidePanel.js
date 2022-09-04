@@ -28,6 +28,12 @@ const tag = hash.substring(1, hash.length);
 navigate(`/hashTag/${tag}`);
 }
 
+const handleButtonPrivacy=()=>{ 
+  navigate(`/policy-term-cookies`);
+  }
+
+
+
   return (
   <div className="SidePanel" >
     
@@ -37,7 +43,7 @@ navigate(`/hashTag/${tag}`);
           trends.map((res)=>
             {if(res.val>0)
               return <div >
-            <div style={{padding:'1%',fontSize:'x-large', display:'flex', flexDirection:'column'}} >
+            <div style={{padding:'1%',fontSize:'large', display:'flex', flexDirection:'column'}} >
                <div onClick={()=>goToHash(res.tag)} className='pointer'> {res.tag}{' '}<div><small style={{fontSize:'small', color:'grey', paddingLeft:'3%'}} >{res.val}{' '} posts</small></div></div>
               </div>
               </div>
@@ -45,9 +51,9 @@ navigate(`/hashTag/${tag}`);
     )}
         </div>
         <div style={{position:'fixed', display:'flex', flexDirection:'row', bottom:'9%', fontSize:'small', width:'38%', backgroundColor:'transparent'}}>
-<span style={{width:'33%', backgroundColor:'transparent'}}> Privacy Policy</span>
-<span style={{whiteSpace:'pre',width:'33%', backgroundColor:'transparent'}}> About us</span>
-<span style={{whiteSpace:'pre',width:'33%', backgroundColor:'transparent'}}> Contact</span>
+<span style={{width:'33%', backgroundColor:'transparent', cursor:'pointer'}} onClick={handleButtonPrivacy}> Privacy Policy</span>
+<span style={{whiteSpace:'pre',width:'33%', backgroundColor:'transparent', cursor:'pointer'}}> About us</span>
+<span style={{whiteSpace:'pre',width:'33%', backgroundColor:'transparent', cursor:'pointer'}}> Contact</span>
 </div>
    
   </div>)

@@ -35,6 +35,7 @@ function Login(setlogged) {
     const [errorMsgName, setErrorMsgName] = useState("");
     const [errorMsgLogin, setErrorMsgLogin] = useState("");
     const [showMobileWarning, setShowMobileWarning] = useState(false);
+    const [checked,setChecked] = useState(false);
 
 
 useEffect(()=>{
@@ -121,6 +122,8 @@ const navigate = useNavigate();
                 banned:false,
                 hold:false,
                 verified:false,
+                delete:false,
+                deleteDate:""
                 });
 
         } 
@@ -322,6 +325,10 @@ const navigate = useNavigate();
         navigate('/passwordReset');
     }
 
+    const handlebuttonHelpCenter=()=>{
+        navigate('/policy-term-cookies')
+    }
+  
 
     return (<div className="Login"> 
     <LoginHeader></LoginHeader>
@@ -334,22 +341,26 @@ const navigate = useNavigate();
     {linkSent &&
     (<small style={{color:'green', textAlign:'center'}}>Email Verification Link Sent!!</small>)}
     {errorMsg && errorMsgName &&(
-        <small style={{color:'red', textAlign:'center'}}>{errorMsgName}</small>
+        <small style={{position:'absolute',top:'15%',color:'red', textAlign:'center'}}>{errorMsgName}</small>
     )}
 
     {errorMsg && !errorMsgName &&(
-        <small style={{color:'red', textAlign:'center'}}>{errorMsg}</small>
+        <small style={{position:'absolute',top:'15%',color:'red', textAlign:'center'}}>{errorMsg}</small>
     )}
 
 {!errorMsg && errorMsgName &&(
-        <small style={{color:'red', textAlign:'center'}}>{errorMsgName}</small>
+        <small style={{position:'absolute',top:'15%',color:'red', textAlign:'center', height:'fit-content'}}>{errorMsgName}</small>
     )}
 
     <input placeholder='Name...' className='input' required={true}  onChange={(event)=>{handleSetUsername(event.target.value);}}></input>
     <input placeholder='Email...' className='input'  required={true}  onChange={(event)=>{handleSetEmail(event.target.value);}}></input>
     <input placeholder='Password...' type="password"  required={true}  className='input'  onChange={(event)=>{setRegisterPassword(event.target.value);}}></input>
+    <div style={{color:'white', marginTop:'-5%'}}>
+    <input type="checkbox" onChange={(e)=>{setChecked(e.target.checked)}}></input>
+    <small> By signing up, you agree to our </small><small style={{color:'lightblue', cursor:'pointer'}} onClick={handlebuttonHelpCenter}>Privacy Policy, Terms and Cookie Policy.</small> 
+    </div>
     {!loadingR ?(
-    <button style={{width:'100%'}} disabled={errorMsgName} onClick={register}>Sign Up</button>):(
+    <button style={{width:'100%'}} disabled={errorMsgName || !checked || registerEmail===null || name ===null || registerPassword===null|| name===""} onClick={register}>Sign Up</button>):(
     <button style={{ width:'100%'}} >{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Registering ....</button>)}
     
     </div>
@@ -357,12 +368,12 @@ const navigate = useNavigate();
     <div className="half" >
     <div className='heading'>Login</div>
     {errorMsgLogin && (
-        <small style={{color:'red', textAlign:'center'}}>{errorMsgLogin}</small>
+        <small style={{position:'absolute',top:'19%',color:'red', textAlign:'center'}}>{errorMsgLogin}</small>
     )}
     <input placeholder='Email...' className='input' onChange={(event)=>{setLoginEmail(event.target.value);}}></input>
     <input placeholder='Password...' type="password" className='input' onChange={(event)=>{setLoginPassword(event.target.value);}}></input>
   {!loading ?(
-    <button style={{width:'100%'}} disabled={loading} onClick={login}>Sign In</button>):(
+    <button style={{width:'100%'}} disabled={loading || loginEmail===null || loginEmail===""|| loginPassword===null}  onClick={login}>Sign In</button>):(
     <button style={{ width:'100%'}} >{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Signing In ....</button>)}
 
     <div className="forgotPass">

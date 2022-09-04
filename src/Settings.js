@@ -21,6 +21,7 @@ import * as ReactBootstrap from 'react-bootstrap'
 
 
 import List from './List'
+import { update } from 'firebase/database';
 
 
 
@@ -37,6 +38,7 @@ function Settings() {
     const [emailAndSms, SetEmailAndSms]=useState(false);
     const [privacy, SetPrivacy]=useState(false);
     const [security, SetSecurity]=useState(false);
+    const [deleteAccount, SetDeleteAccount]=useState(false);
     const [loginActivity, SetLoginActivity]=useState(false);
     
     const [username, SetUserName]=useState("");
@@ -52,6 +54,8 @@ function Settings() {
     const [preview, SetPreview]=useState(false);
     const [loading, SetLoading]=useState(false);
     const [enteredText, setEnteredText] = useState('')
+    const[checkDeleteAccount,SetCheckDeleteAccount] = useState(false);
+    const[deleteCredential,SetDeleteCredential]=useState("");
 
   const [val, setVal] = React.useState();
 
@@ -168,6 +172,7 @@ function Settings() {
           SetPrivacy(false);
           SetSecurity(false);
           SetLoginActivity(false);
+          SetDeleteAccount(false);
         
 
   }
@@ -180,6 +185,7 @@ function Settings() {
           SetPrivacy(false);
           SetSecurity(false);
           SetLoginActivity(false);
+          SetDeleteAccount(false);
         
 
   }
@@ -191,6 +197,7 @@ function Settings() {
           SetPrivacy(false);
           SetSecurity(false);
           SetLoginActivity(false);
+          SetDeleteAccount(false);
         
 
   }
@@ -202,6 +209,7 @@ function Settings() {
           SetPasswordReset(false);
           SetSecurity(false);
           SetLoginActivity(false);
+          SetDeleteAccount(false);
         
 
   }
@@ -214,7 +222,20 @@ function Settings() {
           SetPrivacy(false);
           SetPasswordReset(false);
           SetLoginActivity(false);
+          SetDeleteAccount(false);
   }
+
+  const handleButtonDeleteAccount = () =>
+  {
+    SetEditProfile(false);
+          SetSecurity(false);
+          SetEmailAndSms(false);
+          SetPrivacy(false);
+          SetPasswordReset(false);
+          SetLoginActivity(false);
+          SetDeleteAccount(true);
+  }
+
   const handleButtonLoginActivity = () =>
   {
     SetEditProfile(false);
@@ -223,6 +244,7 @@ function Settings() {
           SetPrivacy(false);
           SetSecurity(false);
           SetPasswordReset(false);
+          SetDeleteAccount(false);
         
 
   }
@@ -399,6 +421,7 @@ function Settings() {
     const showAlert = () =>{
       window.alert("Profile successfully updated!")
     }
+
 
 
     const getBlockedList=async()=>{
@@ -652,6 +675,62 @@ function Settings() {
       window.location.reload();
   }
 
+const deleteAcc = async() =>{
+    SetLoading(true);
+    const cred = EmailAuthProvider.credential(auth.currentUser.email, deleteCredential); 
+    reauthenticateWithCredential(auth.currentUser,cred).then(async() => {
+       await setDoc(doc(collection(db, "deleteRequests")), {
+        message:"Service Request:Please delete my account.",
+        uid:auth.currentUser.uid,
+        createdAt:serverTimestamp(),
+      })
+      SetLoading(false);
+      window.alert("Your Account will be deleted soon.Thank you for using our services.")
+  }).catch((error) => {
+    window.alert("Password Incorrect");
+    console.log(error);
+    SetLoading(false);
+  });
+}
+
+
+  const sendMessage=async(e)=>{
+    e.preventDefault();
+    const docRef = collection(db, "AdminMessages");
+/*
+    const hashFeedRef = collection(db,`users/${auth.currentUser.uid}/hashFeed` )
+    const hashFeedDoc = await getDocs(hashFeedRef);
+
+    const followerList = collection(db,`users/${auth.currentUser.uid}/followerList` )
+    const followerListDoc = await getDocs(followerList);
+
+    const postList = collection(db,`users/${auth.currentUser.uid}/posts` )
+    const posiListDoc = await getDocs(followerList);
+
+
+    hashFeedDoc.forEach((hash)=>{
+      updateDoc(doc(db, `hashags/${hash.data().hash}`, `${hash.data().pid}`),{
+        show:false,
+      })
+    })
+  */  
+
+/*
+    update(doc(db, "users", `${auth.currentUser.uid}`), {
+      deleted:true,
+      deleteDate:serverTimestamp()
+    })
+
+
+    SetSent(true);
+    SetLoading(false);
+*/
+    window.alert("Your Account will be permanently deleted soon.")
+
+
+  }
+  
+
 
 
   return (<div className="Settings">
@@ -757,6 +836,7 @@ No Followers.
             <button className='sideButtons' onClick={handleButtonEmailAndSms}>Email and SMS</button>
             <button className='sideButtons' onClick={handleButtonPrivacy}>Privacy</button>
             <button className='sideButtons' onClick={handleButtonSecurity}>Security</button>
+            <button className='sideButtons' onClick={handleButtonDeleteAccount}>Delete my Account</button>
             <button  className='sideButtons'>Login Activity {'('}Coming Soon!{')'}</button>
     </div>
     {editProfile && (
@@ -860,6 +940,21 @@ No Followers.
         </div>
       </div>
     
+    </div>)}
+
+    {deleteAccount && (
+    <div className="formContainer">
+        <div className='formInputsColumnPasswordReset'>
+        <input placeholder='Enter Password*' type="password" className='formInput' onChange={(event=>{SetDeleteCredential(event.target.value)})}></input>
+         <div style={{paddingLeft:'10%', marginTop:'5%'}}>
+        <input type="checkbox" onChange={(e)=>{SetCheckDeleteAccount(e.target.checked)}}></input><small> I confirm, delete my account</small>
+         </div>       
+      {!loading ?
+       ( <button className='submitResetPassword'  disabled={loading || !checkDeleteAccount} onClick={deleteAcc} >Delete my Account</button>):
+       (<button className='submitResetPassword'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Deleting...</button>)}
+      
+      </div>
+
     </div>)}
 
     </div>

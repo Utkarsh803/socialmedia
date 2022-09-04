@@ -570,10 +570,19 @@ catch(error)
             likes:0,
             comments:0,
             saves:0,
+            show:true,
             reported:0,
             createdAt:Timestamp.fromDate(new Date()),
           });
-        
+
+          const hashFeed=doc(db, `users/${auth.currentUser.uid}/hashPosts`, `${usersCollectionRef.id}`)
+
+          setDoc(hashFeed,{
+            hash:arr[a].hash,
+            postid:usersCollectionRef.id,
+            pid:pid
+          })
+          
         }
         else{
         
@@ -591,8 +600,17 @@ catch(error)
             comments:0,
             saves:0,
             reported:0,
+            show:true,
             createdAt:Timestamp.fromDate(new Date()),
           });
+
+          const hashFeed=doc(db, `users/${auth.currentUser.uid}/hashPosts`, `${usersCollectionRef.id}`)
+
+          setDoc(hashFeed,{
+            hash:arr[a].hash,
+            postid:usersCollectionRef.id,
+            pid:pid
+          })
 
           a=a+1;
         }
@@ -634,6 +652,7 @@ catch(error)
           author:auth.currentUser.uid,
           postID:usersCollectionRef.id,
           reported:false,
+          show:true,
         })  
 
         transaction.set(doc(db, `users/${auth.currentUser.uid}/feedRef/${usersCollectionRef.id}/nodes`, `${docc.id}`), {

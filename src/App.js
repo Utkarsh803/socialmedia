@@ -19,6 +19,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { faCheckSquare, faCoffee } from '@fortawesome/free-solid-svg-icons'
 import HelpCenter from './HelpCenter';
+import HelpCenterPublic from './HelpCenterPublic';
 import PasswordReset from "./PasswordReset";
 import PrivateRoute from './PrivateRoute'
 
@@ -38,6 +39,8 @@ function App() {
     <Routes>
 
     <Route exact path="/login" element={<Login setlogged={SetLogged}/>}> </Route>
+    <Route exact path="/passwordReset" element={<PasswordReset/>}> </Route>
+    <Route exact path="/policy-term-cookies" element={<HelpCenterPublic/>}> </Route>
 
     <Route
     path="/"
@@ -52,14 +55,6 @@ function App() {
     element={
     <PrivateRoute>
     <HelpCenter />
-    </PrivateRoute>}/>
-
-
-    <Route
-    path="/passwordReset"
-    element={
-    <PrivateRoute>
-    <PasswordReset/>
     </PrivateRoute>}/>
 
 

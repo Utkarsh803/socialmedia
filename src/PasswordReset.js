@@ -83,8 +83,8 @@ function PasswordReset() {
     )}
     <input placeholder='Email...' style={{textAlign:'center', color:'white',fontSize:'large', width:'30%', marginLeft:'35%',color:'black', borderRadius:'5px'}} onChange={(event)=>{ setRegisterEmail(event.target.value)}}></input>
   {!loading ?(
-    <button  style={{textAlign:'center',width:'30%', marginLeft:'35%'}} disabled={loading} onClick={handleButtonSendEmailLink}>Send Password Reset Link</button>):(
-    <button style={{textAlign:'center',width:'30%', marginLeft:'35%'}} >{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Signing In ....</button>)}
+    <button  style={{textAlign:'center',width:'30%', marginLeft:'35%'}} disabled={loading|| registerEmail===null || registerEmail===""} onClick={handleButtonSendEmailLink}>Send Password Reset Link</button>):(
+    <button style={{textAlign:'center',width:'30%', marginLeft:'35%'}} >{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Sending Link...</button>)}
     </div>
     </div>
     </div>);
