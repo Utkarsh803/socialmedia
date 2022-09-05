@@ -26,9 +26,9 @@
  .SearchResult .welcome{
     position: relative;
     height: fit-content;
-    min-width: 50%;
-    margin-top:8%;
-    margin-left:10%;
+    min-width: fit-content;
+    margin-top:5%;
+    margin-left:5%;
     font-size: large;
     background-color: transparent;
 cursor: pointer;

@@ -327,75 +327,74 @@ function NotifLike({authorId,postid,content, timestamp, type, identifier}) {
   return (
     <div className="NotifLike">
     {type === "like" && (
-      
-    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)} >
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'transparent', width:'100%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)} >
     <Avatar
     alt="preview image"
     src={imageUrl}
-    sx={{ width: 40, height: 40, marginTop:'3%'}}
+    sx={{ width: 40, height: 40, marginTop:'3.5%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> liked a post.<small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
-    
-    <img src={postUrl} style={{height:'60%', backgroundColor:'black',height:'fit-content', maxHeight:'10vh', maxWidth:'10vh'}}></img>
+    <div style={{backgroundColor:'transparent', width:'fit-content', marginTop:'3.5%'}}> liked a post. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+    <div style={{width:'10%', marginRight:'2%', marginLeft:'auto'}}>
+    <img src={postUrl} style={{ backgroundColor:'black', maxHeight:'10vh'}}></img>
+    </div>
     </div>
    )}
 
     {type === "comment" && (
-    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'transparent', width:'100%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
     <Avatar
     alt="preview image"
     src={imageUrl}
-    sx={{ width: 40, height: 40, marginTop:'3%'}}
+    sx={{ width: 40, height: 40, marginTop:'3.5%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> commented on a post. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
-    
-    <img src={postUrl} style={{height:'60%', backgroundColor:'black',height:'fit-content', maxHeight:'10vh', maxWidth:'10vh'}}></img>
+    <div style={{backgroundColor:'transparent', width:'fit-content', marginTop:'3.5%'}}> commented on a post. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+    <div style={{width:'10%',  marginRight:'2%', marginLeft:'auto'}}>
+    <img src={postUrl} style={{ backgroundColor:'black', maxHeight:'10vh'}}></img>
+    </div>
     </div>
    )}
 
     {type === "follow" && (
-    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'transparent', width:'100%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
     <Avatar
     alt="preview image"
     src={imageUrl}
-    sx={{ width: 40, height: 40, marginTop:'3%'}}
+    sx={{ width: 40, height: 40, marginTop:'3.5%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> started following you. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
-   
+    <div style={{backgroundColor:'transparent', width:'fit-content', marginTop:'3.5%'}}>started following you. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
     </div>
    )}
 
 {type === "accept" && (
-    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', marginRight:'45%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'transparent', width:'100%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
     <Avatar
     alt="preview image"
     src={imageUrl}
-    sx={{ width: 40, height: 40, marginTop:'3%'}}
+    sx={{ width: 40, height: 40, marginTop:'3.5%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> accepted your follow request. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
-   
+    <div style={{backgroundColor:'transparent', width:'fit-content', marginTop:'3.5%'}}> accepted your follow request. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
     </div>
    )}
 
 {type === "request" && (
-    <div style={{display:'flex', flexDirection:'column', backgroundColor:'black', marginRight:'45%'}} >
-     <div style={{display:'flex', flexDirection:'row', backgroundColor:'black'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
+    <div style={{display:'flex', flexDirection:'column', backgroundColor:'transparent', marginRight:'45%', width:'100%'}} >
+     <div style={{display:'flex', flexDirection:'row', backgroundColor:'transparent', width:'100%'}} onClick={auth.currentUser.uid != authorId ? (handleButtonSendToProfile):(handleButtonSendToMyprofile)}>
     <Avatar
     alt="preview image"
     src={imageUrl}
-    sx={{ width: 40, height: 40, marginTop:'3%'}}
+    sx={{ width: 40, height: 40, marginTop:'3.5%'}}
     />
     <h4 className='welcome'>{username}</h4>  
-    <div style={{backgroundColor:'black', width:'220px',overflow:'hidden', whiteSpace:'nowrap', marginTop:'7%'}}> has requested to follow you. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
+    <div style={{backgroundColor:'transparent', width:'fit-content', marginTop:'3.5%'}}> requested to follow you. <small><Moment fromNow ago style={{backgroundColor:'transparent', color:'grey', fontSize:'x-small'}}>{ timestamp ? (timestamp.toDate()):null}</Moment></small></div>
     </div>
-    <div style={{display:'flex', flexDirection:'row', backgroundColor:'black', justifyContent:'center'}} >
+    <div style={{display:'flex', flexDirection:'row', backgroundColor:'transparent', marginLeft:'12%', height:'fit-content', maxHeight:'10vh'}} >
     {!followLoading ?
-    (<button style={{width:'fit-content', marginRight:'2%'}} onClick={handleButtonAccept}>Accept</button>):(
-      <button style={{width:'fit-content', marginRight:'2%'}}>{<ReactBootstrap.Spinner animation="border" size="sm"/>}</button>
+    (<button style={{width:'fit-content', marginRight:'2%',height:'fit-content'}} onClick={handleButtonAccept}>Accept</button>):(
+      <button style={{width:'fit-content', marginRight:'2%',height:'fit-content'}}>{<ReactBootstrap.Spinner animation="border" size="sm"/>}</button>
     )}
     {!declineLoading ?
     (<button style={{width:'fit-content'}} onClick={handleButtonDecline}>Decline</button>):

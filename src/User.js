@@ -71,9 +71,9 @@ const User=({user, selectUser, user1, chat})=> {
     src={picUrl}
     sx={{ width: 40, height: 40, marginTop:'2%'}}
     />
-    <h4 className='welcome' style={{backgroundColor:'transparent',height:'fit-content', marginTop:'4%', marginLeft:'2%'}}>{name}</h4>  
+    <h4 className='welcome' style={{backgroundColor:'transparent',height:'fit-content', marginTop:'4%', marginLeft:'3%'}}>{name}</h4>  
     </div>  
-    <div style={{position:'relative',marginLeft:'15%', backgroundColor:'transparent', height:'fit-content', width:'90%'}}>
+    <div style={{position:'relative',marginLeft:'16%', backgroundColor:'transparent', height:'fit-content', width:'90%', marginTop:'-2%' }}>
      {data && (data.from !== user1 && data.unread === true) ? (
   <p 
   style={{

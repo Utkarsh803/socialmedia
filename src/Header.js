@@ -578,7 +578,7 @@ catch(error)
 
           const hashFeed=doc(db, `users/${auth.currentUser.uid}/hashPosts`, `${usersCollectionRef.id}`)
 
-          setDoc(hashFeed,{
+         await  setDoc(hashFeed,{
             hash:arr[a].hash,
             postid:usersCollectionRef.id,
             pid:pid
@@ -607,7 +607,7 @@ catch(error)
 
           const hashFeed=doc(db, `users/${auth.currentUser.uid}/hashPosts`, `${usersCollectionRef.id}`)
 
-          setDoc(hashFeed,{
+         await setDoc(hashFeed,{
             hash:arr[a].hash,
             postid:usersCollectionRef.id,
             pid:pid
@@ -813,7 +813,7 @@ catch(error)
 
    const updateNotifStamp=async()=>{
     const docRef=doc(db, "users", `${auth.currentUser.uid}`)
-    updateDoc(docRef, {
+    await updateDoc(docRef, {
       notificationStamp:serverTimestamp(),
     })
    }

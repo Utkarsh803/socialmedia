@@ -64,7 +64,7 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    height: fit-content;
+    height: 100%;
     
 }
 
@@ -96,7 +96,7 @@
     padding-left:2% ;
     width: 70%;
     height: fit-content;
-    min-height:83vh;
+    min-height:83.9vh;
    
   
     

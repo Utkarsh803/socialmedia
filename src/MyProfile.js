@@ -327,12 +327,12 @@ if(index < collectionSize-1){
       <div className='number'>{numberOfPosts}</div>
       <div className='category'>Posts</div>
     </div>
-    <div className='column'>
-      <div className='number' onClick={()=>{handleButtonShowFollowers()}}>{numberOFollowers}</div>
+    <div className='column'style={{cursor:'pointer'}} onClick={()=>{handleButtonShowFollowers()}}>
+      <div className='number' >{numberOFollowers}</div>
       <div className='category'>Followers</div>
     </div>
-    <div className='column'>
-      <div className='number'  onClick={()=>{handleButtonShowFollowing()}}>{numberOFollowing}</div>
+    <div className='column'  style={{cursor:'pointer'}}  onClick={()=>{handleButtonShowFollowing()}}>
+      <div className='number'>{numberOFollowing}</div>
       <div className='category'>Following</div>
     </div>
     </div>  

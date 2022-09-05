@@ -32,7 +32,7 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
   const incCommentNum=async()=>{
     const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
     const newfield={totalComments:totalComments+1};
-    const data = updateDoc(comRef, newfield);
+    const data = await updateDoc(comRef, newfield);
 
   
   }

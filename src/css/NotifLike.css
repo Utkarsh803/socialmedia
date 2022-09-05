@@ -1,14 +1,18 @@
 .NotifLike {
     background-color:black;
      position:relative;
-     display:flex;
-     flex-direction: row;
      padding:3%;
-     min-width:93%;
-     width: fit-content;
+     min-width:100%;
+     width: 100%;
      border-bottom: 1px grey;
      border-bottom-style:outset;
+     cursor: pointer;
     }
+
+    .NotifLike:hover {
+      background-color:#666;
+      }
+   
  
 
     .NotifLike .logo{
@@ -24,12 +28,11 @@
  
  .NotifLike .welcome{
     position: relative;
-    height: fit-content;
     width: fit-content;
-    margin-top:7%;
-    margin-left:5%;
+    margin-top:4%;
+    margin-left:3%;
     font-size: large;
-    background-color: black;
+    background-color: transparent;
     }
 
     

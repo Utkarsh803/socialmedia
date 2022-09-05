@@ -41,7 +41,7 @@
     letter-spacing: 1px;
     }
 
-.welcome{
+    .Header .welcome{
 position: relative;
 height: fit-content;
 margin-top:3%;
@@ -51,19 +51,19 @@ margin-left:2%;
 background-color: black;
 }
 
-.logo{
+.Header .logo{
 position:relative;
 display: block;
 height:100%;
 width: 20%;
 }
 
-.signout{
+.Header .signout{
     position: relative;
     bottom: 7%;
 }
 
-.icons{
+.Header .icons{
     position: relative;
     background-color: black;
     margin-top: 3%;
@@ -212,7 +212,7 @@ top:250%;
   flex-direction: column;
   top: 105%;
   right: 3%;
-  width: 32%;
+  width: 40%;
   height: 70vh;
   overflow: scroll;
   scroll-behavior: smooth;

@@ -634,8 +634,8 @@ function Profile() {
       const likesRef = doc(db, `users/${auth.currentUser.uid}/likes/${docc.id}/ids`, `${uid}`) 
       const likesDoc = await getDoc(likesRef);
       if(likesDoc.exists()){
-        deleteDoc(likesRef);
-        updateDoc(postidRef,{likes:postidDocs.data().likes-1})
+       await deleteDoc(likesRef);
+        await updateDoc(postidRef,{likes:postidDocs.data().likes-1})
       }
    
 
@@ -648,7 +648,7 @@ function Profile() {
         const docRef = await getDoc(comRef) 
         
         const newfield={validComments:docRef.data().validComments-1};
-        updateDoc(comRef, newfield);
+        await updateDoc(comRef, newfield);
        
      
       
@@ -661,7 +661,7 @@ function Profile() {
       }
       else{
         const usersCollectionRef = doc(db, `/users/${auth.currentUser.uid}/comments/${docc}/ids`, `${commentDoc.id}`);
-        updateDoc(usersCollectionRef,{
+       await  updateDoc(usersCollectionRef,{
           comment: "[deleted]",
           author:"[deleted]",
         });      
@@ -677,22 +677,22 @@ function Profile() {
     })
 
     if(d.exists()){
-      updateDoc(theirRef , {following:theirDoc.data().following-1});
-    deleteDoc(theirfollowingRef)
+     await updateDoc(theirRef , {following:theirDoc.data().following-1});
+     await  deleteDoc(theirfollowingRef)
     }
 
     if(c.exists()){
-      updateDoc(theirRef , {followers:theirDoc.data().followers-1});
-    deleteDoc(theirfollowerRef)
+      await   updateDoc(theirRef , {followers:theirDoc.data().followers-1});
+      await deleteDoc(theirfollowerRef)
     }
 
     if(b.exists()){
-      updateDoc(myRef, {following:myDoc.data().following-1});
-      deleteDoc(ownfollowingRef)}
+      await updateDoc(myRef, {following:myDoc.data().following-1});
+      await deleteDoc(ownfollowingRef)}
 
     if(a.exists()){
-        updateDoc(myRef, {followers:myDoc.data().followers-1});
-        deleteDoc(ownfollowerRef);
+      await  updateDoc(myRef, {followers:myDoc.data().followers-1});
+      await  deleteDoc(ownfollowerRef);
         }
 
     
@@ -875,12 +875,12 @@ try{
       <div className='number'>{numberOfPosts}</div>
       <div className='category'>Posts</div>
     </div>
-    <div className='column' onClick={()=>{handleButtonShowFollowers()}}>
-      <div className='number'>{numberOFollowers}</div>
+    <div className='column' style={{cursor:'pointer'}} onClick={()=>{handleButtonShowFollowers()}}>
+      <div className='number' >{numberOFollowers}</div>
       <div className='category'>Followers</div>
     </div>
-    <div className='column' onClick={()=>{handleButtonShowFollowing()}}>
-      <div className='number'>{numberOFollowing}</div>
+    <div className='column' style={{cursor:'pointer'}} onClick={()=>{handleButtonShowFollowing()}}>
+      <div className='number' >{numberOFollowing}</div>
       <div className='category'>Following</div>
     </div>
     </div>  

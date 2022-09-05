@@ -184,7 +184,7 @@ const getComments=async()=>{
 const incCommentNum=async()=>{
   const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
   const newfield={totalComments:comments+1};
-  const data = updateDoc(comRef, newfield);
+  const data = await updateDoc(comRef, newfield);
 
 
 }

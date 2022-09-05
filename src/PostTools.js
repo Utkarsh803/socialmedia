@@ -108,7 +108,7 @@ const incCommentNum=async()=>{
   await runTransaction(db, async (transaction) => { 
   const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
   const newfield={totalComments:totalComments+1};
-  const data = updateDoc(comRef, newfield);
+  const data =await updateDoc(comRef, newfield);
   
     });
   }

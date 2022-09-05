@@ -274,7 +274,7 @@ if(!myfollow.exist){
 
   return (<div className="SearchResult">
     
-    <div style={{width:'20%', display:'flex', flexDirection:'row', backgroundColor:'transparent', marginRight:'45%', cursor:'pointer'}}  onClick={handleButtonSendToProfile} >
+    <div style={{width:'100%', display:'flex', flexDirection:'row', backgroundColor:'transparent', marginRight:'45%', cursor:'pointer'}}  onClick={handleButtonSendToProfile} >
     <Avatar
     alt="preview image"
     src={imageUrl}

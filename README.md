@@ -62,7 +62,7 @@ A red heart means you have new unopened notifications.
 
 ![notifications](notifs.JPG)
 
-![notif](notif2.JPG)
+![notif](notif3.JPG)
 
 ## Additional Features
 Firebase transactions for data integrity

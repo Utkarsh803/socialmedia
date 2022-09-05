@@ -139,7 +139,7 @@ const Comment = ({ comment })=> {
   const incCommentNum=async()=>{
     const comRef = doc(db, `users/${comment.postAuthor}/comments`, `${comment.postid}`)
     const newfield={totalComments:totalComments+1};
-    const data = updateDoc(comRef, newfield);
+    await updateDoc(comRef, newfield);
  
   }
 
@@ -269,10 +269,10 @@ await setDoc(docRef, {
 }
 
   
-const  subCommentLikes=()=>{
+const  subCommentLikes=async()=>{
 
   const usersCollectionRef = doc(db, `/users/${comment.postAuthor}/comments/${comment.postid}/ids`, `${comment.id}`);
-  const docRef = updateDoc(usersCollectionRef,{
+  const docRef =await  updateDoc(usersCollectionRef,{
     likes:commentLikes-1,
   })
   

@@ -252,8 +252,8 @@ const Chats=()=>{
     <div style={{padding:'1%'}}>
     <Avatar  src={picUrl} sx={{ width: 40, height: 40, marginTop:'2%'}}></Avatar>
     </div>
-    <div style={{marginLeft:'1%',paddingTop:'1.8%',fontSize:'x-large',paddingRight:'70%'}}>{chatName}</div>
-   <div style={{width:'10%'}}>
+    <div style={{marginLeft:'1%',paddingTop:'1%',fontSize:'x-large', width:'fit-content'}}>{chatName}</div>
+   <div style={{width:'10%', marginLeft:'auto',marginRight:'2%' }}>
     <BiDotsVerticalRounded style={{height:'100%', width:'40%', float:'right'}}/>
     </div>
     </div>   

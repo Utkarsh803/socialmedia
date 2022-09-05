@@ -35,14 +35,26 @@ const List = ({authorId, typ})=> {
     const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            SetFollow(true);
             SetRemove(true);
         } else {
         // doc.data() will be undefined in this case
-            SetFollow(false);
             SetRemove(false);
         }
     }
+
+    const getFollowing=async()=>{
+        const docRef = doc(db, `users/${auth.currentUser.uid}/followingList`, `${authorId}`)
+        const docSnap = await getDoc(docRef);
+    
+            if (docSnap.exists()) {
+                SetFollow(true);
+              
+            } else {
+            // doc.data() will be undefined in this case
+                SetFollow(false);
+               
+            }
+        }
 
     const getBlock=async()=>{
         const docRef = doc(db, `users/${auth.currentUser.uid}/blockedUsers`, `${authorId}`)
@@ -137,15 +149,20 @@ const List = ({authorId, typ})=> {
             });
             }
             getPostPic();
-            if(typ==="follow" || typ==="remove"){
+            if( typ==="remove"){
             getFollow();
             getFollowStats();
         }
-            if(typ==="block"){
+
+        else if( typ==="follow"){
+            getFollowing();
+            getFollowStats();
+        }
+            else if(typ==="block"){
             getBlock();}
-            if(typ==="mute"){
+            else if(typ==="mute"){
             getMute();}
-            if(typ==="restrict"){
+            else if(typ==="restrict"){
             getRestrict();}
       }, [] );
 
@@ -379,7 +396,7 @@ const handleButtonUnRestrict=async()=>{
 
   return (<div className="SearchResult">
     
-    <div style={{width:'20%',display:'flex', flexDirection:'row', backgroundColor:'transparent', marginRight:'45%', cursor:'pointer'}}  onClick={handleButtonSendToProfile} >
+    <div style={{width:'30%',display:'flex', flexDirection:'row', backgroundColor:'transparent', marginRight:'45%', cursor:'pointer'}}  onClick={handleButtonSendToProfile} >
     <Avatar
     alt="preview image"
     src={imageUrl}
