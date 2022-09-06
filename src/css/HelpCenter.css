@@ -6,6 +6,12 @@
     height:fit-content;
     min-height: 80vh;
   }
+
+  
+  .HelpCenter textarea::placeholder {
+    color: rgb(202, 202, 202);
+  }
+
   .HelpCenter button{
     position: relative;
     display: block;

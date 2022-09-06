@@ -155,8 +155,10 @@ const Chats=()=>{
 
 
     const handleSubmit=async()=>{
+      
+        document.getElementById('messageInput').value = '';
         if(img!==null && text!==null && text!==""){
-        setVal(()=>"");
+        
         const id = auth.currentUser.uid > chat ? `${auth.currentUser.uid + chat}` : `${chat + auth.currentUser.uid}`
 
 
@@ -271,7 +273,7 @@ const Chats=()=>{
          </label>
             </div>
         <div style={{position:'relative',display:'flex', flexDirection:'row', width:'85%',backgroundColor:'transparent', marginBottom:'0px'}}>
-        <input placeholder="Message...."  style={{position:'relative',height:'100%', width:'100%', color:'white', paddingLeft:'2%', paddingRight:'2%', fontSize:'large', border:'1px solid #333', borderRadius:'5px', backgroundColor:'#333'}} onChange={(event)=>{SetText(event.target.value)}}></input>
+        <input id="messageInput" placeholder="Message...."  style={{position:'relative',height:'100%', width:'100%', color:'white', paddingLeft:'2%', paddingRight:'2%', fontSize:'large', border:'1px solid #333', borderRadius:'5px', backgroundColor:'#333'}} onChange={(event)=>{SetText(event.target.value)}}></input>
         </div>
         <div style={{position:'relative',width:'10%', height:'100%',paddingLeft:'1%',backgroundColor:'transparent',paddingTop:'7px' }}>
         <button style={{position:'relative',height:'100%', width:'92%', border:'1px solid #405cf5', borderRadius:'5px'}} onClick={()=>{handleSubmit()}}>Post</button>

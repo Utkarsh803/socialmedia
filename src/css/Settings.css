@@ -6,6 +6,13 @@
     height:fit-content;
     min-height: 80vh;
   }
+
+  
+  .Settings input::placeholder {
+    color: rgb(202, 202, 202);  
+  }
+
+
   .Settings button{
     position: relative;
     display: block;

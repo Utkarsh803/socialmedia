@@ -243,6 +243,7 @@ const addToPostComments=async()=>{
 
   const addComment=async()=>{ 
     SetCommentLoading(true);
+    document.getElementById('commentInput').value = '';
     try{
       await runTransaction(db, async (transaction) => {   
     
@@ -353,7 +354,7 @@ const addToPostComments=async()=>{
     src={profilePicUrl}
     sx={{ width: 25, height: 25, marginTop:'1%', marginLeft:'3%'}}
     />
-    <input placeholder='Add a comment....' style={{backgroundColor:'black', width:'90%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }} onChange={(event)=>{SetComCaption(event.target.value)}}>
+    <input id="commentInput" placeholder='Add a comment....' style={{backgroundColor:'black', width:'90%',borderTop:'none',borderLeft:'none',borderRight:'none', borderBottom:'1px solid white', paddingLeft:'2%', height:'6vh', color:'white' }} onChange={(event)=>{SetComCaption(event.target.value)}}>
     </input>
     {!commentLoading ?
     (<button disable={commentLoading} style={{backgroundColor:'black', width:'fit-content', textAlign:'left', height:'6vh',marginTop:'0.4%', color:'deepskyblue',fontSize:'large'}} onClick={addComment}>Post</button>):

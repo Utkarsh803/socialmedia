@@ -209,8 +209,10 @@ if(userMessage.length>1 && userMessage!==null && userMessage!=""){
       uid:auth.currentUser.uid,
       createdAt:serverTimestamp(),
     })
-    SetSent(true);
     SetLoading(false);
+    window.alert("Message sent.")
+    document.getElementById("messageForm").reset();
+    
   }else{
     window.alert("Please type in a message. ")
   }
@@ -279,18 +281,15 @@ if(userMessage.length>1 && userMessage!==null && userMessage!=""){
    </div>)}
 
    {report && (
-       <div className="formContainer" style={{paddingLeft:'10%'}}>
-        <form>
-        <textArea placeholder="your message" style={{width:'90%', height:'40vh'}} onChange={(e)=>{
+       <div className="formContainer">
+        <form id="messageForm" style={{paddingLeft:'5%'}} onSubmit={sendMessage}>
+        <textArea id="messageArea" placeholder="Type you Message or Request" style={{width:'93%', height:'40vh', borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}} onChange={(e)=>{
           SetUserMessage(e.target.value)
         }}></textArea>
         <div style={{width:'90%', height:'40vh'}}>
-        {!loading && ! sent &&(
-        <button style={{marginLeft:'40%', width:'fit-content'}} onClick={(e)=>{sendMessage(e)}}>Submit</button>)}
+        {!loading && (
+        <button style={{marginLeft:'43%', width:'fit-content'}} type="submit">Submit</button>)}
         
-        {!loading && sent &&(
-        <button disabled={true} style={{marginLeft:'40%', width:'fit-content'}}>Submited</button>)}
-
 {loading && (
         <button style={{marginLeft:'40%', width:'fit-content'}}>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Submiting...</button>)}
         </div>

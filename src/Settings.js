@@ -42,6 +42,7 @@ function Settings() {
     const [loginActivity, SetLoginActivity]=useState(false);
     
     const [username, SetUserName]=useState("");
+    const [usernameVal, SetUserNameVal]=useState("");
     const [website, SetWebsite]=useState("");
     const [bio, SetBio]=useState("");
     const [phone, SetPhone]=useState("");
@@ -255,9 +256,9 @@ function Settings() {
    
   }
   
-  const handleInputUsername=(e)=>{
+  const handleInputUsernameVal=(e)=>{
 
-    SetUserName(e);
+    SetUserNameVal(e);
 
   }
   const handleInputBio=(e)=>{
@@ -296,14 +297,15 @@ function Settings() {
 
 
 
-  const addProfileInfo = async () =>
+  const addProfileInfo = async (e) =>
   {
+    e.preventDefault();
     SetLoading(true);  
       try
        {  
           await updateDoc(doc(db, "users", auth.currentUser.uid), {
               name: name,
-              username:username,
+              username:usernameVal,
               email: email,
               phone:phone,
               bio:bio,
@@ -311,7 +313,8 @@ function Settings() {
               website:website,
               });
               SetLoading(false);
-              showAlert();
+             // showAlert();
+             document.getElementById("profileInfo").reset();
              
             
             } 
@@ -533,7 +536,8 @@ function Settings() {
                       }
                       
                       }
-    const reAuth = async() =>{
+    const reAuth = async(e) =>{
+      e.preventDefault();
       SetLoading(true);
       const cred = EmailAuthProvider.credential(auth.currentUser.email, credential); 
       reauthenticateWithCredential(auth.currentUser,cred).then(() => {
@@ -545,6 +549,7 @@ function Settings() {
           console.log(error);
         });
         SetLoading(false);
+        document.getElementById("passwordResetForm").reset();
       }
       else{
         window.alert("New Passwords do not match.")
@@ -675,7 +680,8 @@ function Settings() {
       window.location.reload();
   }
 
-const deleteAcc = async() =>{
+const deleteAcc = async(e) =>{
+  e.preventDefault();
     SetLoading(true);
     const cred = EmailAuthProvider.credential(auth.currentUser.email, deleteCredential); 
     reauthenticateWithCredential(auth.currentUser,cred).then(async() => {
@@ -686,6 +692,7 @@ const deleteAcc = async() =>{
       })
       SetLoading(false);
       window.alert("Your Account will be deleted soon.Thank you for using our services.")
+      document.getElementById("deleteAccountForm").reset();
   }).catch((error) => {
     window.alert("Password Incorrect");
     console.log(error);
@@ -854,38 +861,37 @@ No Followers.
         
         </div>
         </div>
-        <div className='formInputsColumn'>
-        <div className='bgblack'>Name :<input placeholder={name} className='formInput' onChange={(event)=>{handleInputName(event.target.value)}}></input></div>
         
-        <div className='bgblack'>Username :<input  placeholder={username} className='formInput' onChange={(event)=>{handleInputUsername(event.target.value)}}></input></div>
-        <div className='bgblack'>Website :<input  placeholder={website} className='formInput' onChange={(event)=>{handleInputWebsite(event.target.value)}}></input></div>
-        <div className='bgblack'> Bio :<input  placeholder={bio} className='formInputBio' onChange={(event)=>{handleInputBio(event.target.value)}}></input></div>
-        <div className='bgblack'>Number :<input  placeholder={phone} className='formInput' onChange={(event)=>{handleInputPhone(event.target.value)}}></input></div>
-        <div className='bgblack'>Email :<input  placeholder={email} className='formInput' onChange={(event)=>{handleInputEmail(event.target.value)}}></input></div>
-        <div className='bgblack'>Gender :<input  placeholder={gender} className='formInput' onChange={(event)=>{handleInputGender(event.target.value)}}></input></div>
-      {!loading ? (<button className='submit' onClick={addProfileInfo} disabled={loading}>Submit </button>):
+<form  className='formInputsColumn' id="profileInfo" onSubmit={addProfileInfo}>
+        <label className='bgblack'>Name :<input placeholder={name} className='formInput' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}} onChange={(event)=>{handleInputName(event.target.value)}}></input></label>
+        
+        <label className='bgblack'>Username :<input  placeholder={username} className='formInput' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}} onChange={(event)=>{handleInputUsernameVal(event.target.value)}}></input></label>
+        <label className='bgblack'>Website :<input  placeholder={website} className='formInput' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}} onChange={(event)=>{handleInputWebsite(event.target.value)}}></input></label>
+        <label className='bgblack'> Bio :<input  placeholder={bio} className='formInputBio' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}} onChange={(event)=>{handleInputBio(event.target.value)}}></input></label>
+        <label className='bgblack'>Number :<input  placeholder={phone} className='formInput' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}}  onChange={(event)=>{handleInputPhone(event.target.value)}}></input></label>
+        <label className='bgblack'>Email :<input  placeholder={email} className='formInput' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}} onChange={(event)=>{handleInputEmail(event.target.value)}}></input></label>
+        <label className='bgblack'>Gender :<input  placeholder={gender} className='formInput' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}}  onChange={(event)=>{handleInputGender(event.target.value)}}></input></label>
+      {!loading ? (<button className='submit' type= 'submit' disabled={loading}>Submit </button>):
       (<button className='submit'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Submiting.... </button>)}  
-        
+</form>
       
-      </div>
+   
     </div>)}
     {passwordReset && (
-    <div className="formContainer">
+    <form className="formContainer" id="passwordResetForm" onSubmit={reAuth}>
   
         <div className='formInputsColumnPasswordReset'>
     
-        <input placeholder='Enter Old Password*' className='formInput' onChange={(event=>{SetCredential(event.target.value)})}></input>
-                
-                
-        <input placeholder='Enter New Password *'  className='formInput' onChange={(event=>{SetnewPass(event.target.value)})}></input>
-        <input placeholder='Confirm New Password *' className='formInput'  onChange={(event=>{SetNewPassConfirm(event.target.value)})}></input>
+        <input placeholder='Enter Old Password*' type="password" className='formInput' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}} onChange={(event=>{SetCredential(event.target.value)})}></input>
+        <input placeholder='Enter New Password *'  type="password" className='formInput' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}} onChange={(event=>{SetnewPass(event.target.value)})}></input>
+        <input placeholder='Confirm New Password *' type="password" className='formInput'  style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}} onChange={(event=>{SetNewPassConfirm(event.target.value)})}></input>
       {!loading ?
-       ( <button className='submitResetPassword'  disabled={loading} onClick={reAuth}>Submit</button>):
+       ( <button className='submitResetPassword' type='submit' disabled={loading}>Submit</button>):
        (<button className='submitResetPassword'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Submiting...</button>)}
       
       </div>
 
-    </div>)}
+    </form>)}
     {emailAndSms && (
     <div className="formContainerEmailandSms">
     
@@ -943,19 +949,19 @@ No Followers.
     </div>)}
 
     {deleteAccount && (
-    <div className="formContainer">
+    <form className="formContainer" id="deleteAccountForm" onSubmit={deleteAcc}>
         <div className='formInputsColumnPasswordReset'>
-        <input placeholder='Enter Password*' type="password" className='formInput' onChange={(event=>{SetDeleteCredential(event.target.value)})}></input>
+        <input placeholder='Enter Password*' type="password" className='formInput' style={{borderRadius:'5px', backgroundColor:'#666', color:'white', border:'none', outline:'none', padding:'10px'}}  onChange={(event=>{SetDeleteCredential(event.target.value)})}></input>
          <div style={{paddingLeft:'10%', marginTop:'5%'}}>
         <input type="checkbox" onChange={(e)=>{SetCheckDeleteAccount(e.target.checked)}}></input><small> I confirm, delete my account</small>
          </div>       
       {!loading ?
-       ( <button className='submitResetPassword'  disabled={loading || !checkDeleteAccount} onClick={deleteAcc} >Delete my Account</button>):
+       ( <button className='submitResetPassword'  type="submit" disabled={loading || !checkDeleteAccount} >Delete my Account</button>):
        (<button className='submitResetPassword'>{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Deleting...</button>)}
       
       </div>
 
-    </div>)}
+    </form>)}
 
     </div>
     </div>

@@ -30,7 +30,7 @@ function Login(setlogged) {
     const [user, setUser] = useState({});
     const [loading, setLoading] = useState(false);
     const [loadingR, setLoadingR] = useState(false);
-    const [linkSent, setLinkSent] = useState(false);
+    const [linkSent, setLinkSent] = useState(true);
     const [errorMsg, setErrorMsg] = useState("");
     const [errorMsgName, setErrorMsgName] = useState("");
     const [errorMsgLogin, setErrorMsgLogin] = useState("");
@@ -338,8 +338,10 @@ const navigate = useNavigate();
     <div className='divider'>
     <div className="half">
     <div className='heading'>Register</div>
+
     {linkSent &&
-    (<small style={{color:'green', textAlign:'center'}}>Email Verification Link Sent!!</small>)}
+    (<small style={{position:'absolute',top:'15%',color:'green', textAlign:'center'}}>Email Verification Link Sent.</small>)}
+
     {errorMsg && errorMsgName &&(
         <small style={{position:'absolute',top:'15%',color:'red', textAlign:'center'}}>{errorMsgName}</small>
     )}
