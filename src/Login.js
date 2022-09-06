@@ -30,7 +30,7 @@ function Login(setlogged) {
     const [user, setUser] = useState({});
     const [loading, setLoading] = useState(false);
     const [loadingR, setLoadingR] = useState(false);
-    const [linkSent, setLinkSent] = useState(true);
+    const [linkSent, setLinkSent] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [errorMsgName, setErrorMsgName] = useState("");
     const [errorMsgLogin, setErrorMsgLogin] = useState("");
