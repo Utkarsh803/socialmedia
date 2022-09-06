@@ -100,8 +100,8 @@ const SearchResult = ({name, authorId, url, SetSearchRes})=> {
             });
             }
             getPostPic();
-            getFollow();
-            getFollowStats();
+         //   getFollow();
+         //   getFollowStats();
       }, [] );
 
 

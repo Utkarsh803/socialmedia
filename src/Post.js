@@ -37,7 +37,10 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
   
   }
 
+
   useEffect(()=>{
+
+
       const getCommentNum=async()=>{
         const comRef = doc(db, `users/${authorId}/comments/`, `${postid}`)
         const data = await getDoc(comRef);
@@ -243,8 +246,10 @@ const addToPostComments=async()=>{
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={profilePic}></PostTools>
 
     <div className='caption'>
-    <span style={{height:'auto', width:'100%',flex:'1',wordWrap:'break-word'}}>{name+" "+captions}</span>
-    </div>
+   <p  style={{height:'auto', width:'100%',flex:'1',wordBreak:'break-word'}}>
+   <span style={{fontWeight:'bold'}}> {name}</span>{' '}<span>{captions}</span>
+   </p>
+  </div>
 
     <div style={{color:'#888',backgroundColor:'black',paddingLeft:'3%', fontSize:'small'}}><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></div>
 

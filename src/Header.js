@@ -69,41 +69,51 @@ function Header() {
   let nextRef= useRef();
   let searchRef= useRef();
   let searchRefHash= useRef();
+  let notifButton= useRef();
+  let profileButton= useRef();
+  let addPostButton= useRef();
  
   
   useEffect(()=>{
 
     let handler = (event)=>{
-      if(!notifRef.current.contains(event.target)){
-      SetViewNotif(false);}
+      if(notifRef.current && !notifRef.current.contains(event.target) || notifRef.current && notifButton.current.contains(event.target) ){
+      SetViewNotif(false);}else if (!notifRef.current && notifButton.current.contains(event.target)){
+        SetViewNotif(true)
+      }
     }
 
     let handler2 = (event)=>{
-      if(!profileRef.current.contains(event.target)){
-      SetProfileMenu(false);}
+      if(profileRef.current && !profileRef.current.contains(event.target) || profileRef.current && profileButton.current.contains(event.target)){
+      SetProfileMenu(false);}else if (!profileRef.current && profileButton.current.contains(event.target)){
+        SetProfileMenu(true)
+      }
     }
 
     let handler3 = (event)=>{
-      if(!addPostRef.current.contains(event.target)){
+      if(addPostRef.current && !addPostRef.current.contains(event.target) || addPostRef.current && addPostButton.current.contains(event.target)){
         handleButtonUploadImage();
       SetAddPost(false);}
+      else if(!addPostRef.current && addPostButton.current.contains(event.target)){
+        SetAddPost(true);
+      }
     }
     let handler4 = (event)=>{
-      if(!uploadRef.current.contains(event.target)){
+      if(uploadRef.current && !uploadRef.current.contains(event.target)){
         handleButtonUploadImage();
       SetUpload(false);}
     }
     let handler5 = (event)=>{
-      if(!nextRef.current.contains(event.target)){
+      if(nextRef.current && !nextRef.current.contains(event.target)){
         handleButtonClose();
       SetNext(false);}
     }
     let handler6 = (event)=>{
-      if(!searchRef.current.contains(event.target)){
+      if( searchRef.current && !searchRef.current.contains(event.target)){
       SetSearchRes(false);}
     }
     let handler7 = (event)=>{
-      if(!searchRefHash.current.contains(event.target)){
+      if(searchRefHash.current && !searchRefHash.current.contains(event.target)){
       SetSearchResHash(false);}
     }
 
@@ -199,6 +209,11 @@ function Header() {
           
     }
 
+    const generateKey = (pre) => {
+      return `${ pre }_${ new Date().getTime() }`;
+  }
+
+  
    const search = async(name) =>{
     SetSearchInput(name);
     getStatus();
@@ -822,7 +837,6 @@ catch(error)
     SetNewNotifs(false);
     updateNotifStamp();
     getNotif();
-    SetViewNotif(!viewNotif);
    }
 
 
@@ -850,7 +864,7 @@ catch(error)
     {
     searchRes.map((res)=>
     {if(!blocked.includes(res.id))
-      return <div  style={{width:'60%', marginLeft:'4%'}} >
+      return <div  style={{width:'60%', marginLeft:'4%'}} key={ generateKey(res.id)} >
      <SearchResult name={res.username} authorId={res.id} url={res.profilePic} SetSearchRes={SetSearchRes}></SearchResult>
       </div>;
     })
@@ -859,18 +873,25 @@ catch(error)
     }
 
 {searchResHash && 
-    (
+     <div ref={searchRefHash}>
+    {
     searchResHash.map((res)=>
-    {return <div  style={{width:'60%', marginLeft:'4%'}}  ref={searchRefHash}>
+    {return <div  style={{width:'60%', marginLeft:'4%'}} >
      <SearchResultHash hash={res.tag}  SetSearchResHash={SetSearchResHash}></SearchResultHash>
       </div>;
     })
-    )}
+    }
+    </div>
+    }
 
     </div>
-    <AiOutlineHome className='icons' onClick={goToHome}/>
-    
-    <BiImageAdd className='icons'  onClick={handleButtonAddPost}/>
+    <div className='icons'>
+    <AiOutlineHome style={{width:'100%', height:'100%'}} onClick={goToHome}/>
+    </div>
+
+    <div className='icons' ref={addPostButton}>
+    <BiImageAdd style={{width:'100%', height:'100%'}}/>
+    </div>
     {addPost && (
     <div class="middletray" ref={addPostRef}>
         <button className='addMedia' onClick={handleButtonUploadImage}> <BiImageAdd className='selectionIcon' />  Add Image</button>
@@ -976,10 +997,11 @@ catch(error)
 </div>
   )}
 
+<div  className='icons' ref = {notifButton}>
     {!newNotifs ?
-   (<AiOutlineHeart className='icons' onClick={handleButtonNotif}/>):
-   (<AiFillHeart className='icons' style={{color:'red'}} onClick={handleButtonNotif}/>)}
-        
+   (<AiOutlineHeart  style={{width:'100%', height:'100%'}} onClick={handleButtonNotif}/>):
+   (<AiFillHeart style={{width:'100%', height:'100%'}}   onClick={handleButtonNotif}/>)}
+        </div>
         {!loading && viewNotif && Notif !=="null" && Notif !== null && (
         <div ref={notifRef} className='NotifTray'>
          {( Notif.map((res)=>
@@ -1012,10 +1034,14 @@ catch(error)
               </div>
          )}
         
-     
-    <BiMessageRounded className='icons'onClick={handleButtonChats}/>
-    
-    <CgProfile className='icons' onClick={handleButtonProfileMenu}/>
+     <div className='icons'>
+    <BiMessageRounded style={{width:'100%', height:'100%'}} onClick={handleButtonChats}/>
+    </div>
+
+    <div className='icons' ref={profileButton}>
+    <CgProfile style={{width:'100%', height:'100%'}}/>
+    </div>
+
     {profileMenu && (
     <div  ref={profileRef} className="dropdown">
       <ul style={{background:'black', height:'fit-content'}}>

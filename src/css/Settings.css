@@ -330,7 +330,20 @@
                                     position: absolute;
                                     display: flex;
                                     flex-direction: column;
-                                    top: 10%;
+                                    top:100px;
+                                    right: 30%;
+                                    width: 40%;
+                                    height: fit-content;
+                                    z-index: 2;
+                                    background-color: black;
+                                    border-radius: 2.5%;
+                                  }
+
+                                  .Settings .uploadtrayS{
+                                    position: absolute;
+                                    display: flex;
+                                    flex-direction: column;
+                                    top:100px;
                                     right: 30%;
                                     width: 40%;
                                     height: fit-content;

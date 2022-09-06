@@ -789,8 +789,8 @@ No Followers.
    
    
     {uploadProfilePic && (   
- <div class="uploadtray">
-  <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton"></AiOutlineCloseCircle>
+ <div class="uploadtrayS" >
+  <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton" style={{color:'white'}}></AiOutlineCloseCircle>
 <div className='chooseAndDisplay'>
   <input type="file" className='chooseImage' onChange={onImageChange} ></input>
 </div>
@@ -803,7 +803,7 @@ No Followers.
 
 {preview && (   
   <div class="uploadtray">
-   <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton"></AiOutlineCloseCircle>
+   <AiOutlineCloseCircle onClick={handleButtonUploadImage} style={{color:'white'}} className="closeButton"></AiOutlineCloseCircle>
    <button className="back" onClick={handleButtonBack}>Back</button>
     
    {profilePic &&(

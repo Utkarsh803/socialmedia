@@ -311,9 +311,12 @@ const addToPostComments=async()=>{
     </div>
     <div style={{width:'50%', paddingLeft:'2%', height:'70vh'}}>
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={currentPicUrl}></PostTools>
-    <div className='caption'>
-    <span style={{height:'auto', width:'100%',flex:'1',wordWrap:'break-word'}}>{name+" "+captions}</span>
-    </div>
+ 
+  <div className='caption'>
+   <p  style={{height:'auto', width:'100%',flex:'1',wordBreak:'break-word'}}>
+   <span style={{fontWeight:'bold'}}> {name}</span>{' '}<span>{captions}</span>
+   </p>
+  </div>
 
     <div style={{color:'#888',backgroundColor:'black',paddingLeft:'3%', fontSize:'small', paddingTop:'3%'}}><Moment fromNow style={{backgroundColor:'transparent'}}>{ timeStamp ? (timeStamp.toDate()):null}</Moment></div>
 

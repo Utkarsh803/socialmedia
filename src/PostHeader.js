@@ -22,22 +22,27 @@ function PostHeader({name, url, postid, authorId, typ, tags}) {
 
     
     const optionRef = useRef();
-    const optionRefH = useRef();
-    let navigate = useNavigate(); 
+    let navigate = useNavigate();
+    
+    let optionB  = useRef();
+
+    
 
     useEffect(()=>{
-      let handler = (event)=>{
-        if(!optionRef.current.contains(event.target)){
-        SetOption(false);}
-      }
 
-      let handler2 = (event)=>{
-        if(!optionRefH.current.contains(event.target)){
-        SetOption(false);}
+        
+    let handler = (event)=>{
+      if(optionRef.current && !optionRef.current.contains(event.target) || optionRef.current && optionB.current.contains(event.target) ){
+      SetOption(false);}else if (!optionRef.current && optionB.current.contains(event.target)){
+        SetOption(true)
       }
+    }
+
+
   
-      document.addEventListener("mousedown", handler);
-      document.addEventListener("mousedown", handler2);
+    document.addEventListener("mousedown", handler);
+  
+
 
       const getCommentsStatus=async()=>{
         const docRef = doc(db, `users/${authorId}/posts/`, `${postid}`);
@@ -52,10 +57,12 @@ function PostHeader({name, url, postid, authorId, typ, tags}) {
       }
       
       getCommentsStatus();
-      getReported();
+      if(auth.currentUser.uid!==authorId){
+      getReported();}
+      
       return()=>{
         document.removeEventListener("mousedown", handler)
-        document.removeEventListener("mousedown", handler2)
+        
       }
     }, [])
 
@@ -289,8 +296,9 @@ const archivePost=async()=>{
     onClick={goToProfile}
     />
     <h4 className='welcome' onClick={goToProfile}>{name}</h4>
-    <BiDotsVerticalRounded className='icons'  onClick={handleButtonOptiont}/>
-
+    <div className='icons'  ref={optionB}>
+    <BiDotsVerticalRounded style={{width:'100%', height:'100%'}}/>
+    </div>
     {option && typ===vertical && auth.currentUser.uid!=authorId &&(
     <div className="dropdown" ref={optionRef}>
       <ul className="ulV">
@@ -302,7 +310,7 @@ const archivePost=async()=>{
 
 
 {option && typ===horizontal && auth.currentUser.uid!=authorId &&(
-    <div className="dropdownH" ref={optionRefH} >
+    <div className="dropdownH" ref={optionRef} >
       <ul className="ulH" >
         <button className='selection' onClick={handleButtonNotInterested}> Not Interested</button>
         {reported ? (<button className='selection'> Reported</button>):(<button className='selection'onClick={handleButtonReport}> Report</button>)}
@@ -311,7 +319,7 @@ const archivePost=async()=>{
   )}
 
 {option && typ===horizontal && auth.currentUser.uid==authorId &&(
-    <div className="dropdownH" ref={optionRefH} >
+    <div className="dropdownH" ref={optionRef} >
       <ul className="ulH">
       {commentStatus ?
         (<button className='selection'  onClick={turnOffComments}>Turn off Comments</button>):

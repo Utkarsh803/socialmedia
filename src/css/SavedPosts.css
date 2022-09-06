@@ -55,12 +55,12 @@
       display: flex;
       flex-direction: column;
       background-color: black;
-      width:80%;
+      width:60%;
       height:fit-content;
       min-height: 80vh;
       margin-bottom:3%;
       margin-Top: 3%;
-      margin-left: 10%;
+      margin-left: 20%;
       border-radius: 2%;
       border-top-left-radius: 2%;
       border-bottom-left-radius: 2%;
@@ -72,10 +72,10 @@
     flex: 1;
     background-color: black;
     flex-wrap: wrap;
-    flex-direction: 'row';
-    width: 90%;
+    flex-direction: 'column';
+    width: 80%;
     height: fit-content;
-    margin-left: 5%;
+    margin-left: 10%;
     padding-top: 2%;
     border-radius: 2%;
     margin-bottom: 2%;
@@ -84,8 +84,7 @@
   
   .SavedPosts .indPost{ 
     position: relative;
-    width: 85%;
-    padding-left: 7.5%;
+    width: 100%;
     background-color:black;
     margin-bottom: 0.5%;
     border: 1px solid black;

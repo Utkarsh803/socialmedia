@@ -292,8 +292,10 @@ catch(e)
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={currentPicUrl}></PostTools>
 
     <div className='caption'>
-   <span style={{height:'auto', width:'100%',flex:'1',wordBreak:'break-word'}}>{name+" "+captions}</span>
-    </div>
+   <p  style={{height:'auto', width:'100%',flex:'1',wordBreak:'break-word'}}>
+   <span style={{fontWeight:'bold'}}> {name}</span>{' '}<span>{captions}</span>
+   </p>
+  </div>
 
     
     {(comments >= 2) &&  commentStatus &&(

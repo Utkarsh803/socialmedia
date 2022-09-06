@@ -34,6 +34,7 @@ function Grid({postid,authorId}) {
 
 
 useEffect(()=>{
+  
 
 const getUserPost =async()=>{
   const postsCollectionRef = doc(db, `users/${authorId}/posts`, `${postid}`);
@@ -67,6 +68,7 @@ const getUserPost =async()=>{
     
 }
 }
+
 getUserPost();
 }, [] );
 

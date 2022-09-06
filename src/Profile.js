@@ -78,7 +78,39 @@ function Profile() {
     const[collectionSize, SetCollectionSize]=useState();
     const followString="follow"
     
+    let followerB = useRef()
+    let followingB = useRef()
+    let optionB = useRef()
+    let followerT = useRef()
+    let followingT = useRef()
+    let optionT = useRef()
+    
     useEffect(()=>{
+
+      let handler = (event)=>{
+        if(followerT.current && !followerT.current.contains(event.target) || followerT.current && followerB.current.contains(event.target) ){
+        SetShowFollowers(false);}else if (!followerT.current && followerB.current.contains(event.target)){
+          SetShowFollowers(true)
+        }
+      }
+
+      let handler2 = (event)=>{
+        if(followingT.current && !followingT.current.contains(event.target) || followingT.current && followingB.current.contains(event.target) ){
+        SetShowFollowing(false);}else if (!followingT.current && followingB.current.contains(event.target)){
+          SetShowFollowing(true)
+        }
+      }
+
+      let handler3 = (event)=>{
+        if(optionT.current && !optionT.current.contains(event.target) || optionT.current && optionB.current.contains(event.target) ){
+        SetOptions(false);}else if (!optionT.current && optionB.current.contains(event.target)){
+          SetOptions(true)
+        }
+      }
+
+      document.addEventListener("mousedown", handler);
+      document.addEventListener("mousedown", handler2);
+      document.addEventListener("mousedown", handler3);
 
       SetCurrentPicUrl(null);
       const getUsersData = () => {
@@ -209,7 +241,18 @@ function Profile() {
     if(privateAccount && !follow){
       getRequested();
     }
+
+    return()=>{
+      document.removeEventListener("mousedown", handler)
+      document.removeEventListener("mousedown", handler2)
+      document.removeEventListener("mousedown", handler3)
+    }
   }, [uid, index] );
+
+      
+  const generateKey = (pre) => {
+    return `${ pre }_${ new Date().getTime() }`;
+}
 
   const getStatus=async()=>{
     let keys3=[];
@@ -778,13 +821,10 @@ function Profile() {
 
   const handleButtonShowFollowers=async()=>{
 try{
-  if(showFollowing===false){
+
     await getStatus();
   await  getFollowersList();
-  SetShowFollowers(!showFollowers);}
-  else{
-    SetShowFollowers(!showFollowers);
-  }
+
   }
   catch(e){
     console.log(e.message)
@@ -793,13 +833,11 @@ try{
   }
 
   const handleButtonShowFollowing=async()=>{
-    if(showFollowing===false){
+
     await getStatus();
     await getFollowingList();
-    SetShowFollowing(!showFollowing)}
-    else{
-      SetShowFollowing(!showFollowing)
-    }
+    
+
   }
  
   return (<div className="Profile">
@@ -808,7 +846,7 @@ try{
     <Header handleLogout={logout} ></Header>
 
     {options && 
-      (<div  style={{position:'absolute', top:'22.5%',left:'75%', width:'fit-content', zIndex:'3', backgroundColor:'black'}}>
+      (<div  style={{position:'absolute', top:'22.5%',left:'75%', width:'fit-content', zIndex:'3', backgroundColor:'black'}} ref={optionT}>
         <ul style={{justifyContent:'center'}}>
           
           {restricted ? (<button className='option' onClick={handleButtonUnRestrict}>UnRestrict</button>):(<button className='option' disabled={restricted} onClick={handleButtonRestrict}>Restrict</button>)}
@@ -824,7 +862,7 @@ try{
   )} 
 
   {showFollowing && followingList !== null &&(
-    <div className='list'>
+    <div className='list' ref={followingT}>
   {followingList.map((res)=>
     {if (!(blockedList.includes(res.id)))
     return <div style={{width:'100%'}}>
@@ -833,7 +871,7 @@ try{
   </div>)}
   
   {showFollowers && followerList!==null && (
-      <div className='list'>
+      <div className='list' ref={followerT}>
         {followerList.map((res)=>
     {if (!(blockedList.includes(res.id)))
   return <div style={{width:'100%'}}>
@@ -871,21 +909,21 @@ try{
     />
     </div>
     <div className='row'>
-    <div className='column' >
+    <div className='column'  >
       <div className='number'>{numberOfPosts}</div>
       <div className='category'>Posts</div>
     </div>
-    <div className='column' style={{cursor:'pointer'}} onClick={()=>{handleButtonShowFollowers()}}>
+    <div className='column' style={{cursor:'pointer'}} ref={followerB} onClick={()=>{handleButtonShowFollowers()}}>
       <div className='number' >{numberOFollowers}</div>
       <div className='category'>Followers</div>
     </div>
-    <div className='column' style={{cursor:'pointer'}} onClick={()=>{handleButtonShowFollowing()}}>
+    <div className='column' style={{cursor:'pointer'}} ref={followingB} onClick={()=>{handleButtonShowFollowing()}}>
       <div className='number' >{numberOFollowing}</div>
       <div className='category'>Following</div>
     </div>
     </div>  
-    <div style={{height:'40px',width:'40px', backgroundColor:'black', color:'white'}}>
-      <BiDotsVerticalRounded style={{width:'100%', height:'40px', cursor:'pointer'}} onClick={()=>{handleButtonOptions()}}/>
+    <div style={{height:'40px',width:'40px', backgroundColor:'black', color:'white'}} ref={optionB}>
+      <BiDotsVerticalRounded style={{width:'100%', height:'40px', cursor:'pointer'}} />
     </div>
     </div>
     <div className='columnBionButton'>
@@ -941,7 +979,7 @@ try{
       </div>
 
 {!privateAccount &&( 
-      <div className='posts'>  
+      <div className='posts' key={ generateKey({uid})}>  
       {posts !== null && focusImages && grid && !loading && posts !== "null" &&
       (posts.map((post)=>
     {if(!post.deleted)  
@@ -969,7 +1007,7 @@ try{
  </div>)};
 
  {privateAccount && follow && ( 
-      <div className='posts'>  
+      <div className='posts' key={ generateKey({uid})}>  
       {posts !== null && focusImages && grid && !loading && posts !== "null" &&
       (posts.map((post)=>
     { if(!post.deleted)  
@@ -996,7 +1034,7 @@ try{
 
 
 {privateAccount && !follow && ( 
-      <div className='posts'>  
+      <div className='posts' key={ generateKey({uid})}>  
       <div style={{width:'100%',marginTop:'7%', textAlign:'center', color:'#666'}}>
        Follow {name} to see their posts.
       </div>

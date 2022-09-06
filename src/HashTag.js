@@ -36,6 +36,28 @@ const  HashTag=()=> {
     const[restricted, SetRestricted]= useState(null);
 
     useEffect(() => {
+
+
+      const getPopularPosts=async ()=>{
+        const tag = '#' + hash;
+        const docRef = collection(db, `hashtags/${tag}/posts`)
+        const q = query(docRef, orderBy("likes","desc"));
+        const docSnap = await getDocs(q);
+        if(docSnap.size>0){
+            setPosts(docSnap.docs.map((doc)=>({...doc.data(), id: doc.id})));
+            let mymap = docSnap.docs.map((doc)=>({...doc.data(), id: doc.id}))
+            let keys = [...mymap.values()]
+            SetCollectionSize(keys.length);
+            SetPostArray(keys);
+            SetLoading(false);
+        }
+        else{
+            setPosts("null");
+            SetLoading(false);
+        }
+       
+    }
+
         const getHashVal=async()=>{
 
         const tag = '#' + hash;
@@ -114,7 +136,12 @@ const  HashTag=()=> {
         getStatus();
         getPopularPosts();
         getHashVal();
-    }, [])
+    }, [hash])
+
+    
+    const generateKey = (pre) => {
+      return `${ pre }_${ new Date().getTime() }`;
+  }
 
     const getPopularPosts=async ()=>{
         const tag = '#' + hash;
@@ -278,9 +305,9 @@ return(<div className='HashTag'>
     <div className={`recent ${recent?"underlined":""}`}  onClick={handleButtonRecent}>Recent</div> 
     
       </div>
-    <div className='posts'>
-        
-{popular && posts!=="null" && posts!==null && !loading &&(
+    
+    <div className='posts' key={ generateKey(hash)}>    
+    {popular && posts!=="null" && posts!==null && !loading &&(
        posts.map((post)=>
         {if ((blocked!==null) && (!(blocked.includes(post.authorId))&&!(muted.includes(post.authorId))))
           return <div className="indGrid"  onClick={()=>{handleButtonPopularClicked(post.postId)}}>

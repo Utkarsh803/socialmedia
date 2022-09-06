@@ -54,6 +54,13 @@ function MyProfile() {
     const[followerList, SetFollowerList]=useState(null);
     const[followingList, SetFollowingList]=useState(null);
 
+    let followerB = useRef()
+    let followingB = useRef()
+    let optionB = useRef()
+    let followerT = useRef()
+    let followingT = useRef()
+    let optionT = useRef()
+
     const docRef = doc(db, "users", auth.currentUser.uid);
     let navigate = useNavigate(); 
     const myRef = useRef(null)
@@ -79,6 +86,25 @@ function MyProfile() {
 
     const typeString = "follow"
     useEffect(()=>{
+
+      
+      let handler = (event)=>{
+        if(followerT.current && !followerT.current.contains(event.target) || followerT.current && followerB.current.contains(event.target) ){
+        SetShowFollowers(false);}else if (!followerT.current && followerB.current.contains(event.target)){
+          SetShowFollowers(true)
+        }
+      }
+
+      let handler2 = (event)=>{
+        if(followingT.current && !followingT.current.contains(event.target) || followingT.current && followingB.current.contains(event.target) ){
+        SetShowFollowing(false);}else if (!followingT.current && followingB.current.contains(event.target)){
+          SetShowFollowing(true)
+        }
+      }
+
+      document.addEventListener("mousedown", handler);
+      document.addEventListener("mousedown", handler2);
+      
 
         const getUsersData = async () => {
           const docSnap = await getDoc(docRef);
@@ -141,6 +167,12 @@ function MyProfile() {
       }
       getUsersData();
       getUserPost();
+
+      return()=>{
+        document.removeEventListener("mousedown", handler)
+        document.removeEventListener("mousedown", handler2)
+      }
+
     }, [index] );
 
   const logout = async () =>
@@ -250,12 +282,9 @@ if(index < collectionSize-1){
 
       const handleButtonShowFollowers=async()=>{
         try{
-          if(showFollowing===false){
+         
           await  getFollowersList();
-          SetShowFollowers(!showFollowers);}
-          else{
-            SetShowFollowers(!showFollowers);
-          }
+
           }
           catch(e){
             console.log(e.message)
@@ -264,12 +293,9 @@ if(index < collectionSize-1){
           }
         
           const handleButtonShowFollowing=async()=>{
-            if(showFollowing===false){
+         
             await getFollowingList();
-            SetShowFollowing(!showFollowing)}
-            else{
-              SetShowFollowing(!showFollowing)
-            }
+
           }
   
   
@@ -281,13 +307,13 @@ if(index < collectionSize-1){
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
 
     {showFollowing && followingList !== null && (
-    <div className='list'>
+    <div className='list'  ref={followingT}>
   {followingList.map((res)=>
      <List authorId={res.id} typ={typeString} ></List>)}
   </div>)}
   
   {showFollowers && followerList!==null && (
-      <div className='list'>
+      <div className='list'  ref={followerT}>
         {followerList.map((res)=>
   <div style={{width:'100%'}}>
      <List authorId={res.id} typ={typeString}></List>
@@ -327,11 +353,11 @@ if(index < collectionSize-1){
       <div className='number'>{numberOfPosts}</div>
       <div className='category'>Posts</div>
     </div>
-    <div className='column'style={{cursor:'pointer'}} onClick={()=>{handleButtonShowFollowers()}}>
+    <div className='column'style={{cursor:'pointer'}} ref={followerB} onClick={()=>{handleButtonShowFollowers()}}>
       <div className='number' >{numberOFollowers}</div>
       <div className='category'>Followers</div>
     </div>
-    <div className='column'  style={{cursor:'pointer'}}  onClick={()=>{handleButtonShowFollowing()}}>
+    <div className='column'  style={{cursor:'pointer'}}  ref={followingB} onClick={()=>{handleButtonShowFollowing()}}>
       <div className='number'>{numberOFollowing}</div>
       <div className='category'>Following</div>
     </div>

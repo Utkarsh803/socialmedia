@@ -18,12 +18,11 @@
     height:450px;
 }
 
-.Post span{
-    display: block;
-}
 
 .Post .caption{
     position:relative;
+    display: flex;
+    flex-direction: row;
     background-color: black;
     color: aliceblue;
     height:auto;
