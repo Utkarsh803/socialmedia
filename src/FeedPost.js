@@ -14,6 +14,7 @@ import Moment from 'react-moment';
 import createTree from './createTree';
 import { runTransaction } from "firebase/firestore";
 import * as ReactBootstrap from 'react-bootstrap'
+import { useNavigate } from "react-router-dom";
 //    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
 function FeedPost({postid,authorId}) {
 
@@ -34,7 +35,7 @@ function FeedPost({postid,authorId}) {
   const[loading, SetLoading]= useState(true);
   const[commentLoading, SetCommentLoading]= useState(false);
   //to get: name, captions, comments, likes, saves, url 
-
+  let navigate = useNavigate();
 
 useEffect(()=>{
 
@@ -282,6 +283,29 @@ catch(e)
 }
 }
 
+function goToHash(hash) {
+  const tag = hash.substring(1, hash.length); 
+  
+  navigate(`/hashTag/${tag}`);
+}
+
+function goToProfile(hash) {
+  const tag = hash.substring(1, hash.length); 
+  navigate(`/profile/${tag}`);
+}
+
+const CustomText = (props) => {
+  const text = props.text.split(/(\s+)/);
+  return <span >{text.map(text => {
+    if (text.startsWith('#')) {
+      return <span style={{ color: 'lightblue',cursor:'pointer'}} onClick={()=>{goToHash(text)}}>{text} </span>;
+    }
+    else if(text.startsWith('@')){
+      return <span style={{ color: 'lightblue',cursor:'pointer'}} onClick={()=>{goToProfile(text)}}>{text} </span>;
+    }
+    return `${text} `;
+  })}</span>;
+}
 
 
   return (<div className="FeedPost">
@@ -294,7 +318,7 @@ catch(e)
 
     <div className='caption'>
    <p  style={{height:'auto', width:'100%',flex:'1',wordBreak:'break-word'}}>
-   <span style={{fontWeight:'bold'}}> {name}</span>{' '}<span>{captions}</span>
+   <span style={{fontWeight:'bold'}}> {name}</span>{' '}<span><CustomText text={captions}></CustomText></span>
    </p>
   </div>
 

@@ -1004,7 +1004,7 @@ try{
       </div>
       
       )}  
- </div>)};
+ </div>)}
 
  {privateAccount && follow && ( 
       <div className='posts' key={ generateKey({uid})}>  
@@ -1030,7 +1030,7 @@ try{
       </div>
       
       )}  
- </div>)};
+ </div>)}
 
 
 {privateAccount && !follow && ( 
@@ -1038,7 +1038,7 @@ try{
       <div style={{width:'100%',marginTop:'7%', textAlign:'center', color:'#666'}}>
        Follow {name} to see their posts.
       </div>
- </div>)};
+ </div>)}
  
  
  
@@ -1056,7 +1056,7 @@ try{
     )}
  
     </nav>
-  </div>);
+  </div>)
 }
 
 export default  Profile;

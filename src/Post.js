@@ -1,6 +1,7 @@
 import './css/Post.css';
 
 import createTree from './createTree';
+import { useNavigate } from "react-router-dom";
 import PostHeader from './PostHeader';
 import {useState, useEffect } from "react";
 import {db, auth, storage} from './firebase-config';
@@ -27,6 +28,8 @@ function Post({postid, name, authorId, captions, comments, likes, saves, timeSta
   const[loading, SetLoading]= useState(true);
   const[commentLoading, SetCommentLoading]= useState(false);
   const cap = {name}+" "+{captions}
+
+let navigate = useNavigate();
   
 
   const incCommentNum=async()=>{
@@ -158,6 +161,25 @@ const addTotalPostComments=async()=>{
 }
 
 
+function goToProfile(hash) {
+  const tag = hash.substring(1, hash.length); 
+  navigate(`/profile/${tag}`);
+}
+
+
+const CustomText = (props) => {
+  const text = props.text.split(' ');
+  return <span >{text.map(text => {
+    if (text.startsWith('#')) {
+      return <span style={{ color: 'lightblue',cursor:'pointer'}} onClick={()=>{goToHash(text)}}>{text} </span>;
+    }
+    else if(text.startsWith('@')){
+      return <span style={{ color: 'lightblue',cursor:'pointer'}} onClick={()=>{goToProfile(text)}}>{text} </span>;
+    }
+    return `${text} `;
+  })}</span>;
+}
+
 
 const addToPostComments=async()=>{
   try{
@@ -234,6 +256,12 @@ const addToPostComments=async()=>{
   }
   }
 
+  function goToHash(hash) {
+    const tag = hash.substring(1, hash.length); 
+    
+    navigate(`/hashTag/${tag}`);
+  }
+
   return (<div className="Post">
     <nav>
     <div style={{display:'flex', flexDirection:'row', height:'78vh', maxWidth:'100%'}}>
@@ -248,7 +276,7 @@ const addToPostComments=async()=>{
 
     <div className='caption'>
    <p  style={{height:'auto', width:'100%',flex:'1',wordBreak:'break-word'}}>
-   <span style={{fontWeight:'bold'}}> {name}</span>{' '}<span>{captions}</span>
+   <span style={{fontWeight:'bold'}}> {name}</span>{' '}<span><CustomText text={captions}></CustomText></span>
    </p>
   </div>
 

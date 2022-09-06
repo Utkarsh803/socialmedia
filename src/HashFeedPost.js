@@ -9,6 +9,7 @@ import moment from 'react-moment'
 import {BiDotsVerticalRounded } from 'react-icons/bi';
 import Avatar from '@mui/material/Avatar';
 import Comment from './Comment';
+import { useNavigate } from "react-router-dom";
 import Moment from 'react-moment';
 import createTree from './createTree';
 import * as ReactBootstrap from 'react-bootstrap'
@@ -35,7 +36,7 @@ function HashFeedPost({postid,authorId}) {
   const[commentLoading, SetCommentLoading]= useState(false);
 
   //to get: name, captions, comments, likes, saves, url 
-
+  let navigate = useNavigate();
 
 useEffect(()=>{
 
@@ -73,6 +74,7 @@ useEffect(()=>{
       console.log("No such document!");
     }
 };
+
 
 const getCommentsStatus=async()=>{
   const docRef = doc(db, `users/${authorId}/posts/`, `${postid}`);
@@ -196,6 +198,12 @@ const getComments=async()=>{
 
 }
 
+function goToHash(hash) {
+  const tag = hash.substring(1, hash.length); 
+  
+  navigate(`/hashTag/${tag}`);
+}
+
 
 const incCommentNum=async()=>{
   const comRef = doc(db, `users/${authorId}/comments`, `${postid}`)
@@ -298,7 +306,25 @@ const addToPostComments=async()=>{
     SetCommentLoading(false);
   }
   }
+  
+function goToProfile(hash) {
+  const tag = hash.substring(1, hash.length); 
+  navigate(`/profile/${tag}`);
+}
 
+
+  const CustomText = (props) => {
+    const text = props.text.split(' ');
+    return <span >{text.map(text => {
+      if (text.startsWith('#')) {
+        return <span style={{ color: 'lightblue',cursor:'pointer'}} onClick={()=>{goToHash(text)}}>{text} </span>;
+      }
+      else if(text.startsWith('@')){
+        return <span style={{ color: 'lightblue',cursor:'pointer'}} onClick={()=>{goToProfile(text)}}>{text} </span>;
+      }
+      return `${text} `;
+    })}</span>;
+}
 
 
   return (<div className="HashFeedPost">
@@ -313,9 +339,9 @@ const addToPostComments=async()=>{
     <div style={{width:'50%', paddingLeft:'2%', height:'70vh'}}>
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={currentPicUrl}></PostTools>
  
-  <div className='caption'>
+  <div className='caption' >
    <p  style={{height:'auto', width:'100%',flex:'1',wordBreak:'break-word'}}>
-   <span style={{fontWeight:'bold'}}> {name}</span>{' '}<span>{captions}</span>
+   <span style={{fontWeight:'bold'}}> {name}</span>{' '}<span ><CustomText text={captions}></CustomText></span>
    </p>
   </div>
 

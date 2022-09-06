@@ -515,10 +515,13 @@ catch(error)
 
    const createPost = async() =>{
     var hashtagArray = caption.match(/#[\p{L}]+/ugi);
-
+    var mentionArray = caption.match(/@[\p{L}]+/ugi);
     var privat = await getPrivate();
     if(hashtagArray === null){
       hashtagArray=0;
+    };
+    if(mentionArray === null){
+      mentionArray=0;
     };
     const imageName = imageFile.name + v4();
     try
@@ -565,6 +568,7 @@ catch(error)
         deleted:false,
         edited:false,
         tags:hashtagArray,
+        mentions:mentionArray,
         timeStamp:Timestamp.fromDate(new Date()),
         });       
 
@@ -685,6 +689,10 @@ catch(error)
         
         const newfield1 = {posts: postsNum + 1};
         transaction.update(followingdocRef,newfield1);
+
+        for (const mention of mentionArray){
+
+        } 
      
         })
         SetNumPosts(numPosts+1);
