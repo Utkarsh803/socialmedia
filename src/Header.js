@@ -689,10 +689,6 @@ catch(error)
         
         const newfield1 = {posts: postsNum + 1};
         transaction.update(followingdocRef,newfield1);
-
-        for (const mention of mentionArray){
-
-        } 
      
         })
         SetNumPosts(numPosts+1);
