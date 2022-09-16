@@ -12,6 +12,7 @@ import Comment from './Comment';
 import Moment from 'react-moment';
 import createTree from './createTree';
 import * as ReactBootstrap from 'react-bootstrap'
+import ReactPlayer from "react-player";
 
 function Grid({postid,authorId}) {
 
@@ -73,10 +74,14 @@ getUserPost();
 }, [] );
 
 return (<div style={{width:'100%', height:'100%'}}>
-  {!loading ?
-  (<img src={postUrl} style={{width:'100%', height:'100%', backgroundColor:'#666', marginBottom:"-1.7%"}}/>):
-  
-  (<ReactBootstrap.Spinner animation="border" style={{marginTop:'45%', marginLeft:'48%'}}/>)}
+{!loading && !(url.split(".").pop()).startsWith("mp4") && <img src={postUrl} style={{width:'100%', height:'100%', backgroundColor:'#666', marginBottom:"-1.7%"}}/>}
+
+{!loading && (url.split(".").pop()).startsWith("mp4") && 
+<ReactPlayer url={postUrl} width="100%" height="55vh" controls={false} autoPlay={false}/>
+}
+
+{loading && <ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>}
+
   
   </div>);
 

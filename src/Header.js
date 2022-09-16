@@ -24,6 +24,7 @@ import { MdCancel } from 'react-icons/md';
 import { FaCrop } from 'react-icons/fa';
 import getCroppedImg from './crop/utils/CropImage.js';
 import * as ReactBootstrap from 'react-bootstrap'
+import ReactPlayer from "react-player";
 
 
 
@@ -34,10 +35,12 @@ function Header() {
   const[profileMenu, SetProfileMenu]=useState(false);
   const[addPost, SetAddPost]=useState(false);
   const[upload, SetUpload]=useState(false);
+  const[imageFile, SetImageFile]=useState(null);
   const[image, SetImage]=useState(null);
+  const[videoFile, SetVideoFile]=useState(null);
+  const[video, SetVideo]=useState(null);
   const[next, SetNext]=useState(false);
   const[caption, SetCaption]=useState(null);
-  const[imageFile, SetImageFile]=useState(null);
   const[percent, SetPercent]=useState(0);
   const[postID, SetPostID]=useState(null);
   const[url, SetUrl]=useState(null);
@@ -58,6 +61,9 @@ function Header() {
   const[muted, SetMuted]= useState([]);
   const[restricted, SetRestricted]= useState([]);
   const[newNotifs, SetNewNotifs]= useState(false);
+
+  const MAX_IMAGE_SIZE = 3072 // 5MB
+  const MAX_VIDEO_SIZE =10240// 5MB
 
 
 
@@ -288,12 +294,13 @@ function Header() {
 
   const addToStorage = async(imgName) =>{
 
-  if (imageFile == null) {
+  if (imageFile == null && videoFile==null) {
       window.alert("Please choose a file first!");
       return;
   }
 
   try{
+  if(imageFile){ 
   const storageRef = ref(storage, `/${auth.currentUser.uid}/${imgName}`);
   SetUrl(imgName);
   const uploadTask = uploadBytesResumable(storageRef, imageFile);
@@ -317,6 +324,32 @@ function Header() {
     }
 ); 
 
+  }
+  else if(videoFile){
+    const storageRef = ref(storage, `/${auth.currentUser.uid}/${imgName}`);
+    SetUrl(imgName);
+    const uploadTask = uploadBytesResumable(storageRef, videoFile);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+          const percent = Math.round(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+  
+          // update progress
+          SetPercent(percent);
+      },
+      (err) => console.log(err),
+      () => {
+          // download url
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+           
+          });
+      }
+  ); 
+
+  }
 }
 
 catch(error){
@@ -396,6 +429,8 @@ catch(error)
   function handleButtonUploadImage() {
     SetImage(null);
     SetImageFile(null);
+    SetVideo(null);
+    SetVideoFile(null);
     SetAddPost(false);
     SetUpload(!upload);
     SetNext(false);
@@ -405,6 +440,8 @@ catch(error)
   function handleButtonClose() {
     SetImage(null);
     SetImageFile(null);
+    SetVideoFile(null);
+    SetVideo(null);
     SetAddPost(false);
     SetUpload(false);
     SetNext(false);
@@ -455,12 +492,7 @@ catch(error)
   const handleButtonNext = async() => {
     setLoading(true);
     getStatus();
-
-    if(imageFile.width==imageFile.height){
     await createPost();
-  }else{
-    console.log("File resolution not supported")
-  }
     SetImage(null);
     SetImageFile(null);
     SetPercent(0);
@@ -479,12 +511,15 @@ catch(error)
 
   const onImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
+      if((event.target.files[0].name).split(".").pop()==="jpg"||(event.target.files[0].name).split(".").pop()==="png"){
       SetImage(URL.createObjectURL(event.target.files[0]));
       SetImageFile(event.target.files[0]);
-     
-
     }
-   }
+    else if((event.target.files[0].name).split(".").pop()==="mp4"){
+      SetVideo(URL.createObjectURL(event.target.files[0]));
+      SetVideoFile(event.target.files[0]);}
+    }
+    }
 
   const addToFeed=async(postid)=>{
     try {
@@ -514,16 +549,23 @@ catch(error)
 
 
    const createPost = async() =>{
+    if(imageFile && ((imageFile.size/1024) === MAX_IMAGE_SIZE)){
+      window.alert("Sorry only images upto 3MB in size can be uploaded.")
+      return;
+    }
+    else if(videoFile && ((videoFile.size/1024) === MAX_VIDEO_SIZE)){
+      window.alert("Sorry only videos upto 10MB in size can be uploaded.")
+      return;
+    }
+
     var hashtagArray = caption.match(/#[\p{L}]+/ugi);
-    var mentionArray = caption.match(/@[\p{L}]+/ugi);
+   
     var privat = await getPrivate();
     if(hashtagArray === null){
       hashtagArray=0;
     };
-    if(mentionArray === null){
-      mentionArray=0;
-    };
-    const imageName = imageFile.name + v4();
+
+    
     try
     {
     await runTransaction(db, async (transaction) => { 
@@ -549,10 +591,17 @@ catch(error)
         arr.push({hashVal:hashVal, hashRef:hashRef, hash:hash});
       }}
 
-   
+      var videoName = null;
+      var imageName = null;
 
+      if(videoFile){
+        videoName = videoFile.name + v4();
+        await addToStorage(videoName);
+      }
+      else{
+        imageName = imageFile.name + v4();
        await addToStorage(imageName);
-     
+      }
        const usersCollectionRef = doc(collection(db, `/users/${auth.currentUser.uid}/posts`));
        
        const addedDoc =  transaction.set(usersCollectionRef, {
@@ -560,7 +609,7 @@ catch(error)
         likes:0,
         comments:0,
         caption:caption,
-        url:imageName,
+        url:imageName || videoName,
         reported:0,
         saved:0,
         allowComments:true,
@@ -568,7 +617,6 @@ catch(error)
         deleted:false,
         edited:false,
         tags:hashtagArray,
-        mentions:mentionArray,
         timeStamp:Timestamp.fromDate(new Date()),
         });       
 
@@ -848,6 +896,12 @@ catch(error)
     navigate("/saved-posts");
    }
 
+   const openCaption=()=>{
+    SetUpload(false);
+    SetNext(true);
+   }
+
+
    const goToHelpCenter=()=>{
     navigate("/help");
    }
@@ -898,13 +952,13 @@ catch(error)
     </div>
     {addPost && (
     <div class="middletray" ref={addPostRef}>
-        <button className='addMedia' onClick={handleButtonUploadImage}> <BiImageAdd className='selectionIcon' />  Add Image</button>
-        <button className='addMedia' disabled={true}><AiOutlineVideoCameraAdd className='selectionIcon' /> Add Video (Coming Soon)</button>
+        <button className='addMedia' onClick={handleButtonUploadImage}> <BiImageAdd className='selectionIcon' />  Add Media</button>
+
     </div>
   )}
 
   {upload && (   
- <div class={`uploadtray ${!image && `low`}`} ref={uploadRef}>
+ <div class={`uploadtray ${!image && !video &&  `low`}`} ref={uploadRef}>
   <AiOutlineCloseCircle onClick={handleButtonUploadImage} className="closeButton"></AiOutlineCloseCircle>
 
  
@@ -980,6 +1034,41 @@ catch(error)
      </DialogActions>
      </div>
 )}
+
+{video &&(
+  <div>
+     <div 
+     style={{
+         position:"relative",
+         height:250,
+         width:"auto",
+         minWidth: {sn:500},
+         backgroundColor:"black",
+         color:'white',
+       }}
+     >  
+    <ReactPlayer url={video} width="90%" height="80%" controls={true} autoPlay={true} style={{ marginLeft:'5%'}}/>
+     </div>
+     <DialogActions sx={{flexDirection:'column', mx:3,my:2}}>
+            {!loading ?(
+             <button
+             style={{width:'100%'}}
+             onClick={()=>{openCaption()}}
+             disabled={loading}
+             >
+                Next
+             </button>):(
+              <button
+              style={{width:'100%'}}
+              >
+{<ReactBootstrap.Spinner animation="border" size="sm"/>}{' '}Loading.....
+              </button>
+             )}
+       
+     </DialogActions>
+     </div>
+)}
+
 
 </div>
   )}

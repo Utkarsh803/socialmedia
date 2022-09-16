@@ -15,6 +15,7 @@ import createTree from './createTree';
 import { runTransaction } from "firebase/firestore";
 import * as ReactBootstrap from 'react-bootstrap'
 import { useNavigate } from "react-router-dom";
+import ReactPlayer from "react-player";
 //    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
 function FeedPost({postid,authorId}) {
 
@@ -311,9 +312,15 @@ const CustomText = (props) => {
   return (<div className="FeedPost">
     <nav>
     <PostHeader name = {name} url={currentPicUrl} postid={postid} authorId={authorId} typ={"vertical"}></PostHeader>
-    {!loading ?
-  (<img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />):
-  (<ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>)}
+   
+    {!loading && !(url.split(".").pop()).startsWith("mp4") && <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />}
+
+    {!loading && (url.split(".").pop()).startsWith("mp4") && 
+    <ReactPlayer url={postUrl} width="100%" height="70vh" controls={true} autoPlay={true}/>
+    }
+
+    {loading && <ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>}
+
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={currentPicUrl}></PostTools>
 
     <div className='caption'>

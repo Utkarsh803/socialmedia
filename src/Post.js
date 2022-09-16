@@ -15,6 +15,7 @@ import Comment from './Comment';
 import Moment from 'react-moment';
 import { runTransaction } from "firebase/firestore";
 import * as ReactBootstrap from 'react-bootstrap'
+import ReactPlayer from "react-player";
 
 //    <div style={{backgroundColor:'black', color:'white', paddingTop:'3%', paddingLeft:'2%', textAlign:'left', fontStyle:'normal'}}>Liked by Utkarsh and others</div>
 function Post({postid, name, authorId, captions, comments, likes, saves, timeStamp, url, profilePic, allowComments}) {
@@ -267,10 +268,17 @@ const addToPostComments=async()=>{
     <div style={{display:'flex', flexDirection:'row', height:'78vh', maxWidth:'100%'}}>
     <div style={{width:'50%', height:'90%'}}>
     <PostHeader name = {name} url={profilePic} postid={postid} authorId={authorId} typ="horizontal"></PostHeader>
-    {!loading ?
-  (<img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />):
-  (<ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>)}
+
+    {!loading && !(url.split(".").pop()).startsWith("mp4") && <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />}
+
+    {!loading && (url.split(".").pop()).startsWith("mp4") && 
+    <ReactPlayer url={postUrl} width="100%" height="100%" controls={true} autoPlay={true}/>
+    }
+
+    {loading && <ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>}
     </div>
+    
+    
     <div style={{width:'50%', paddingLeft:'2%', height:'auto', maxWidth:'40%', overflow:'scroll'}}>
     <PostTools postid={postid} authorId={authorId} likes={likes} saves={saves} profilePic={profilePic}></PostTools>
 
