@@ -41,10 +41,10 @@ const getUserPost =async()=>{
   const postsCollectionRef = doc(db, `users/${authorId}/posts`, `${postid}`);
   const docSnap = await getDoc(postsCollectionRef);
   {
+    SetUrl(docSnap.data().url);
     getDownloadURL(ref(storage, `${authorId}/${docSnap.data().url}`))
     .then((url) => {
       SetPostUrl(url);
-   
       SetLoading(false);
     })
     .catch((error) => {

@@ -315,7 +315,7 @@ function goToProfile(hash) {
 
 
   const CustomText = (props) => {
-    const text = props.text.split(' ');
+    const text = props.text.split(/(\s+)/);
     return <span >{text.map(text => {
       if (text.startsWith('#')) {
         return <span style={{ color: 'lightblue',cursor:'pointer'}} onClick={()=>{goToHash(text)}}>{text} </span>;
