@@ -77,7 +77,11 @@ return (<div style={{width:'100%', height:'100%'}}>
 {!loading && !(url.split(".").pop()).startsWith("mp4") && <img src={postUrl} style={{width:'100%', height:'100%', backgroundColor:'#666', marginBottom:"-1.7%"}}/>}
 
 {!loading && (url.split(".").pop()).startsWith("mp4") && 
-<ReactPlayer url={postUrl} width="100%" height="55vh" controls={false} autoPlay={false}/>
+<ReactPlayer url={postUrl} config={{ file: { 
+    attributes: {
+      controlsList: 'nodownload'
+    }
+  }}} width="100%" height="55vh" controls={false} autoPlay={false}/>
 }
 
 {loading && <ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>}

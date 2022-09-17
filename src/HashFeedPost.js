@@ -336,7 +336,11 @@ function goToProfile(hash) {
       {!loading && !(url.split(".").pop()).startsWith("mp4") && <img  style={{backgroundColor:'black', marginBottom:'-2%'}} src={postUrl} className="media" />}
 
       {!loading && (url.split(".").pop()).startsWith("mp4") && 
-      <ReactPlayer url={postUrl} width="100%" height="70vh" controls={true} autoPlay={true}/>
+      <ReactPlayer url={postUrl} config={{ file: { 
+        attributes: {
+          controlsList: 'nodownload'
+        }
+      }}} width="100%" height="70vh" controls={true} autoPlay={true}/>
       }
 
       {loading && <ReactBootstrap.Spinner animation="border" style={{marginTop:'30%', marginLeft:'48%', marginBottom:'30%'}}/>}
