@@ -1,7 +1,7 @@
 import './css/Home.css';
 import Header from'./Header.js';
 import Post from'./Post.js';
-
+import {BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill} from 'react-icons/bs';
 import FeedPost from './FeedPost';
 import SidePanel from './SidePanel';
 import {useState, useEffect } from "react";
@@ -10,7 +10,7 @@ import {collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, orderBy,
 import {signOut, onAuthStateChanged} from "firebase/auth";
 import { Link } from "react-router-dom";
 import * as ReactBootstrap from 'react-bootstrap'
-
+import Avatar from '@mui/material/Avatar';
 
 
 
@@ -148,6 +148,78 @@ function Home() {
     <Header handleLogout={logout} name={auth.currentUser.email}></Header>
     
     <div style={{display:'flex', flexDirection:'row', paddingTop:'100px'}}>
+    <div style={{display:'flex', flexDirection:'column', width:'100%'}}>
+    
+    
+    <div className='storiesContainer'>
+    
+    <div className='storiesNavL'>
+    <BsFillArrowLeftCircleFill style={{width:'20px', height:'20px'}}/>
+    </div>
+
+    <div className='storiesSlate'>
+    
+    <div style={{display:'flex', flexDirection:'column', textAlign:'center', marginRight:'5%'}}>
+    <Avatar style={{width:'90px',height:'90px'}}/>
+    <div >Utkarsh</div>
+    </div>
+
+    <div style={{display:'flex', flexDirection:'column', textAlign:'center', marginRight:'5%'}}>
+    <Avatar style={{width:'90px',height:'90px'}}/>
+    <div >Utkarsh</div>
+    </div>
+
+
+    <div style={{display:'flex', flexDirection:'column', textAlign:'center', marginRight:'5%'}}>
+    <Avatar style={{width:'90px',height:'90px'}}/>
+    <div >Utkarsh</div>
+    </div>
+
+
+    <div style={{display:'flex', flexDirection:'column', textAlign:'center', marginRight:'5%'}}>
+    <Avatar style={{width:'90px',height:'90px'}}/>
+    <div >Utkarsh</div>
+    </div>
+
+    <div style={{display:'flex', flexDirection:'column', textAlign:'center', marginRight:'5%'}}>
+    <Avatar style={{width:'90px',height:'90px'}}/>
+    <div >Utkarsh</div>
+    </div>
+
+    <div style={{display:'flex', flexDirection:'column', textAlign:'center', marginRight:'5%'}}>
+    <Avatar style={{width:'90px',height:'90px'}}/>
+    <div >Utkarsh</div>
+    </div>
+
+    <div style={{display:'flex', flexDirection:'column', textAlign:'center', marginRight:'5%'}}>
+    <Avatar style={{width:'90px',height:'90px'}}/>
+    <div >Utkarsh</div>
+    </div>
+
+    <div style={{display:'flex', flexDirection:'column', textAlign:'center', marginRight:'5%'}}>
+    <Avatar style={{width:'90px',height:'90px'}}/>
+    <div >Utkarsh</div>
+    </div>
+
+    <div style={{display:'flex', flexDirection:'column', textAlign:'center', marginRight:'5%'}}>
+    <Avatar style={{width:'90px',height:'90px'}}/>
+    <div >Utkarsh</div>
+    </div>
+
+
+   
+
+  
+    
+
+    </div>
+
+    <div className='storiesNavR'>
+    <BsFillArrowRightCircleFill style={{width:'20px', height:'20px'}}/>
+    </div>
+
+    </div>
+
     <div className='secondTray'>
     <div className='posts'> 
 
@@ -178,7 +250,7 @@ function Home() {
 
     </div>
     </div>
- 
+    </div>
  
 
 

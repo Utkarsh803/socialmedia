@@ -392,7 +392,19 @@ if(index < collectionSize-1){
       <div className='posts'>  
       {posts !== null && focusImages && grid && !loading && posts !== "null" &&
       (posts.map((post)=>
-    { if((!post.deleted))
+    { if((!post.deleted) && !((post.url.split(".").pop()).startsWith("mp4")))
+      return <div id={post.url} className="indGrid" onClick={()=>{handleButtonSetGrid(post.id)}}>
+       {!(post.deleted) && (
+      <GridImg name={name} captions={post.caption} url={post.url} authorId={post.authorID}></GridImg>
+       )}
+      </div>
+    }
+    )
+  )}  
+
+{posts !== null && focusVideos && grid && !loading && posts !== "null" &&
+      (posts.map((post)=>
+    { if((!post.deleted) && ((post.url.split(".").pop()).startsWith("mp4")))
       return <div id={post.url} className="indGrid" onClick={()=>{handleButtonSetGrid(post.id)}}>
        {!(post.deleted) && (
       <GridImg name={name} captions={post.caption} url={post.url} authorId={post.authorID}></GridImg>
