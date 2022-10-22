@@ -7,7 +7,7 @@ import { collection, query, where, onSnapshot, getDoc,getDocs, snapshotEqual,add
 import User from './User.js'
 import Avatar from '@mui/material/Avatar';
 import {BiDotsVerticalRounded } from 'react-icons/bi';
-import {AiOutlineUpload} from 'react-icons/ai';
+import {AiOutlineUpload, AiOutlineSearch} from 'react-icons/ai';
 import {ref ,getStorage,  uploadBytesResumable, getDownloadURL, uploadBytes } from "firebase/storage"
 import MessageForm from './MessageForm.js'
 import { async } from '@firebase/util'
@@ -33,6 +33,8 @@ const Chats=()=>{
     const[muted, SetMuted]= useState(null);
     const[restricted, SetRestricted]= useState(null);
     const[loading, SetLoading]=useState(true);
+    const[searching, SetSearching]=useState(false);
+    const [youMayKnow, SetYouMayKnow]= useState([]);
 
 
     useEffect(()=>{
@@ -41,18 +43,30 @@ const Chats=()=>{
         const myRef = doc(db, "users", `${auth.currentUser.uid}`);
         const data = await getDoc(myRef);
 
-        const userRef = collection(db, "users");
-        const q = query(userRef, where('username', 'not-in', [data.data().username]));
-        const unsub = onSnapshot(q, querySnapshot =>{
-            let users = []
+        const userRef = collection(db, `users/${auth.currentUser.uid}/followingList`);
+        const q = query(userRef);
+        let users = []
+        onSnapshot(q, querySnapshot =>{
             querySnapshot.forEach(doc=>{
                 users.push(doc.id)
               
             })
+         //   SetUsers(users);
+        })
+
+        const userRef2 = collection(db, `users/${auth.currentUser.uid}/followerList`);
+        const q2 = query(userRef2);
+        onSnapshot(q2, querySnapshot =>{
+            querySnapshot.forEach(doc=>{
+              if(!users.includes(doc.id)){
+                users.push(doc.id)}
+              
+            })
             SetUsers(users);
         })
+        
         SetLoading(false);
-        return () => unsub();
+        
         }
 
         
@@ -123,7 +137,71 @@ const Chats=()=>{
         getUsers();
     }, [])
 
+    const getUsers=async()=>{
+      const myRef = doc(db, "users", `${auth.currentUser.uid}`);
+      const data = await getDoc(myRef);
+
+      const userRef = collection(db, `users/${auth.currentUser.uid}/followingList`);
+      const q = query(userRef);
+      let users = []
+      onSnapshot(q, querySnapshot =>{
+          querySnapshot.forEach(doc=>{
+            if(!users.includes(doc.id)){
+              users.push(doc.id)}
+          })
+       //   SetUsers(users);
+      })
+
+      const userRef2 = collection(db, `users/${auth.currentUser.uid}/followerList`);
+      const q2 = query(userRef2);
+      onSnapshot(q2, querySnapshot =>{
+          querySnapshot.forEach(doc=>{
+            if(!users.includes(doc.id)){
+              users.push(doc.id)}
+            
+          })
+          SetUsers(users);
+      })
+      
+      SetLoading(false);
+      
+      }
    
+    const showResults=async(val)=>{
+      SetSearching(true);
+      if(val===""){
+        SetUsers([])
+        SetYouMayKnow([])
+        SetSearching(false);
+        await getUsers();
+      }
+      else{
+        let copyUsers=[...users]
+        SetUsers([])
+        SetYouMayKnow([])
+        const userRef2 = collection(db, `users`);
+        const q2 = query(userRef2,where("username", ">=", `${val}`) , where("username", "<=", `${val + "~"}`));
+       
+        onSnapshot(q2, querySnapshot =>{
+          let users=[]
+          let unkownUsers=[]
+            querySnapshot.forEach(doc=>{
+              if(copyUsers.includes(doc.id)){
+                users.push(doc.id)}
+                else{
+                  if(unkownUsers.length<4){
+                  unkownUsers.push(doc.id);
+                }
+                }
+                
+              })
+            SetUsers(users);
+            SetYouMayKnow(unkownUsers);
+        })
+        
+        SetLoading(false);
+      }
+    }
 
     const selectUser=async(user)=>{
         SetPicUrl(null);
@@ -228,8 +306,15 @@ const Chats=()=>{
     <Header></Header>
     <div style={{display:'flex', flexDirection:'row', width:'100%',  border:'1px solid grey', paddingTop:'100px',minHeight:'100vh'}}>
     <div style={{width:'30%', border:'1px solid grey', overflow:'scroll'}}>
+    <div style={{padding:'2%'}}>
+    
+    <AiOutlineSearch style={{width:'20', height:'20'}}></AiOutlineSearch>
+    
+    <input placeholder='search for people and rooms' style={{width:'90%', padding:'2%', backgroundColor:'#555', borderRadius:'5px', outline:'none', border:'none', color:'white', cursor:'pointer', marginLeft:'2%'}} onChange={(event)=>showResults(event.target.value)}></input>
+    </div>
     {!loading &&(
     <div className='chatDrawer'>
+      {searching && users.length>0 && <div style={{height:'fit-content', marginLeft:'15px'}}>Your connections:</div>}
         
         {users.map((user) => 
 
@@ -237,6 +322,15 @@ const Chats=()=>{
         return <User user={user} selectUser={selectUser} user1={auth.currentUser.uid} chat={chat}/>
         }
         )}
+
+      {searching && youMayKnow.length>0 && <div style={{height:'fit-content', marginLeft:'15px'}}>Others users on Lyfy:</div>}
+
+      {youMayKnow.map((user) => 
+      {if(blocked!==null && !blocked.includes(user))
+      return <User user={user} selectUser={selectUser} user1={auth.currentUser.uid} chat={chat}/>
+      }
+      )}
+
     
     </div>)}
     {loading && (
