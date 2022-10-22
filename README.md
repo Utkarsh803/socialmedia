@@ -7,9 +7,15 @@ With a beautiful interface and important features Lyfy (spelled Liffey) is an ap
 
 # Latest Updates
 
+## Post Videos
 Now users can share videos in their posts.
 
 ![video](photos/video.JPG)
+
+## Serach for users in Chats 
+Users can search for connections on chat page. They will also be able to see upto 3 non-connections with similar/same name.
+
+![update](photos/update1.JPG)
 
 # Features
 
