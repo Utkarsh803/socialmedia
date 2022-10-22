@@ -511,11 +511,11 @@ catch(error)
 
   const onImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
-      if((event.target.files[0].name).split(".").pop()==="jpg"||(event.target.files[0].name).split(".").pop()==="png"){
+      if((event.target.files[0].name).split(".").pop()==="jpg"||(event.target.files[0].name).split(".").pop()==="png"||(event.target.files[0].name).split(".").pop()==="JPG"||(event.target.files[0].name).split(".").pop()==="PNG"){
       SetImage(URL.createObjectURL(event.target.files[0]));
       SetImageFile(event.target.files[0]);
     }
-    else if((event.target.files[0].name).split(".").pop()==="mp4"){
+    else if((event.target.files[0].name).split(".").pop()==="mp4"||(event.target.files[0].name).split(".").pop()==="MP4"){
       SetVideo(URL.createObjectURL(event.target.files[0]));
       SetVideoFile(event.target.files[0]);}
     }
